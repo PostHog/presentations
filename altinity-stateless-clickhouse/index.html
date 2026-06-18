@@ -52,7 +52,7 @@
             <section class="section-divider" data-background-color="#151515" data-theme-section>
                 <span class="section-num">01</span>
                 <h2 style="color:#eeefe9">The pipeline that stopped scaling</h2>
-                <p class="lead" style="color:#b6b7b0">Kafka engine tables, living on the data nodes.</p>
+                <p class="lead" style="color:#b6b7b0">Kafka table engines, living on the data nodes.</p>
                 <img class="hog" src="img/hogs/lost-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
                 <aside class="notes">The classic ClickHouse + Kafka recipe — and where it breaks.</aside>
             </section>
@@ -69,10 +69,10 @@
                             <div class="node-sub">kafka_events → events_mv → sharded_events</div></div>
                     </div>
                 </div>
-                <p class="small muted" style="margin-top:0.6em">Kafka engine table is a consumer. A materialized view fires on each inserted block and writes into the real MergeTree table. Elegant — pull-based, resilient to spikes, no external writer.</p>
+                <p class="small muted" style="margin-top:0.6em">Kafka table engine is a consumer. A materialized view fires on each inserted block and writes into the real MergeTree table. Elegant — pull-based, resilient to spikes, no external writer.</p>
                 <aside class="notes">
                     This is what every CH-on-Kafka tutorial shows, and it's genuinely good:
-                    Kafka engine table consumes, MV transforms + routes, MergeTree stores. It buys
+                    Kafka table engine consumes, MV transforms + routes, MergeTree stores. It buys
                     you backpressure for free. We ran it for years.
                 </aside>
             </section>
@@ -169,13 +169,13 @@ go 1.20
                 <div class="cols center">
                     <div class="node ingest" style="flex:1.2">
                         <div class="node-title">Stateless CH node</div>
-                        <div class="node-sub">Kafka engine table</div>
+                        <div class="node-sub">Kafka table engine</div>
                         <div class="node-sub">+ materialized view</div>
                         <div class="node-sub">+ Distributed table</div>
                         <div class="node-sub" style="color:var(--ph-accent)">no MergeTree · no data</div>
                     </div>
                     <div class="stack">
-                        <p class="small">Consume from Kafka? <strong>Kafka engine table.</strong></p>
+                        <p class="small">Consume from Kafka? <strong>Kafka table engine.</strong></p>
                         <p class="small">Transform + batch? <strong>Materialized view.</strong></p>
                         <p class="small">Route to the right shard and <code>INSERT</code>? <strong>Distributed engine.</strong></p>
                         <p class="small muted">Every feature we'd have built into the inserter, ClickHouse already ships. So run those three objects on a node that stores <em>nothing</em>.</p>
@@ -224,7 +224,7 @@ go 1.20
                         <p class="pill ingest">INGESTION nodes (stateless)</p>
                         <div class="stack" style="margin-top:0.4em">
                             <div class="node ingest"><div class="node-title">② Writable Distributed table</div><div class="node-sub">routes INSERTs to the data table</div></div>
-                            <div class="node kafka"><div class="node-title">③ Kafka engine table</div><div class="node-sub">consumes the topic</div></div>
+                            <div class="node kafka"><div class="node-title">③ Kafka table engine</div><div class="node-sub">consumes the topic</div></div>
                             <div class="node ingest"><div class="node-title">④ Materialized view</div><div class="node-sub">Kafka table → writable table</div></div>
                         </div>
                     </div>
@@ -275,7 +275,7 @@ ENGINE = Distributed('posthog_single_shard', 'default', 'groups');</code></pre>
 
             <!-- 15 · SQL ③ kafka table -->
             <section>
-                <span class="kicker">③ Kafka engine table — on INGESTION nodes</span>
+                <span class="kicker">③ Kafka table engine — on INGESTION nodes</span>
                 <h3>The consumer</h3>
                 <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS kafka_groups
 (
@@ -299,7 +299,7 @@ TO writable_groups            -- ← writes into the Distributed table
 AS SELECT
     group_type_index, group_key, created_at, team_id, group_properties,
     _timestamp, _offset
-FROM kafka_groups;            -- ← reads from the Kafka engine table</code></pre>
+FROM kafka_groups;            -- ← reads from the Kafka table engine</code></pre>
                 <p class="small">Selecting from the Kafka table advances consumer offsets. The MV fires per block, transforms, and pushes into <code>writable_groups</code> → which forwards to the data nodes. <strong>That's the whole inserter.</strong></p>
                 <aside class="notes">
                     This MV is the entire "service". It's declarative, it lives in a migration, and
@@ -431,7 +431,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             <section>
                 <span class="kicker">One pattern, two jobs</span>
                 <h2>Same shape, different sink</h2>
-                <p class="small muted">Every stateless node is the same core — a <strong>Kafka engine table → materialized view</strong>, no MergeTree. The only thing that changes is <em>what the MV writes into</em>.</p>
+                <p class="small muted">Every stateless node is the same core — a <strong>Kafka table engine → materialized view</strong>, no MergeTree. The only thing that changes is <em>what the MV writes into</em>.</p>
                 <div class="cols" style="margin-top:0.5em">
                     <div class="card data">
                         <span class="pill data">Application A · ingestion</span>
@@ -460,7 +460,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
                     The crucial delineation: A and B are the *same* stateless-ClickHouse shape (Kafka engine
                     table + MV, no MergeTree). The only difference is the MV's target. Application A writes to a
                     Distributed table → rows land in ClickHouse storage (this replaced the inserter service).
-                    Application B writes to a Kafka engine table → rows go back onto a new, re-partitioned topic
+                    Application B writes to a Kafka table engine → rows go back onto a new, re-partitioned topic
                     for a different consumer entirely. Same hammer, two very different nails. ShuffleHog (next
                     slide) is application B.
                 </aside>
@@ -500,7 +500,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             <section>
                 <span class="kicker">A bonus the pattern unlocked</span>
                 <h2>Swapping Kafka under a live firehose</h2>
-                <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run <strong>two Kafka engine tables</strong> on the same topic — one per backend — both feeding the <em>same</em> writable table, with separate consumer groups.</p>
+                <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run <strong>two Kafka table engines</strong> on the same topic — one per backend — both feeding the <em>same</em> writable table, with separate consumer groups.</p>
                 <div class="pipe-row" style="justify-content:center; font-size:0.92em; margin:0.7em 0">
                     <div class="stack">
                         <div class="node kafka"><div class="node-title">kafka_groups</div><div class="node-sub">MSK</div></div>
@@ -530,7 +530,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             <section>
                 <span class="kicker">The tradeoff</span>
                 <h2>Sharp edges</h2>
-                <p class="small">The cost of this pattern is <strong>schema management</strong>. Every object — the data table, the Kafka engine table, the MV, the Distributed writable table — is schema we own and migrate, now across multiple node roles.</p>
+                <p class="small">The cost of this pattern is <strong>schema management</strong>. Every object — the data table, the Kafka table engine, the MV, the Distributed writable table — is schema we own and migrate, now across multiple node roles.</p>
                 <div class="cols">
                     <div class="card accent">
                         <p class="small">It's real engineering — but far simpler than building, scaling, and being on call for a stateful inserter service.</p>
