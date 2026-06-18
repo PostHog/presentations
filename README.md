@@ -32,7 +32,11 @@ Deck controls: arrows/space to navigate, **S** speaker notes, **F** fullscreen, 
 4. Add a card to the landing `index.html` and a row to the table above.
 5. Open a PR. GitHub Pages publishes from `main` on merge.
 
-Styling follows PostHog's brand: cream→cool gradient background, Open Runde (Inter fallback), borders-first with the signature hard drop shadow, sentence case, accent color points at one thing per slide. See an existing deck's `css/` for reusable component classes.
+### Styling
+
+Read [`PRESENTATION_GUIDELINES.md`](./PRESENTATION_GUIDELINES.md) first — it's the authoritative PostHog slide & presentation style guide (colors, typography, voice, do's and don'ts), with the app design tokens in [`system.md`](./system.md). It's the spec to follow when generating a new deck.
+
+In short: cream→cool gradient background (`#FFF1D5 → #DAE0EB`), Open Runde (Inter fallback), borders-first with the signature hard drop shadow, sentence case, accent color points at one thing per slide, 1280×720 canvas. See an existing deck's `css/` for reusable component classes that already implement this.
 
 ## License
 
