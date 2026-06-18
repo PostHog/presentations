@@ -49,7 +49,7 @@ No `TODO` cards remain.
 - **Slide 31 (results)** — ingestion scales independently from data/query tiers; dedicated query-tier resources → deterministic query performance.
 - **Slide 33 (closing)** — contact (@fuziontech), thanks to the ClickHouse team (Ted Kaemming & Dani Escribano), we're hiring.
 
-(33 slides total — three are meme breaks: "this is fine" (6), galaxy brain (8), Drake (12). A "same shape, different sink" contrast slide (26) sets up ShuffleHog.)
+(34 slides total — three are meme breaks: "this is fine" (6), galaxy brain (8), Drake (12). A "same shape, different sink" contrast slide sets up ShuffleHog; a tuning slide covers the painful Kafka-table-engine knobs (`kafka_num_consumers` / `kafka_thread_per_consumer`). All ClickHouse claims cross-checked against the engine docs.)
 
 ## Upgrade the font (optional)
 

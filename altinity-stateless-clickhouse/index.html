@@ -364,6 +364,30 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
                 <aside class="notes">The roles map to throughput tiers. SHUFFLEHOG is its own thing — next act.</aside>
             </section>
 
+            <!-- 19b · Tuning the Kafka table engine -->
+            <section>
+                <span class="kicker">The catch behind the tiers</span>
+                <h2>Tuning the Kafka table engine is the fiddly part</h2>
+                <pre><code data-trim data-noescape class="language-sql">ENGINE = Kafka(warpstream_ingestion,
+    kafka_topic_list = 'events', kafka_group_name = 'clickhouse',
+    kafka_format = 'JSONEachRow',
+    kafka_num_consumers       = 4,    -- ≤ topic partitions  AND  ≤ physical cores
+    kafka_thread_per_consumer = 1);   -- without this, all 4 squash onto ONE thread</code></pre>
+                <div class="cols">
+                    <div class="gotcha" style="flex:1"><span class="gotcha-label">The trap</span><br /><code>kafka_thread_per_consumer</code> defaults to <code>0</code> — rows from every consumer get squashed into a <strong>single block on one thread</strong>. So raising <code>kafka_num_consumers</code> alone buys you nothing; you only get independent, parallel flushes with it set to <code>1</code>.</div>
+                    <div class="card accent small" style="flex:1">Both are <strong>ENGINE settings in the DDL</strong>, capped by partition count and core count. Retuning means <strong>dropping and recreating</strong> the Kafka table — and getting it wrong is silent lag. This is the real lever behind small / medium / events.</div>
+                </div>
+                <aside class="notes">
+                    The throughput knobs are kafka_num_consumers and kafka_thread_per_consumer.
+                    The trap: thread_per_consumer defaults to 0, so consumers share one thread and their
+                    blocks are squashed — bumping num_consumers without setting thread_per_consumer=1 does
+                    nothing. And consumers can't exceed the topic's partition count or the node's physical
+                    cores. Because it's baked into the table ENGINE, retuning is a drop-and-recreate, and a
+                    bad value just quietly falls behind. That fiddliness is exactly why we split ingestion
+                    into small/medium/events tiers rather than one knob.
+                </aside>
+            </section>
+
             <!-- 20 · SECTION: IN PRODUCTION -->
             <section class="section-divider" data-background-color="#151515">
                 <span class="section-num">04</span>
