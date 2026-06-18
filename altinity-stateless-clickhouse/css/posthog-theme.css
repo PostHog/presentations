@@ -306,3 +306,8 @@ body.dark {
 
 /* Max the hedgehog — corner accents on bookend/divider slides only */
 .reveal .hog { position: absolute; bottom: 0; right: 12px; max-height: 240px; width: auto; pointer-events: none; z-index: 2; }
+
+/* QR code card — closing slide, points at the presentations site */
+.reveal .qr-card { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); text-align: center; z-index: 3; }
+.reveal .qr-card img { width: 210px; height: 210px; display: block; background: #fff; border: 1px solid var(--ph-border); border-radius: var(--r); box-shadow: 0 var(--ph-shadow) 0 var(--ph-border); padding: 10px; }
+.reveal .qr-card .qr-cap { font-family: var(--font-mono); font-size: 15px; color: var(--ph-text-secondary); margin-top: 12px; line-height: 1.35; }
