@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stateless ClickHouse for stream processing — PostHog @ Altinity OSA</title>
+
+    <link rel="stylesheet" href="vendor/reveal/dist/reset.css" />
+    <link rel="stylesheet" href="vendor/reveal/dist/reveal.css" />
+    <link rel="stylesheet" href="css/posthog-theme.css" />
+</head>
+<body>
+    <div class="deck-footer"><b>PostHog</b> &nbsp;·&nbsp; Altinity OSA meetup</div>
+
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- 1 · TITLE -->
+            <section class="title-slide" data-auto-animate>
+                <span class="kicker">PostHog · Altinity OSA meetup</span>
+                <h1>Stateless ClickHouse<br />for stream processing</h1>
+                <p class="lead">How we turned ClickHouse itself into our Kafka&nbsp;→&nbsp;CH inserter — and deleted the service we were about to build.</p>
+                <p class="small muted">James Greenhill &nbsp;·&nbsp; <span class="pill">no MergeTree required</span></p>
+                <img class="hog" src="img/hogs/explorer-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
+                <aside class="notes">
+                    Welcome. Tonight: a pattern we run in production to ingest a firehose of events
+                    into ClickHouse without an inserter service in the middle. The trick is that the
+                    inserter is just... ClickHouse.
+                </aside>
+            </section>
+
+            <!-- 2 · WHO / SCALE  (TODO: James) -->
+            <section>
+                <span class="kicker">Who's talking</span>
+                <h2>Me, and the firehose</h2>
+                <div class="cols center">
+                    <div class="stack">
+                        <p class="small"><strong>James Greenhill</strong> — Member of Token Burning Staff, PostHog.</p>
+                        <p class="small">PostHog = open-source product analytics, session replay, feature flags, data warehouse. All the analytical data lives in <strong>ClickHouse</strong>.</p>
+                    </div>
+                    <div class="stack">
+                        <div class="card accent">
+                            <div class="stat" style="color:var(--ph-accent)">trillions</div>
+                            <div class="stat-label">of events</div>
+                        </div>
+                    </div>
+                </div>
+                <aside class="notes">Set the stage: the volume is the whole reason this pattern exists. Token Burning Staff = the title says it all.</aside>
+            </section>
+
+            <!-- 3 · SECTION: THE PROBLEM -->
+            <section class="section-divider" data-background-color="#151515" data-theme-section>
+                <span class="section-num">01</span>
+                <h2 style="color:#eeefe9">The pipeline that stopped scaling</h2>
+                <p class="lead" style="color:#b6b7b0">Kafka engine tables, living on the data nodes.</p>
+                <img class="hog" src="img/hogs/lost-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
+                <aside class="notes">The classic ClickHouse + Kafka recipe — and where it breaks.</aside>
+            </section>
+
+            <!-- 4 · The classic recipe -->
+            <section>
+                <span class="kicker">The textbook pattern</span>
+                <h2>Kafka → CH, the classic recipe</h2>
+                <div class="cols center">
+                    <div class="node kafka"><div class="node-title">Kafka topic</div><div class="node-sub">events</div></div>
+                    <div class="arrow">→</div>
+                    <div class="stack" style="flex:1.4">
+                        <div class="node data" data-id="dn"><div class="node-title">Data node (MergeTree)</div>
+                            <div class="node-sub">kafka_events → events_mv → sharded_events</div></div>
+                    </div>
+                </div>
+                <p class="small muted" style="margin-top:0.6em">Kafka engine table is a consumer. A materialized view fires on each inserted block and writes into the real MergeTree table. Elegant — pull-based, resilient to spikes, no external writer.</p>
+                <aside class="notes">
+                    This is what every CH-on-Kafka tutorial shows, and it's genuinely good:
+                    Kafka engine table consumes, MV transforms + routes, MergeTree stores. It buys
+                    you backpressure for free. We ran it for years.
+                </aside>
+            </section>
+
+            <!-- 5 · Where it breaks  (TODO war story) -->
+            <section>
+                <span class="kicker">The problem</span>
+                <h2>One box, two jobs, fighting</h2>
+                <div class="cols">
+                    <ul class="small">
+                        <li><strong>Ingestion and queries share the same nodes.</strong> A query storm starves Kafka consumption — and vice-versa.</li>
+                        <li><strong>No headroom to recover.</strong> If we ever took lag — paused ingestion for any reason — then at above-average peak we didn't have the throughput to catch back up. We'd just keep falling further behind.</li>
+                        <li>Scaling consumers meant scaling <strong>storage nodes</strong> — the expensive, stateful, hard-to-move ones.</li>
+                    </ul>
+                    <div class="card accent">
+                        <span class="gotcha-label" style="color:var(--ph-accent)">Why ingestion is expensive</span>
+                        <p class="small" style="margin-top:0.3em">The insert is the cheap part. Most of the CPU goes to <strong>denormalizing properties off every event</strong> — parsing the JSON and writing it into <code>Map</code> columns and dozens of <strong>materialized columns</strong>. On shared nodes, that work fights your queries for the same cores.</p>
+                    </div>
+                </div>
+                <aside class="notes">TODO: tell the story here — this is the emotional core of the talk.</aside>
+            </section>
+
+            <!-- 5b · MEME: this is fine -->
+            <section class="meme-slide">
+                <span class="meme-tag">meme break</span>
+                <img class="meme-img" src="img/this-is-fine.jpg" alt="This Is Fine meme: ingestion and queries on the same ClickHouse nodes" />
+                <p class="small muted meme-cap">Our data nodes, every time a dashboard fired a heavy query while the Kafka consumers were trying to keep up.</p>
+                <aside class="notes">Levity beat — but it's true. The shared-node failure mode in one image. Land the joke, then move to the decision.</aside>
+            </section>
+
+            <!-- 6 · The fork: build an inserter?  (TODO) -->
+            <section>
+                <span class="kicker">The fork in the road</span>
+                <h2>Plan A: build an inserter service</h2>
+                <div class="cols center">
+                    <img class="meme-img" src="img/two-buttons.jpg" alt="Two buttons meme: scale the storage tier vs build an inserter service" style="flex:0 0 auto; max-height:360px" />
+                    <div class="stack">
+                        <p class="small">The hard part was never the consumer loop — it was the <strong>schema</strong>. An inserter has to denormalize events into our ever-changing dynamic event schema, which we'd then maintain in <strong>two surface areas</strong>: once in Go, once in ClickHouse SQL. Wrangling prop <code>Map</code>s and materialized columns in <em>one</em> place was already painful.</p>
+                        <p class="small">And the types would drift subtly between Go and ClickHouse — versus ClickHouse feeding <em>native</em> ClickHouse, one type system end to end.</p>
+                        <p class="small muted">How far Plan A got, in full (<code>~/inserter</code>):</p>
+                        <pre><code data-trim data-noescape class="language-go">module github.com/posthog/inserter
+go 1.20
+// ...line 3 was never written.   (Apr 2023)</code></pre>
+                    </div>
+                </div>
+                <aside class="notes">
+                    An inserter service means re-implementing batching, retry, schema mapping, shard
+                    routing, backpressure, dead-lettering — all things ClickHouse already does. New
+                    service = new on-call surface.
+                </aside>
+            </section>
+
+            <!-- 6b · MEME: galaxy brain evolution -->
+            <section class="meme-slide">
+                <span class="meme-tag">galaxy brain</span>
+                <img class="meme-img" src="img/expanding-brain.jpg" alt="Expanding brain meme: Kafka on data nodes, to inserter service, to stateless ClickHouse nodes, to a cluster is just a remote_servers list" />
+                <p class="small muted meme-cap">The evolution of our ingestion takes — ending on the enlightenment.</p>
+                <aside class="notes">The arc of the whole talk in four panels. The last panel is the enlightenment beat — sets up the insight section.</aside>
+            </section>
+
+            <!-- 7 · SECTION: THE INSIGHT -->
+            <section class="section-divider" data-background-color="#151515">
+                <span class="section-num">02</span>
+                <h2 style="color:#eeefe9">The insight</h2>
+                <p class="lead" style="color:#b6b7b0">We didn't need a new service. We needed a new <em style="color:var(--ph-yellow)">role</em> for ClickHouse.</p>
+            </section>
+
+            <!-- 8 · A cluster is just a list -->
+            <section>
+                <span class="kicker">Key realization #1</span>
+                <h2>A "cluster" is just a logical list</h2>
+                <p class="small muted">In ClickHouse, a cluster is a <code>&lt;remote_servers&gt;</code> entry — nothing more. The nodes in it can live anywhere, run anything, and be added at will.</p>
+                <pre data-id="rs"><code data-trim data-noescape class="language-xml">&lt;remote_servers&gt;
+    &lt;posthog&gt;                       &lt;!-- the sharded storage cluster --&gt;
+        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;data-1&lt;/host&gt;&lt;/replica&gt; ... &lt;/shard&gt;
+        ... 10 shards × 3 replicas (EC2, NVMe) ...
+    &lt;/posthog&gt;
+    &lt;posthog_single_shard&gt;          &lt;!-- one shard, for non-sharded writes --&gt;
+        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;data-1&lt;/host&gt;&lt;/replica&gt;&lt;/shard&gt;
+    &lt;/posthog_single_shard&gt;
+&lt;/remote_servers&gt;</code></pre>
+                <p class="small">So we can define a cluster that mixes <span class="pill data">EC2 storage workers</span> with brand-new <span class="pill ingest">stateless K8s pods</span>. Same logical cluster, totally different hardware.</p>
+                <aside class="notes">
+                    This is the unlock. The cluster is a config concept. Nothing says all members
+                    must be identical, co-located, or even persistent. We populate remote_servers
+                    from ZooKeeper via Ansible, so membership is dynamic.
+                </aside>
+            </section>
+
+            <!-- 9 · The inserter IS clickhouse -->
+            <section data-auto-animate>
+                <span class="kicker">Key realization #2</span>
+                <h2>The inserter we wanted... is a ClickHouse node</h2>
+                <div class="cols center">
+                    <div class="node ingest" style="flex:1.2">
+                        <div class="node-title">Stateless CH node</div>
+                        <div class="node-sub">Kafka engine table</div>
+                        <div class="node-sub">+ materialized view</div>
+                        <div class="node-sub">+ Distributed table</div>
+                        <div class="node-sub" style="color:var(--ph-accent)">no MergeTree · no data</div>
+                    </div>
+                    <div class="stack">
+                        <p class="small">Consume from Kafka? <strong>Kafka engine table.</strong></p>
+                        <p class="small">Transform + batch? <strong>Materialized view.</strong></p>
+                        <p class="small">Route to the right shard and <code>INSERT</code>? <strong>Distributed engine.</strong></p>
+                        <p class="small muted">Every feature we'd have built into the inserter, ClickHouse already ships. So run those three objects on a node that stores <em>nothing</em>.</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    Reframe: the inserter's job decomposes exactly onto three CH primitives. Put them
+                    on a node with no MergeTree and you have a purpose-built, stateless ingestion box
+                    that speaks native protocol to the storage cluster.
+                </aside>
+            </section>
+
+            <!-- 9b · MEME: drake -->
+            <section class="meme-slide">
+                <span class="meme-tag">drake says</span>
+                <img class="meme-img" src="img/drake.jpg" alt="Drake meme: rejecting a stateful inserter service, preferring a stateless ClickHouse node with Kafka + MV + Distributed" />
+                <p class="small muted meme-cap">Build-vs-reuse, in one frame.</p>
+                <aside class="notes">Drake meme = the build-vs-reuse decision in one frame. Beat, then hit the orange takeaway slide.</aside>
+            </section>
+
+            <!-- 10 · One-liner takeaway -->
+            <section data-background-color="#f54e00">
+                <h2 style="color:#fff; font-size:2.2em; max-width:18ch">You probably don't need an inserter service.</h2>
+                <p class="lead" style="color:#ffe6da">ClickHouse is already a perfectly good stream processor. Give it a node with no disk to worry about.</p>
+                <aside class="notes">The sticky sentence. Pause here.</aside>
+            </section>
+
+            <!-- 11 · SECTION: HOW IT WORKS -->
+            <section class="section-divider" data-background-color="#151515">
+                <span class="section-num">03</span>
+                <h2 style="color:#eeefe9">How it works</h2>
+                <p class="lead" style="color:#b6b7b0">Four objects. Two node roles. One native-protocol hop.</p>
+                <img class="hog" src="img/hogs/builder-hog.png" alt="" style="right:24px; bottom:0; max-height:280px" />
+            </section>
+
+            <!-- 12 · The four objects -->
+            <section>
+                <span class="kicker">The anatomy</span>
+                <h2>Four objects, split across two roles</h2>
+                <div class="cols">
+                    <div class="card" style="flex:1">
+                        <p class="pill data">DATA nodes</p>
+                        <div class="node data" style="margin-top:0.4em"><div class="node-title">① Data table</div><div class="node-sub">ReplicatedMergeTree · stores rows</div></div>
+                    </div>
+                    <div class="card accent" style="flex:1.5">
+                        <p class="pill ingest">INGESTION nodes (stateless)</p>
+                        <div class="stack" style="margin-top:0.4em">
+                            <div class="node ingest"><div class="node-title">② Writable Distributed table</div><div class="node-sub">routes INSERTs to the data table</div></div>
+                            <div class="node kafka"><div class="node-title">③ Kafka engine table</div><div class="node-sub">consumes the topic</div></div>
+                            <div class="node ingest"><div class="node-title">④ Materialized view</div><div class="node-sub">Kafka table → writable table</div></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="small muted" style="margin-top:0.5em">The MV reads from the Kafka table and writes to the writable Distributed table. The Distributed table forwards to the MergeTree on the data nodes. Done.</p>
+                <aside class="notes">Walk the four objects. Note which role each lives on — that's what the migration encodes.</aside>
+            </section>
+
+            <!-- 13 · SQL ① data table -->
+            <section>
+                <span class="kicker">① Data table — on DATA nodes</span>
+                <h3>The only place that actually stores rows</h3>
+                <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS groups
+(
+    group_type_index UInt8,
+    group_key        VARCHAR,
+    created_at       DateTime64,
+    team_id          Int64,
+    group_properties VARCHAR,
+    _timestamp       DateTime,
+    _offset          UInt64
+)
+ENGINE = ReplicatedReplacingMergeTree(
+    '/clickhouse/tables/{shard}/posthog.groups', '{replica}', _timestamp)
+ORDER BY (team_id, group_type_index, group_key)</code></pre>
+                <p class="small muted">Plain replicated MergeTree. It has no idea Kafka exists. This is the only stateful piece.</p>
+                <aside class="notes">Storage is boring and that's the point — the data table is untouched by the ingestion redesign.</aside>
+            </section>
+
+            <!-- 14 · SQL ② writable distributed -->
+            <section>
+                <span class="kicker">② Writable table — on INGESTION nodes</span>
+                <h3>A Distributed table is the "INSERT client"</h3>
+                <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS writable_groups
+(
+    group_type_index UInt8, group_key VARCHAR, created_at DateTime64,
+    team_id Int64, group_properties VARCHAR, _timestamp DateTime, _offset UInt64
+)
+ENGINE = Distributed('posthog_single_shard', 'default', 'groups');</code></pre>
+                <p class="small">Non-sharded target → point the Distributed table at <code>posthog_single_shard</code>. Sharded target → use the full <code>posthog</code> cluster with a sharding key:</p>
+                <pre><code data-trim data-noescape class="language-sql">ENGINE = Distributed('posthog', 'default', 'sharded_events', sipHash64(distinct_id));</code></pre>
+                <aside class="notes">
+                    The Distributed engine does shard routing + native-protocol INSERT for us. For
+                    non-sharded tables we still wrap in a single-shard cluster so the write path is
+                    uniform. The sharding key is where you'd otherwise hand-roll a hash in an inserter.
+                </aside>
+            </section>
+
+            <!-- 15 · SQL ③ kafka table -->
+            <section>
+                <span class="kicker">③ Kafka engine table — on INGESTION nodes</span>
+                <h3>The consumer</h3>
+                <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS kafka_groups
+(
+    group_type_index UInt8, group_key VARCHAR, created_at DateTime64,
+    team_id Int64, group_properties VARCHAR
+)
+ENGINE = Kafka(warpstream_ingestion,            -- named collection (broker list)
+    kafka_topic_list = 'groups',
+    kafka_group_name = 'group1',
+    kafka_format     = 'JSONEachRow');</code></pre>
+                <p class="small muted">Broker lists come from <strong>named collections</strong> — which is how we run MSK and WarpStream side by side (more later). One consumer per <code>INGESTION_SMALL</code> node; more on the hotter tiers.</p>
+                <aside class="notes">Named collections decouple the table DDL from the broker endpoints — key for the Kafka migration story.</aside>
+            </section>
+
+            <!-- 16 · SQL ④ MV -->
+            <section>
+                <span class="kicker">④ Materialized view — on INGESTION nodes</span>
+                <h3>The wire between consumer and writer</h3>
+                <pre><code data-trim data-noescape class="language-sql">CREATE MATERIALIZED VIEW IF NOT EXISTS groups_mv
+TO writable_groups            -- ← writes into the Distributed table
+AS SELECT
+    group_type_index, group_key, created_at, team_id, group_properties,
+    _timestamp, _offset
+FROM kafka_groups;            -- ← reads from the Kafka engine table</code></pre>
+                <p class="small">Selecting from the Kafka table advances consumer offsets. The MV fires per block, transforms, and pushes into <code>writable_groups</code> → which forwards to the data nodes. <strong>That's the whole inserter.</strong></p>
+                <aside class="notes">
+                    This MV is the entire "service". It's declarative, it lives in a migration, and
+                    ClickHouse owns its lifecycle, retries, and backpressure.
+                </aside>
+            </section>
+
+            <!-- 17 · Full pipeline diagram -->
+            <section>
+                <span class="kicker">Application A · end to end</span>
+                <h2>The whole path</h2>
+                <div class="pipe-row" style="font-size:0.92em">
+                    <div class="node kafka"><div class="node-title">Kafka</div><div class="node-sub">topic: groups</div></div>
+                    <div class="arrow">→</div>
+                    <div class="card accent" style="flex:1 1 auto">
+                        <p class="pill ingest" style="margin-bottom:0.4em">stateless ingestion pod (K8s)</p>
+                        <div class="pipe-row" style="font-size:0.8em; justify-content:space-between">
+                            <div class="node kafka"><div class="node-title">kafka_groups</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">groups_mv</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">writable_groups</div><div class="node-sub">Distributed</div></div>
+                        </div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="node data"><div class="node-title">groups</div><div class="node-sub">MergeTree<br />(data nodes)</div></div>
+                </div>
+                <p class="small muted" style="margin-top:0.7em">Native-protocol INSERT over the cluster. The pod holds <strong>no data</strong> — kill it, replace it, scale it, nothing is lost.</p>
+                <aside class="notes">The money slide. Trace a row left to right. Emphasize: the pod is disposable.</aside>
+            </section>
+
+            <!-- 18 · node_roles routing -->
+            <section>
+                <span class="kicker">How DDL knows where to land</span>
+                <h2>One migration, role-aware placement</h2>
+                <pre><code data-trim data-noescape class="language-python">operations = [
+    run_sql_with_exceptions(GROUPS_TABLE_SQL(),          node_roles=[NodeRole.DATA]),
+    run_sql_with_exceptions(GROUPS_WRITABLE_TABLE_SQL(), node_roles=[NodeRole.INGESTION_SMALL]),
+    run_sql_with_exceptions(KAFKA_GROUPS_TABLE_SQL(),    node_roles=[NodeRole.INGESTION_SMALL]),
+    run_sql_with_exceptions(GROUPS_TABLE_MV_SQL(),       node_roles=[NodeRole.INGESTION_SMALL]),
+]</code></pre>
+                <p class="small">No <code>ON CLUSTER</code>. <code>run_sql_with_exceptions</code> fans each statement to exactly the hosts whose macro <code>hostClusterRole</code> matches — so the MergeTree lands on storage, and Kafka/MV/Distributed land on the stateless tier.</p>
+                <aside class="notes">
+                    Migrations are the source of truth. The node_roles argument is the placement
+                    policy. We deliberately avoid ON CLUSTER — it doesn't play well with our split
+                    topology and the per-role DDL fan-out.
+                </aside>
+            </section>
+
+            <!-- 19 · NodeRole enum -->
+            <section>
+                <span class="kicker">The roles</span>
+                <h2>Ingestion is tiered by throughput</h2>
+                <pre><code data-trim data-noescape class="language-python">class NodeRole(StrEnum):
+    DATA              = "data"        # the sharded MergeTree storage cluster
+    INGESTION_SMALL   = "small"       # 1 Kafka consumer  — low-volume topics
+    INGESTION_MEDIUM  = "medium"      # 4 Kafka consumers — mid-volume
+    INGESTION_EVENTS  = "events"      # the main event firehose, many shards
+    SHUFFLEHOG        = "shufflehog"  # re-partitions events so each key has one consumer
+    # separate clusters: AI_EVENTS, AUX, OPS, SESSIONS, LOGS, ENDPOINTS ...</code></pre>
+                <p class="small muted">Each role is its own logical cluster of stateless nodes, sized to the topic it drains. Scaling ingestion now means adding <em>cheap, stateless pods</em> — never touching the storage tier.</p>
+                <aside class="notes">The roles map to throughput tiers. SHUFFLEHOG is its own thing — next act.</aside>
+            </section>
+
+            <!-- 20 · SECTION: IN PRODUCTION -->
+            <section class="section-divider" data-background-color="#151515">
+                <span class="section-num">04</span>
+                <h2 style="color:#eeefe9">In production</h2>
+                <p class="lead" style="color:#b6b7b0">Two regions, ~60 stateless ingestion nodes, zero stored bytes.</p>
+                <img class="hog" src="img/hogs/swole-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+            </section>
+
+            <!-- 21 · Topology numbers -->
+            <section>
+                <span class="kicker">The shape of it</span>
+                <h2>Storage vs ingestion, by the numbers</h2>
+                <div class="cols">
+                    <div class="card"><p class="pill data">Storage (stateful, EC2 + NVMe)</p>
+                        <ul class="small" style="margin-top:0.3em">
+                            <li><strong>US:</strong> 10 shards × 3 replicas = 30 nodes</li>
+                            <li><strong>EU:</strong> 8 shards × 3 replicas = 24 nodes</li>
+                            <li>i8ge metal, tiered NVMe→EBS→S3</li>
+                        </ul>
+                    </div>
+                    <div class="card accent"><p class="pill ingest">Ingestion (stateless, K8s + EC2)</p>
+                        <ul class="small" style="margin-top:0.3em">
+                            <li><strong>US:</strong> ~38 nodes — small / medium / events tiers</li>
+                            <li><strong>EU:</strong> ~22 nodes</li>
+                            <li>commodity instances, recycled freely</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="small muted" style="margin-top:0.5em">Ingestion outnumbers storage by node count — but costs a fraction, because there's no data to hold or protect.</p>
+                <aside class="notes">Numbers from the cluster inventory. Round + public-safe. Adjust live if topology shifted.</aside>
+            </section>
+
+            <!-- 22 · statelessness proof -->
+            <section>
+                <span class="kicker">"Stateless" — literally</span>
+                <h2>The config that proves there's nothing to lose</h2>
+                <div class="cols">
+                    <div class="stack">
+                        <p class="small muted">EC2 ingestion hosts (Ansible inventory):</p>
+                        <pre><code data-trim data-noescape class="language-yaml">hostClusterRole: ingestion
+raid_volumes: []        # no NVMe / EBS data disks
+backup_tables: []       # nothing to back up
+clickhouse_disk_balancer_enabled: false</code></pre>
+                    </div>
+                    <div class="stack">
+                        <p class="small muted">K8s ingestion pods (chart values):</p>
+                        <pre><code data-trim data-noescape class="language-yaml">volumeTemplates:
+  - name: ingestion
+    reclaimPolicy: Delete   # PVC dies with the pod
+    resources:
+      requests: { storage: 10Gi }   # local cache only</code></pre>
+                    </div>
+                </div>
+                <div class="card accent small" style="margin-top:0.4em">
+                    🙌 The K8s ingestion tier runs on <strong>Altinity's <a href="https://github.com/altinity/clickhouse-operator">clickhouse-operator</a></strong> — each pod is a <code>ClickHouseInstallation</code> CRD (the <code>chi-ingestion-*</code> pods in <code>kubectl get pods</code>). Thanks for the operator, Altinity 👋
+                </div>
+                <p class="small">Pods get recycled and lose their disk — and it doesn't matter. The data is in Kafka and on the storage cluster; the ingestion tier is pure compute.</p>
+                <aside class="notes">
+                    This is the operational payoff. Stateless = trivially scalable + restartable.
+                    Pod death is a non-event. Compare to babysitting a stateful inserter fleet.
+                </aside>
+            </section>
+
+            <!-- 22c · Same shape, two applications -->
+            <section>
+                <span class="kicker">One pattern, two jobs</span>
+                <h2>Same shape, different sink</h2>
+                <p class="small muted">Every stateless node is the same core — a <strong>Kafka engine table → materialized view</strong>, no MergeTree. The only thing that changes is <em>what the MV writes into</em>.</p>
+                <div class="cols" style="margin-top:0.5em">
+                    <div class="card data">
+                        <span class="pill data">Application A · ingestion</span>
+                        <div class="pipe-row" style="font-size:0.66em; margin-top:0.5em; justify-content:space-between">
+                            <div class="node ingest"><div class="node-title">MV</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">Distributed</div><div class="node-sub">table</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node data"><div class="node-title">sharded MergeTree</div><div class="node-sub">data nodes</div></div>
+                        </div>
+                        <p class="xsmall muted" style="margin-top:0.5em">Sink = <strong>ClickHouse</strong>.<br />The inserter service we never built.</p>
+                    </div>
+                    <div class="card accent">
+                        <span class="pill ingest">Application B · ShuffleHog</span>
+                        <div class="pipe-row" style="font-size:0.66em; margin-top:0.5em; justify-content:space-between">
+                            <div class="node ingest"><div class="node-title">MV</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node kafka"><div class="node-title">Kafka table</div><div class="node-sub">producer</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node kafka"><div class="node-title">re-partitioned</div><div class="node-sub">topic</div></div>
+                        </div>
+                        <p class="xsmall muted" style="margin-top:0.5em">Sink = <strong>Kafka</strong>, re-keyed.<br />Re-shapes the stream for a downstream service.</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    The crucial delineation: A and B are the *same* stateless-ClickHouse shape (Kafka engine
+                    table + MV, no MergeTree). The only difference is the MV's target. Application A writes to a
+                    Distributed table → rows land in ClickHouse storage (this replaced the inserter service).
+                    Application B writes to a Kafka engine table → rows go back onto a new, re-partitioned topic
+                    for a different consumer entirely. Same hammer, two very different nails. ShuffleHog (next
+                    slide) is application B.
+                </aside>
+            </section>
+
+            <!-- 23 · ShuffleHog -->
+            <section>
+                <span class="kicker">Application B · why ShuffleHog exists</span>
+                <h2>Partition by the key your consumer aggregates on</h2>
+                <div class="pipe-row" style="font-size:0.68em; justify-content:space-between">
+                    <div class="node kafka"><div class="node-title">events</div><div class="node-sub">raw stream</div></div>
+                    <div class="arrow">→</div>
+                    <div class="node ingest"><div class="node-title">ShuffleHog</div><div class="node-sub">re-key: project+event</div></div>
+                    <div class="arrow">→</div>
+                    <div class="node kafka"><div class="node-title">re-partitioned</div><div class="node-sub">key → 1 partition</div></div>
+                    <div class="arrow">→</div>
+                    <div class="node"><div class="node-title">propdefs</div><div class="node-sub">buffer + squash</div></div>
+                    <div class="arrow">→</div>
+                    <div class="node data"><div class="node-title">Postgres</div><div class="node-sub">upserts</div></div>
+                </div>
+                <p class="small muted" style="margin:0.5em 0">Downstream is <strong>propdefs</strong> (<code>property-defs-rs</code>): it tracks every <em>project + event + property key</em> seen, buffers them, and flushes idempotent upserts into Postgres.</p>
+                <div class="cols">
+                    <div class="gotcha" style="flex:1"><span class="gotcha-label">The bug</span><br />The topic wasn't partitioned by project+event. The same <code>(project, event)</code> arrived on many partitions → many consumers upserting the <strong>same Postgres rows</strong> → tuple-lock contention → everything crawled.</div>
+                    <div class="card accent small" style="flex:1"><strong>The fix:</strong> re-partition so <code>(project + event)</code> hashes to <strong>one</strong> partition. Exactly one consumer owns each key, so the squash upserts with <em>zero</em> row contention in PG.</div>
+                </div>
+                <aside class="notes">
+                    The real ShuffleHog story — and it's not about load balancing, it's about correctness.
+                    propdefs aggregates property definitions keyed by (project, event) and upserts them to
+                    Postgres. With the wrong partitioning, the same key was handled by multiple consumers
+                    writing the same PG rows concurrently → tuple locks → slow. Fix: partition by the key the
+                    downstream aggregates on, so each key has a single owner and the squash is contention-free.
+                    Lesson: choose your Kafka partition key to match your consumer's write key.
+                </aside>
+            </section>
+
+            <!-- 24 · Dual Kafka backends -->
+            <section>
+                <span class="kicker">A bonus the pattern unlocked</span>
+                <h2>Swapping Kafka under a live firehose</h2>
+                <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run <strong>two Kafka engine tables</strong> on the same topic — one per backend — both feeding the <em>same</em> writable table, with separate consumer groups.</p>
+                <div class="pipe-row" style="justify-content:center; font-size:0.92em; margin:0.7em 0">
+                    <div class="stack">
+                        <div class="node kafka"><div class="node-title">kafka_groups</div><div class="node-sub">MSK</div></div>
+                        <div class="node kafka"><div class="node-title">kafka_groups_ws</div><div class="node-sub">WarpStream</div></div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="node ingest"><div class="node-title">writable_groups</div><div class="node-sub">one target, two sources</div></div>
+                    <div class="arrow">→</div>
+                    <div class="node data"><div class="node-title">groups</div><div class="node-sub">MergeTree</div></div>
+                </div>
+                <p class="small muted">Cut over by adding/removing MV legs. No inserter to rewrite, no dual-write code — just DDL.</p>
+                <aside class="notes">
+                    Because ingestion is just declarative CH objects, swapping the upstream broker is
+                    a DDL exercise, not a code migration. This is the kind of flexibility the service
+                    approach would have made painful.
+                </aside>
+            </section>
+
+            <!-- 25 · SECTION: LESSONS -->
+            <section class="section-divider" data-background-color="#151515">
+                <span class="section-num">05</span>
+                <h2 style="color:#eeefe9">What we learned</h2>
+                <img class="hog" src="img/hogs/security-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+            </section>
+
+            <!-- 26 · Gotchas -->
+            <section>
+                <span class="kicker">The tradeoff</span>
+                <h2>Sharp edges</h2>
+                <p class="small">The cost of this pattern is <strong>schema management</strong>. Every object — the data table, the Kafka engine table, the MV, the Distributed writable table — is schema we own and migrate, now across multiple node roles.</p>
+                <div class="cols">
+                    <div class="card accent">
+                        <p class="small">It's real engineering — but far simpler than building, scaling, and being on call for a stateful inserter service.</p>
+                    </div>
+                    <div class="card data">
+                        <p class="small">And we didn't start from zero: our ClickHouse topology — shards × replicas across several clusters — already forced us to build a migration system. The stateless ingestion tiers just added a few layers to it: <code>small</code>, <code>medium</code>, <code>events</code>.</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    The real cost of this approach is schema/migration management — we maintain the
+                    table definitions across node roles. But that's far cheaper than owning an inserter
+                    service, and we already had a migration system for our complex topology (shards,
+                    replicas, multiple clusters). The ingestion tiers just added small/medium/events
+                    layers — see the role-aware run_sql_with_exceptions migrations from earlier.
+                </aside>
+            </section>
+
+            <!-- 27 · Results  (TODO) -->
+            <section>
+                <span class="kicker">Did it work?</span>
+                <h2>The payoff</h2>
+                <div class="cols">
+                    <div class="card accent" style="flex:1.1">
+                        <p class="small"><strong>Ingestion scales independently from the data &amp; query tiers.</strong> We add stateless ingestion pods without touching storage — and because the query tier's resources are now <strong>dedicated</strong>, query performance is far more <strong>deterministic</strong>.</p>
+                    </div>
+                    <ul class="small">
+                        <li>Query storms no longer stall ingestion (and vice-versa).</li>
+                        <li>Scale ingestion = add stateless pods, minutes not days.</li>
+                        <li>Zero inserter service to build, staff, or be paged for.</li>
+                    </ul>
+                </div>
+                <aside class="notes">
+                    Two concrete wins: (1) ingestion capacity scales separately from data/query capacity;
+                    (2) dedicated query-tier resources → deterministic query performance (no ingestion spikes
+                    bleeding into query latency).
+                </aside>
+            </section>
+
+            <!-- 28 · Takeaway -->
+            <section data-background-color="#1d4aff">
+                <span class="kicker" style="color:#cdd7ff">The one thing</span>
+                <h2 style="color:#fff; max-width:20ch">Reach for ClickHouse's own primitives before you build a service around it.</h2>
+                <p class="lead" style="color:#dbe3ff">Kafka engine + materialized view + Distributed table, on a node that stores nothing, <em style="color:#fff">is</em> a stream processor.</p>
+                <aside class="notes">Closing argument. Tie back to slide 10's promise.</aside>
+            </section>
+
+            <!-- 29 · Thanks / links -->
+            <section class="title-slide">
+                <span class="kicker">Thanks — and we're hiring</span>
+                <h1>Questions?</h1>
+                <p class="lead">The pattern, the migrations, and the topology are all open source.</p>
+                <ul class="small">
+                    <li>Code: <a href="https://github.com/PostHog/posthog">github.com/PostHog/posthog</a> — <code>posthog/clickhouse/migrations/</code></li>
+                    <li>ClickHouse @ PostHog: <a href="https://posthog.com/handbook/engineering/clickhouse">posthog.com/handbook/engineering/clickhouse</a></li>
+                    <li>Me: <a href="https://github.com/fuziontech">@fuziontech</a> on GitHub &amp; X · <a href="https://linkedin.com/in/fuziontech">linkedin.com/in/fuziontech</a></li>
+                    <li>🙏 The whole PostHog ClickHouse team — especially <strong>Ted Kaemming</strong> &amp; <strong>Dani Escribano</strong></li>
+                    <li>🦔💛 <strong>Altinity</strong> — for hosting tonight <em>and</em> for <a href="https://github.com/altinity/clickhouse-operator">clickhouse-operator</a></li>
+                </ul>
+                <p class="small" style="margin-top:0.3em"><strong style="color:var(--ph-accent)">We're hiring</strong> → <a href="https://posthog.com/careers">posthog.com/careers</a></p>
+                <aside class="notes">Drive to one action: go read the migrations. Thank the room + Altinity.</aside>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="vendor/reveal/dist/reveal.js"></script>
+    <script src="vendor/reveal/plugin/notes/notes.js"></script>
+    <script src="vendor/reveal/plugin/highlight/highlight.js"></script>
+    <script src="js/deck.js"></script>
+</body>
+</html>

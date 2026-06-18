@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostHog presentations</title>
+    <meta name="description" content="Talks and presentations from the PostHog team." />
+    <link rel="icon" href="img/posthog-logomark.svg" />
+    <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <img class="logo" src="img/posthog-logo.svg" alt="PostHog" />
+            <p class="kicker">Presentations</p>
+            <h1>Talks from the PostHog team</h1>
+            <p class="lead">Decks we've given at meetups and conferences — open source, like everything else we build. Press <code>S</code> in any deck for speaker notes, <code>F</code> for fullscreen.</p>
+        </header>
+
+        <main class="grid">
+            <!-- Seed: Altinity OSA meetup -->
+            <a class="card" href="altinity-stateless-clickhouse/">
+                <img class="thumb" src="altinity-stateless-clickhouse/thumbnail.png" alt="Stateless ClickHouse for stream processing — title slide" />
+                <div class="body">
+                    <p class="meta">Altinity OSA meetup · ClickHouse</p>
+                    <h2>Stateless ClickHouse for stream processing</h2>
+                    <p>How we turned ClickHouse itself into our Kafka&nbsp;→&nbsp;CH inserter — Kafka engine + materialized view + Distributed table on nodes with no MergeTree — and deleted the service we were about to build.</p>
+                    <span class="go">Open deck →</span>
+                </div>
+            </a>
+
+            <div class="card soon">
+                <p>More talks coming.<br />Add yours with a PR.</p>
+            </div>
+        </main>
+
+        <footer>
+            Built with <a href="https://revealjs.com">reveal.js</a> · Source on <a href="https://github.com/PostHog/presentations">github.com/PostHog/presentations</a> · <a href="https://posthog.com">posthog.com</a>
+        </footer>
+    </div>
+</body>
+</html>
