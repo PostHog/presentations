@@ -525,8 +525,8 @@ clickhouse_disk_balancer_enabled: false</code></pre>
                 <span class="kicker">A bonus the pattern unlocked</span>
                 <h2>Swapping Kafka under a live firehose</h2>
                 <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run a <strong>fully parallel write path per backend</strong> — its own Kafka table engine → MV → Distributed table, separate consumer groups — both landing in the same data table.</p>
-                <div class="cols center" style="margin:0.6em 0">
-                    <div class="stack" style="flex:1.8">
+                <div class="cols center" style="margin:0.6em 0; justify-content:center">
+                    <div class="stack" style="flex:0 0 auto">
                         <div class="pipe-row" style="font-size:0.66em; justify-content:flex-start">
                             <div class="node kafka"><div class="node-title">kafka_groups</div><div class="node-sub">MSK</div></div>
                             <div class="arrow">→</div>
@@ -543,7 +543,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
                         </div>
                     </div>
                     <div class="arrow">→</div>
-                    <div class="node data"><div class="node-title">groups</div><div class="node-sub">MergeTree</div></div>
+                    <div class="node data" style="flex:0 0 auto"><div class="node-title">groups</div><div class="node-sub">MergeTree</div></div>
                 </div>
                 <p class="small muted">Cut over by adding or removing a whole leg. No inserter to rewrite, no dual-write code — just DDL.</p>
                 <aside class="notes">
