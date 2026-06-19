@@ -524,18 +524,28 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             <section>
                 <span class="kicker">A bonus the pattern unlocked</span>
                 <h2>Swapping Kafka under a live firehose</h2>
-                <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run <strong>two Kafka table engines</strong> on the same topic — one per backend — both feeding the <em>same</em> writable table, with separate consumer groups.</p>
-                <div class="pipe-row" style="justify-content:center; font-size:0.92em; margin:0.7em 0">
-                    <div class="stack">
-                        <div class="node kafka"><div class="node-title">kafka_groups</div><div class="node-sub">MSK</div></div>
-                        <div class="node kafka"><div class="node-title">kafka_groups_ws</div><div class="node-sub">WarpStream</div></div>
+                <p class="small">Migrating <span class="pill">MSK</span> → <span class="pill ingest">WarpStream</span> with zero downtime: run a <strong>fully parallel write path per backend</strong> — its own Kafka table engine → MV → Distributed table, separate consumer groups — both landing in the same data table.</p>
+                <div class="cols center" style="margin:0.6em 0">
+                    <div class="stack" style="flex:1.8">
+                        <div class="pipe-row" style="font-size:0.66em; justify-content:flex-start">
+                            <div class="node kafka"><div class="node-title">kafka_groups</div><div class="node-sub">MSK</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">groups_mv</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">writable_groups</div><div class="node-sub">Distributed</div></div>
+                        </div>
+                        <div class="pipe-row" style="font-size:0.66em; justify-content:flex-start">
+                            <div class="node kafka"><div class="node-title">kafka_groups_ws</div><div class="node-sub">WarpStream</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">groups_ws_mv</div></div>
+                            <div class="arrow">→</div>
+                            <div class="node ingest"><div class="node-title">writable_groups_ws</div><div class="node-sub">Distributed</div></div>
+                        </div>
                     </div>
-                    <div class="arrow">→</div>
-                    <div class="node ingest"><div class="node-title">writable_groups</div><div class="node-sub">one target, two sources</div></div>
                     <div class="arrow">→</div>
                     <div class="node data"><div class="node-title">groups</div><div class="node-sub">MergeTree</div></div>
                 </div>
-                <p class="small muted">Cut over by adding/removing MV legs. No inserter to rewrite, no dual-write code — just DDL.</p>
+                <p class="small muted">Cut over by adding or removing a whole leg. No inserter to rewrite, no dual-write code — just DDL.</p>
                 <aside class="notes">
                     Because ingestion is just declarative CH objects, swapping the upstream broker is
                     a DDL exercise, not a code migration. This is the kind of flexibility the service
@@ -560,15 +570,21 @@ clickhouse_disk_balancer_enabled: false</code></pre>
                         <p class="small">It's real engineering — but far simpler than building, scaling, and being on call for a stateful inserter service.</p>
                     </div>
                     <div class="card data">
-                        <p class="small">And we didn't start from zero: our ClickHouse topology — shards × replicas across several clusters — already forced us to build a migration system. The stateless ingestion tiers just added a few layers to it: <code>small</code>, <code>medium</code>, <code>events</code>.</p>
+                        <p class="small">And we didn't start from zero: our complex topology already forced us to build a migration system. The stateless ingestion tiers just added a few layers: <code>small</code>, <code>medium</code>, <code>events</code>.</p>
                     </div>
                 </div>
+                <div class="card accent small" style="margin-top:0.5em">
+                    <strong>Why it stays fast:</strong> the operator-managed clusters are <strong>shards-only</strong> (<code>replicasCount: 1</code>) — by design. A migration lands on <strong>every node at once</strong>, instead of rolling through replicas and waiting on ZooKeeper. <span class="muted">(The 3× replicas live on the EC2 data cluster, where durability matters; the stateless tier's tables aren't replicated anyway.)</span>
+                </div>
                 <aside class="notes">
-                    The real cost of this approach is schema/migration management — we maintain the
-                    table definitions across node roles. But that's far cheaper than owning an inserter
-                    service, and we already had a migration system for our complex topology (shards,
-                    replicas, multiple clusters). The ingestion tiers just added small/medium/events
-                    layers — see the role-aware run_sql_with_exceptions migrations from earlier.
+                    The real cost is schema/migration management — we own and migrate every table
+                    definition across node roles. Cheaper than an inserter service, and we already had a
+                    migration system for our complex topology. Key design choice: the Altinity-operator
+                    clusters are shards-only (replicasCount: 1), NOT replicas — so a schema change applies
+                    instantly to every node via the role-aware run_sql_with_exceptions fan-out, rather than
+                    rolling replica-by-replica through the operator and waiting on ZooKeeper. Replicas would
+                    add nothing for the stateless tier anyway (Kafka/MV/Distributed aren't replicated). The
+                    3× replicas are on the EC2 data cluster, where durability matters.
                 </aside>
             </section>
 
