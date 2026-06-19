@@ -144,21 +144,23 @@ go 1.20
             <section>
                 <span class="kicker">Key realization #1</span>
                 <h2>A "cluster" is just a logical list</h2>
-                <p class="small muted">In ClickHouse, a cluster is a <code>&lt;remote_servers&gt;</code> entry — nothing more. The nodes in it can live anywhere, run anything, and be added at will.</p>
+                <p class="small muted">In ClickHouse, a cluster is just a <code>&lt;remote_servers&gt;</code> entry — and one config can declare many. Nodes can live anywhere, run anything, and be added at will.</p>
                 <pre data-id="rs"><code data-trim data-noescape class="language-xml">&lt;remote_servers&gt;
-    &lt;posthog&gt;                       &lt;!-- the sharded storage cluster --&gt;
-        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;data-1&lt;/host&gt;&lt;/replica&gt; ... &lt;/shard&gt;
-        ... 10 shards × 3 replicas (EC2, NVMe) ...
+    &lt;posthog&gt;                       &lt;!-- storage cluster: 10×3 on EC2, NVMe --&gt;
+        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;data-1&lt;/host&gt;&lt;/replica&gt; ... &lt;/shard&gt; ...
     &lt;/posthog&gt;
-    &lt;posthog_single_shard&gt;          &lt;!-- one shard, for non-sharded writes --&gt;
-        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;data-1&lt;/host&gt;&lt;/replica&gt;&lt;/shard&gt;
-    &lt;/posthog_single_shard&gt;
+    &lt;ingestion-events&gt;              &lt;!-- a SEPARATE cluster: stateless K8s pods --&gt;
+        &lt;shard&gt;&lt;replica&gt;&lt;host&gt;chi-ingestion-events-0&lt;/host&gt;&lt;/replica&gt;&lt;/shard&gt; ...
+    &lt;/ingestion-events&gt;
 &lt;/remote_servers&gt;</code></pre>
-                <p class="small">So we can define a cluster that mixes <span class="pill data">EC2 storage workers</span> with brand-new <span class="pill ingest">stateless K8s pods</span>. Same logical cluster, totally different hardware.</p>
+                <p class="small"><span class="pill data">EC2 storage</span> and <span class="pill ingest">stateless K8s ingestion</span> are <strong>separate clusters</strong> — just two entries in the same list. The pods are their own cluster; their Distributed tables target <code>posthog</code> to forward writes. Different hardware, bridged by the Distributed engine — never one mixed cluster.</p>
                 <aside class="notes">
-                    This is the unlock. The cluster is a config concept. Nothing says all members
-                    must be identical, co-located, or even persistent. We populate remote_servers
-                    from ZooKeeper via Ansible, so membership is dynamic.
+                    The unlock: a cluster is a config concept, and one node's remote_servers can declare
+                    several. Storage and each ingestion tier (small/medium/events) are distinct clusters by
+                    cluster_name. The ingestion pods reference the storage cluster only as a Distributed
+                    write target — they aren't members of it. The one cluster that spans both hardware types
+                    is posthog_migrations, and it exists purely to fan DDL out across every node. We populate
+                    remote_servers from ZooKeeper via Ansible, so membership is dynamic.
                 </aside>
             </section>
 
