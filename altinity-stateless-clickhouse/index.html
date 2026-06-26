@@ -32,7 +32,7 @@
                 <h1>Stateless <em>ClickHouse</em><br />for stream processing</h1>
                 <p class="lead">How we turned ClickHouse itself into our Kafka&nbsp;→&nbsp;CH inserter — and deleted the service we were about to build.</p>
                 <p class="small muted">James Greenhill &nbsp;·&nbsp; <span class="pill">no MergeTree required</span></p>
-                <img class="hog" src="img/hogs/explorer-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
+                <img class="hog" src="img/hogs/coach-clipboard-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
                 <aside class="notes">
                     Welcome. Tonight: a pattern we run in production to ingest a firehose of events
                     into ClickHouse without an inserter service in the middle. The trick is that the
@@ -64,7 +64,7 @@
                 <span class="section-num">01</span>
                 <h2 style="color:#eeefe9">The pipeline that stopped scaling</h2>
                 <p class="lead" style="color:#b6b7b0">Kafka table engines, living on the data nodes.</p>
-                <img class="hog" src="img/hogs/lost-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/detective-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
                 <aside class="notes">The classic ClickHouse + Kafka recipe — and where it breaks.</aside>
             </section>
 
@@ -221,7 +221,7 @@ go 1.20
                 <span class="section-num">03</span>
                 <h2 style="color:#eeefe9">How it works</h2>
                 <p class="lead" style="color:#b6b7b0">Four objects. Two node roles. One native-protocol hop.</p>
-                <img class="hog" src="img/hogs/builder-hog.png" alt="" style="right:24px; bottom:0; max-height:280px" />
+                <img class="hog" src="img/hogs/builder-hog-waving.png" alt="" style="right:24px; bottom:0; max-height:280px" />
             </section>
 
             <!-- 12 · The four objects -->
@@ -406,7 +406,7 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
                 <span class="section-num">04</span>
                 <h2 style="color:#eeefe9">In production</h2>
                 <p class="lead" style="color:#b6b7b0">Two regions, ~60 stateless ingestion nodes, zero stored bytes.</p>
-                <img class="hog" src="img/hogs/swole-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/muscle-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
             </section>
 
             <!-- 21 · Topology numbers -->
@@ -570,7 +570,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">05</span>
                 <h2 style="color:#eeefe9">What we learned</h2>
-                <img class="hog" src="img/hogs/security-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/graduate-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
             </section>
 
             <!-- 26 · Gotchas -->
