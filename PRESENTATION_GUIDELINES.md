@@ -42,7 +42,7 @@ this file **for presentations specifically**.
 | Background (light) | white + soft **multi-radial blooms** | Replaces the flat `#FFF1D5 → #DAE0EB` linear gradient. |
 | Background (dark) | `#1e1f23` + faint warm blooms | Replaces flat `#151515`. |
 | Title / body text | `#000` / `rgba(0,0,0,.6)` | |
-| Display + body font | **Open Runde** (shipped as "RoundHog"), self-hosted | Bold titles, SemiBold labels, Medium body. |
+| Display + body font | **RoundHog**, self-hosted | PostHog's house face (rounded Inter, SIL OFL 1.1). Bold titles, SemiBold labels, Medium body; upright + italic. |
 | Mono font | **Berkeley Mono** in the brand → **Source Code Pro** here | Berkeley Mono is commercial; Source Code Pro is the free, self-hosted stand-in. Used Bold + UPPERCASE for eyebrows, labels, footer. |
 | Eyebrow / kicker | mono, UPPERCASE, `rgba(0,0,0,.6)` | e.g. `THE TEXTBOOK PATTERN`. |
 
@@ -56,8 +56,9 @@ this file **for presentations specifically**.
 > it documents the app, not slides. If/when this brand direction is ratified, fold
 > these tokens back into the canonical handbook.
 
-Fonts are **self-hosted** in [`fonts/`](./fonts) (Open Runde + Source Code Pro
-`woff2`), so decks render fully offline with no Google Fonts / CDN dependency.
+Fonts are **self-hosted** in [`fonts/`](./fonts) (RoundHog + Source Code Pro
+`woff2`, both OFL), so decks render fully offline with no Google Fonts / CDN
+dependency.
 
 ---
 

@@ -10,7 +10,7 @@
  *  - Accent #ff5c1c points at ONE thing per slide; yellow #f3c049 on dark slides
  *  - Brand red (#F54E00) reserved for branding moments, NOT status
  *  - Eyebrows / labels / footer in mono, UPPERCASE (Berkeley Mono in the
- *    brand → Source Code Pro here); titles & body in Open Runde (RoundHog)
+ *    brand → Source Code Pro here); titles & body in RoundHog
  *  - Fonts are self-hosted in ../../fonts, so the deck works fully offline
  */
 
@@ -35,7 +35,7 @@
 .reveal .slides { text-align: left; }
 .reveal .slides section { height: 100%; }
 
-/* Headings — sentence case, never uppercased; Open Runde Bold */
+/* Headings — sentence case, never uppercased; RoundHog Bold */
 .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
     font-family: var(--font-title);
     color: var(--ph-text);
