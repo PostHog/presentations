@@ -18,7 +18,7 @@
             <!-- 1 · TITLE -->
             <section class="title-slide" data-auto-animate>
                 <span class="kicker">PostHog · Altinity OSA meetup</span>
-                <h1>Stateless ClickHouse<br />for stream processing</h1>
+                <h1>Stateless <em>ClickHouse</em><br />for stream processing</h1>
                 <p class="lead">How we turned ClickHouse itself into our Kafka&nbsp;→&nbsp;CH inserter — and deleted the service we were about to build.</p>
                 <p class="small muted">James Greenhill &nbsp;·&nbsp; <span class="pill">no MergeTree required</span></p>
                 <img class="hog" src="img/hogs/explorer-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
@@ -49,7 +49,7 @@
             </section>
 
             <!-- 3 · SECTION: THE PROBLEM -->
-            <section class="section-divider" data-background-color="#151515" data-theme-section>
+            <section class="section-divider" data-background-color="#1e1f23" data-theme-section>
                 <span class="section-num">01</span>
                 <h2 style="color:#eeefe9">The pipeline that stopped scaling</h2>
                 <p class="lead" style="color:#b6b7b0">Kafka table engines, living on the data nodes.</p>
@@ -134,7 +134,7 @@ go 1.20
             </section>
 
             <!-- 7 · SECTION: THE INSIGHT -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">02</span>
                 <h2 style="color:#eeefe9">The insight</h2>
                 <p class="lead" style="color:#b6b7b0">We didn't need a new service. We needed a new <em style="color:var(--ph-yellow)">role</em> for ClickHouse.</p>
@@ -206,7 +206,7 @@ go 1.20
             </section>
 
             <!-- 11 · SECTION: HOW IT WORKS -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">03</span>
                 <h2 style="color:#eeefe9">How it works</h2>
                 <p class="lead" style="color:#b6b7b0">Four objects. Two node roles. One native-protocol hop.</p>
@@ -391,7 +391,7 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
             </section>
 
             <!-- 20 · SECTION: IN PRODUCTION -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">04</span>
                 <h2 style="color:#eeefe9">In production</h2>
                 <p class="lead" style="color:#b6b7b0">Two regions, ~60 stateless ingestion nodes, zero stored bytes.</p>
@@ -556,7 +556,7 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             </section>
 
             <!-- 25 · SECTION: LESSONS -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">05</span>
                 <h2 style="color:#eeefe9">What we learned</h2>
                 <img class="hog" src="img/hogs/security-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />

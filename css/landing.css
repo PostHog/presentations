@@ -1,24 +1,10 @@
 /* PostHog presentations — landing page
- * Brand tokens from posthog.com / .interface-design (cream→cool gradient,
- * Open Runde → Inter, borders-first, hard drop shadow, sentence case). */
+ * Tokens live in tokens.css (shared with the deck themes). This file only
+ * lays out the landing grid. Matches the Figma "presentation site" frame:
+ * white + radial-bloom background, blue-accented headline, bordered cards
+ * with soft elevation, orange "Open deck →" link. */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap');
-
-:root {
-    --ph-red: #f54e00;
-    --ph-blue: #1d4aff;
-    --ph-accent: hsl(19, 100%, 48%);
-    --ph-text: #151515;
-    --ph-text-secondary: #55564f;
-    --ph-text-tertiary: #76776f;
-    --ph-surface: #ffffff;
-    --ph-border: #d0d1c9;
-    --ph-border-strong: #b9bab1;
-    --r: 6px;
-    --r-lg: 10px;
-    --font-body: 'Open Runde', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'Source Code Pro', ui-monospace, 'SF Mono', Menlo, monospace;
-}
+@import url('tokens.css');
 
 * { box-sizing: border-box; }
 
@@ -26,7 +12,9 @@ body {
     margin: 0;
     font-family: var(--font-body);
     color: var(--ph-text);
-    background: linear-gradient(180deg, #FFF1D5 0%, #DAE0EB 100%);
+    background-color: var(--ph-bg-base);
+    background-image: var(--ph-bg-bloom);
+    background-repeat: no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -40,9 +28,10 @@ header { margin-bottom: 48px; }
 header .logo { height: 30px; width: auto; display: block; margin-bottom: 28px; }
 header .kicker {
     font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--ph-accent); font-weight: 600; margin: 0 0 8px;
+    letter-spacing: 0.1em; color: var(--ph-text-secondary); font-weight: 600; margin: 0 0 10px;
 }
-header h1 { font-size: 2.6rem; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 12px; }
+header h1 { font-size: 2.7rem; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14px; }
+header h1 .accent { color: var(--ph-blue); }
 header p.lead { font-size: 1.15rem; color: var(--ph-text-secondary); max-width: 60ch; margin: 0; }
 
 /* Card grid */
@@ -56,39 +45,39 @@ header p.lead { font-size: 1.15rem; color: var(--ph-text-secondary); max-width: 
     display: flex;
     flex-direction: column;
     background: var(--ph-surface);
-    border: 1px solid var(--ph-border);
+    border: 1px solid var(--ph-border-soft);
     border-radius: var(--r-lg);
-    box-shadow: 0 3px 0 var(--ph-border);
+    box-shadow: var(--ph-shadow);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
 }
-.card:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--ph-accent); border-color: var(--ph-accent); }
+.card:hover { transform: translateY(-3px); box-shadow: var(--ph-shadow-lg); border-color: var(--ph-orange); }
 
-.card .thumb { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid var(--ph-border); }
+.card .thumb { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid var(--ph-border-soft); }
 .card .body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .card .meta {
     font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;
     letter-spacing: 0.06em; color: var(--ph-text-tertiary);
 }
-.card h2 { font-size: 1.25rem; font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+.card h2 { font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
 .card p { font-size: 0.92rem; color: var(--ph-text-secondary); margin: 0; }
 .card .go {
-    margin-top: auto; font-weight: 600; color: var(--ph-red); font-size: 0.92rem;
+    margin-top: auto; font-weight: 600; color: var(--ph-orange); font-size: 0.92rem;
     display: inline-flex; align-items: center; gap: 6px;
 }
 
 /* Placeholder card for "more coming" */
 .card.soon {
-    border-style: dashed; box-shadow: none; background: transparent;
+    border-style: dashed; border-color: var(--ph-border); box-shadow: none; background: transparent;
     align-items: center; justify-content: center; text-align: center;
     color: var(--ph-text-tertiary); min-height: 200px; padding: 24px;
 }
 .card.soon:hover { transform: none; box-shadow: none; border-color: var(--ph-border-strong); }
 
 footer {
-    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--ph-border);
+    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--ph-border-soft);
     font-size: 0.85rem; color: var(--ph-text-tertiary);
 }
 footer a { color: var(--ph-blue); text-decoration: none; }
