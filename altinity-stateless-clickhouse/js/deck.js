@@ -10,9 +10,12 @@ Reveal.initialize({
     transition: 'fade',
     transitionSpeed: 'fast',
     backgroundTransition: 'fade',
-    controls: true,
+    controls: false, // default arrow cluster is ugly; we use a custom .deck-next button (see below)
     progress: true,
     center: false, // we lay out slides top-aligned; section/title slides center themselves
 
     plugins: [RevealNotes, RevealHighlight],
 });
+
+// Custom bottom-right "next" arrow (matches the Figma page-number + arrow pair).
+document.querySelector('.deck-next')?.addEventListener('click', () => Reveal.next());

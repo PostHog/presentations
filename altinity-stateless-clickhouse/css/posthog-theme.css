@@ -184,21 +184,38 @@
 
 /* ---- Chrome: progress, slide number, controls -------------------------- */
 .reveal .progress { color: var(--ph-orange); height: 4px; }
-.reveal .controls { color: var(--ph-text-tertiary); }
 
-/* Page number — orange on a white pill, bottom-right (Figma "4 / 34") */
+/* Bottom-right chrome (Figma): orange page-number pill + a clean "→" box.
+   reveal's default .controls arrow cluster is disabled in deck.js. */
 .reveal .slide-number {
     background: var(--ph-surface);
     color: var(--ph-orange);
     font-family: var(--font-title);
     font-weight: 700;
     font-size: 15px;
-    padding: 5px 11px;
+    height: 34px;
+    padding: 0 13px;
+    display: flex;
+    align-items: center;
     border-radius: var(--r);
     box-shadow: var(--ph-shadow);
-    right: 18px; bottom: 16px;
+    right: 70px; bottom: 16px;   /* sits to the left of .deck-next */
 }
 .reveal .slide-number a { color: var(--ph-orange); }
+
+.deck-next {
+    position: fixed; right: 18px; bottom: 16px; z-index: 31;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 34px;
+    background: var(--ph-surface); color: #1d1d1d;
+    border: none; border-radius: var(--r);
+    box-shadow: var(--ph-shadow);
+    font-family: var(--font-body); font-size: 19px; line-height: 1;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.deck-next:hover { transform: translateY(-1px); box-shadow: var(--ph-shadow-lg); }
+.deck-next:active { transform: translateY(0); }
 
 /* Persistent footer brand line — mono, uppercase */
 .deck-footer {
