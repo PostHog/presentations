@@ -182,14 +182,45 @@
 /* Section number — mono, muted (Figma "02") */
 .reveal .section-num { font-family: var(--font-mono); color: var(--ph-text-secondary); font-size: 0.8em; letter-spacing: 0.1em; }
 
-/* ---- Chrome: progress, slide number, controls -------------------------- */
-.reveal .progress { color: var(--ph-orange); height: 4px; }
+/* ---- Chrome: bottom toolbar (logomark + progress + nav) -----------------
+   reveal's own progress, slideNumber and .controls are all disabled in
+   deck.js; this custom bar matches the Figma. */
+.deck-bottombar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; align-items: center; gap: 22px;
+    padding: 14px 20px 16px;
+    pointer-events: none;          /* clicks fall through to the slide... */
+}
+.deck-nav { pointer-events: auto; } /* ...except the nav buttons */
 
-/* Bottom-right nav (Figma): orange page-number pill + prev/next arrow boxes.
-   reveal's own slideNumber + .controls are disabled (deck.js); this is custom
-   so we get clean, consistent vertical centering. */
+/* Footer brand line — logomark + meetup, mono uppercase */
+.deck-footer {
+    flex: 0 0 auto;
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ph-text-secondary);
+}
+.deck-logomark { height: 22px; width: auto; display: block; }
+
+/* Progress bar — orange fill on a rounded track */
+.deck-progress {
+    flex: 1 1 auto;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+}
+.deck-progress-fill {
+    height: 100%; width: 0;
+    background: var(--ph-orange);
+    border-radius: var(--r-pill);
+    transition: width 0.3s ease;
+}
+
+/* Nav — [←] [n / total] [→], each framed */
 .deck-nav {
-    position: fixed; right: 18px; bottom: 16px; z-index: 31;
+    flex: 0 0 auto;
     display: flex; align-items: center; gap: 10px;
 }
 .deck-nav-num,
@@ -199,9 +230,7 @@
     border: none;
     border-radius: var(--r);
     box-shadow: var(--ph-shadow);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center;
     line-height: 1;
 }
 .deck-nav-num {
@@ -209,34 +238,23 @@
     padding: 0 16px;
     color: var(--ph-orange);
     font-family: var(--font-title);
-    font-weight: 700;
-    font-size: 15px;
+    font-weight: 700; font-size: 15px;
     font-variant-numeric: tabular-nums;
 }
 .deck-nav-btn {
     width: 44px;
     color: #1d1d1d;
-    font-family: var(--font-body);
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0;
+    font-family: var(--font-body); font-size: 18px;
+    cursor: pointer; padding: 0;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .deck-nav-btn:hover { transform: translateY(-1px); box-shadow: var(--ph-shadow-lg); }
 .deck-nav-btn:active { transform: translateY(0); }
 .deck-nav-btn[disabled] { opacity: 0.4; cursor: default; transform: none; box-shadow: var(--ph-shadow); }
 
-/* Persistent footer brand line — mono, uppercase */
-.deck-footer {
-    position: fixed; bottom: 16px; left: 22px; z-index: 30;
-    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--ph-text-secondary);
-}
-.deck-footer b { color: var(--ph-red); font-weight: 700; }
-/* Flip footer to light when the current slide has a dark background */
-body:has(.reveal section.present.has-dark-background) .deck-footer { color: rgba(255, 255, 255, 0.65); }
-body:has(.reveal section.present.has-dark-background) .deck-footer b { color: #fff; }
+/* Dark slides: lighten footer text + progress track (fill & pills stay) */
+body:has(.reveal section.present.has-dark-background) .deck-footer { color: rgba(255, 255, 255, 0.7); }
+body:has(.reveal section.present.has-dark-background) .deck-progress { background: rgba(255, 255, 255, 0.16); }
 
 /* ---- Diagram helpers (pure CSS boxes for the pipeline) ------------------ */
 .reveal .node {

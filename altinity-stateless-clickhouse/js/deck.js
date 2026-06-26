@@ -10,8 +10,8 @@ Reveal.initialize({
     transition: 'fade',
     transitionSpeed: 'fast',
     backgroundTransition: 'fade',
-    controls: false, // default arrow cluster is ugly; we use a custom .deck-next button (see below)
-    progress: true,
+    controls: false, // default arrow cluster is ugly; we render a custom .deck-nav
+    progress: false, // custom .deck-progress bar instead of reveal's thin edge line
     center: false, // we lay out slides top-aligned; section/title slides center themselves
 
     plugins: [RevealNotes, RevealHighlight],
@@ -21,11 +21,14 @@ Reveal.initialize({
 const navNum = document.querySelector('.deck-nav-num');
 const navPrev = document.querySelector('[data-nav="prev"]');
 const navNext = document.querySelector('[data-nav="next"]');
+const navFill = document.querySelector('.deck-progress-fill');
 function updateNav() {
+    const total = Reveal.getTotalSlides();
     const current = (Reveal.getState().indexh || 0) + 1;
-    navNum.textContent = current + ' / ' + Reveal.getTotalSlides();
+    navNum.textContent = current + ' / ' + total;
     navPrev.disabled = Reveal.isFirstSlide();
     navNext.disabled = Reveal.isLastSlide();
+    navFill.style.width = (total > 1 ? (current / total) * 100 : 100) + '%';
 }
 Reveal.on('ready', updateNav);
 Reveal.on('slidechanged', updateNav);
