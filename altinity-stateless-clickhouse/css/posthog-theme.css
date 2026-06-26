@@ -185,38 +185,46 @@
 /* ---- Chrome: progress, slide number, controls -------------------------- */
 .reveal .progress { color: var(--ph-orange); height: 4px; }
 
-/* Bottom-right chrome (Figma): orange page-number pill + a clean "→" box.
-   reveal's default .controls arrow cluster is disabled in deck.js. */
-.reveal .slide-number {
+/* Bottom-right nav (Figma): orange page-number pill + prev/next arrow boxes.
+   reveal's own slideNumber + .controls are disabled (deck.js); this is custom
+   so we get clean, consistent vertical centering. */
+.deck-nav {
+    position: fixed; right: 18px; bottom: 16px; z-index: 31;
+    display: flex; align-items: center; gap: 10px;
+}
+.deck-nav-num,
+.deck-nav-btn {
+    height: 36px;
     background: var(--ph-surface);
+    border: none;
+    border-radius: var(--r);
+    box-shadow: var(--ph-shadow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.deck-nav-num {
+    min-width: 92px;   /* fixed so the pill doesn't jump between 1- and 2-digit slides */
+    padding: 0 16px;
     color: var(--ph-orange);
     font-family: var(--font-title);
     font-weight: 700;
     font-size: 15px;
-    height: 34px;
-    padding: 0 13px;
-    display: flex;
-    align-items: center;
-    border-radius: var(--r);
-    box-shadow: var(--ph-shadow);
-    right: 70px; bottom: 16px;   /* sits to the left of .deck-next */
+    font-variant-numeric: tabular-nums;
 }
-.reveal .slide-number,
-.reveal .slide-number a { color: var(--ph-orange); border-bottom: none; }
-
-.deck-next {
-    position: fixed; right: 18px; bottom: 16px; z-index: 31;
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 34px;
-    background: var(--ph-surface); color: #1d1d1d;
-    border: none; border-radius: var(--r);
-    box-shadow: var(--ph-shadow);
-    font-family: var(--font-body); font-size: 19px; line-height: 1;
+.deck-nav-btn {
+    width: 44px;
+    color: #1d1d1d;
+    font-family: var(--font-body);
+    font-size: 18px;
     cursor: pointer;
+    padding: 0;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.deck-next:hover { transform: translateY(-1px); box-shadow: var(--ph-shadow-lg); }
-.deck-next:active { transform: translateY(0); }
+.deck-nav-btn:hover { transform: translateY(-1px); box-shadow: var(--ph-shadow-lg); }
+.deck-nav-btn:active { transform: translateY(0); }
+.deck-nav-btn[disabled] { opacity: 0.4; cursor: default; transform: none; box-shadow: var(--ph-shadow); }
 
 /* Persistent footer brand line — mono, uppercase */
 .deck-footer {
