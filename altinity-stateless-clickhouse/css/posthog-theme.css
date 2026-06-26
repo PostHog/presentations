@@ -201,7 +201,8 @@
     box-shadow: var(--ph-shadow);
     right: 70px; bottom: 16px;   /* sits to the left of .deck-next */
 }
-.reveal .slide-number a { color: var(--ph-orange); }
+.reveal .slide-number,
+.reveal .slide-number a { color: var(--ph-orange); border-bottom: none; }
 
 .deck-next {
     position: fixed; right: 18px; bottom: 16px; z-index: 31;
