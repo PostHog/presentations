@@ -1,61 +1,20 @@
 /*
- * PostHog reveal.js theme
- * Built from .interface-design/slides.md + system.md tokens.
+ * PostHog reveal.js theme — 2026 Figma redesign
+ * Design tokens live in ../../css/tokens.css (shared with the landing page
+ * and every other deck). This file maps those tokens onto reveal.js.
  *
  * Brand rules honored here:
  *  - Sentence case (we never text-transform titles)
- *  - Borders-first, shadows rare: the signature hard shadow is `0 3px 0 <border>`
+ *  - White + soft multi-radial bloom background (was flat cream→cool linear)
+ *  - Soft elevation, not the old hard "0 3px 0" shadow
+ *  - Accent #ff5c1c points at ONE thing per slide; yellow #f3c049 on dark slides
  *  - Brand red (#F54E00) reserved for branding moments, NOT status
- *  - Accent (orange light / yellow dark) points at ONE thing per slide
- *  - Open Runde is the brand font; Inter is the documented fallback when it
- *    isn't available. Drop Open Runde woff2s in fonts/ and add an @font-face
- *    to upgrade — everything below already prefers it.
+ *  - Eyebrows / labels / footer in mono, UPPERCASE (Berkeley Mono in the
+ *    brand → Source Code Pro here); titles & body in RoundHog
+ *  - Fonts are self-hosted in ../../fonts, so the deck works fully offline
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap');
-
-:root {
-    /* Brand */
-    --ph-red: #f54e00;       /* branding only */
-    --ph-blue: #1d4aff;
-    --ph-yellow: #f9bd2b;
-
-    /* Light surfaces (posthog-3000) */
-    --ph-bg: #eeefe9;            /* warm cream fallback */
-    /* Signature deck gradient — copied from posthog.com slide system:
-       warm beige -> soft purple-blue, top to bottom, black text. */
-    --ph-bg-gradient: linear-gradient(180deg, #FFF1D5 0%, #DAE0EB 100%);
-    --ph-surface: #ffffff;       /* cards / code blocks */
-    --ph-surface-2: #f3f4ef;     /* secondary fill */
-    --ph-surface-3: #e9eae3;
-
-    /* Text */
-    --ph-text: #151515;          /* neutral-950 */
-    --ph-text-secondary: #55564f;/* neutral-750 */
-    --ph-text-tertiary: #76776f;
-
-    /* Borders-first depth */
-    --ph-border: #d0d1c9;
-    --ph-border-strong: #b9bab1;
-    --ph-shadow: 3px;            /* hard-shadow offset */
-
-    /* Accent — "look here", one focal point per slide */
-    --ph-accent: hsl(19, 100%, 48%);     /* orange */
-    --ph-accent-soft: hsl(19, 100%, 48%, 0.12);
-
-    /* Semantic — only when we genuinely mean status */
-    --ph-danger: #db3707;
-    --ph-warning: #f7a501;
-    --ph-success: #388600;
-
-    --r-sm: 4px;
-    --r: 6px;
-    --r-lg: 10px;
-
-    --font-body: 'Open Runde', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-title: 'Open Runde', 'MatterSQ', 'Inter', -apple-system, sans-serif;
-    --font-mono: 'Source Code Pro', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-}
+@import url('../../css/tokens.css');
 
 /* ---- Base deck ---------------------------------------------------------- */
 .reveal {
@@ -65,32 +24,34 @@
     color: var(--ph-text);
     -webkit-font-smoothing: antialiased;
 }
-.reveal-viewport { background: var(--ph-bg-gradient); background-color: var(--ph-bg); }
-
-.reveal .slides {
-    text-align: left;
+/* White base + signature radial blooms. Dark slides paint over this via
+   reveal's data-background-color and pick up the dark tokens below. */
+.reveal-viewport {
+    background-color: var(--ph-bg-base);
+    background-image: var(--ph-bg-bloom);
+    background-repeat: no-repeat;
 }
-.reveal .slides section {
-    height: 100%;
-}
 
-/* Headings — sentence case, never uppercased */
+.reveal .slides { text-align: left; }
+.reveal .slides section { height: 100%; }
+
+/* Headings — sentence case, never uppercased; RoundHog Bold */
 .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
     font-family: var(--font-title);
     color: var(--ph-text);
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
     text-transform: none;
     margin: 0 0 0.4em 0;
 }
-.reveal h1 { font-size: 2.05em; }
-.reveal h2 { font-size: 1.55em; }
+.reveal h1 { font-size: 2.1em; }
+.reveal h2 { font-size: 1.6em; }
 .reveal h3 { font-size: 1.15em; font-weight: 600; }
 
 .reveal p { line-height: 1.4; margin: 0 0 0.6em 0; }
 .reveal strong { font-weight: 600; }
-.reveal em { font-style: normal; color: var(--ph-accent); font-weight: 600; }
+.reveal em { font-style: normal; color: var(--ph-accent); font-weight: 700; }
 
 .reveal a { color: var(--ph-blue); text-decoration: none; border-bottom: 1px solid currentColor; }
 
@@ -100,38 +61,39 @@
 
 /* ---- Reusable slide components ------------------------------------------ */
 
-/* Small uppercase label (mirrors h5 token: uppercase + letter-spacing) */
+/* Eyebrow / kicker — mono, uppercase, muted (Figma "THE TEXTBOOK PATTERN") */
 .reveal .kicker {
-    font-family: var(--font-title);
+    font-family: var(--font-mono);
     font-size: 0.5em;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.075em;
-    color: var(--ph-accent);
-    margin: 0 0 0.6em 0;
+    letter-spacing: 0.12em;
+    color: var(--ph-text-secondary);
+    margin: 0 0 0.7em 0;
     display: block;
 }
 
 .reveal .lead {
-    font-size: 1.15em;
+    font-size: 1.1em;
     color: var(--ph-text-secondary);
-    max-width: 22ch;
+    max-width: 24ch;
 }
 
 /* Big stat */
 .reveal .stat { font-family: var(--font-title); font-weight: 700; font-size: 2.4em; line-height: 1; letter-spacing: -0.02em; }
 .reveal .stat-label { color: var(--ph-text-secondary); font-size: 0.7em; }
 
-/* Cards — borders-first with the signature hard shadow */
+/* Cards — soft elevation over the bloom background */
 .reveal .card {
-    background: var(--ph-surface);
-    border: 1px solid var(--ph-border);
-    border-radius: var(--r);
-    box-shadow: 0 var(--ph-shadow) 0 var(--ph-border);
-    padding: 0.7em 0.85em;
+    background: var(--ph-card-bg);
+    border: 1px solid var(--ph-border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--ph-shadow);
+    padding: 0.7em 0.9em;
+    backdrop-filter: blur(2px);
 }
-.reveal .card.accent { border-color: var(--ph-accent); box-shadow: 0 var(--ph-shadow) 0 var(--ph-accent); }
-.reveal .card.data { border-color: var(--ph-blue); box-shadow: 0 var(--ph-shadow) 0 #cdd7ff; }
+.reveal .card.accent { border-color: var(--ph-accent); }
+.reveal .card.data { border-color: var(--ph-blue); }
 
 .reveal .pill {
     display: inline-block;
@@ -139,7 +101,7 @@
     font-weight: 600;
     font-family: var(--font-mono);
     padding: 0.15em 0.6em;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     border: 1px solid var(--ph-border-strong);
     background: var(--ph-surface);
     color: var(--ph-text-secondary);
@@ -155,7 +117,7 @@
 /* Callout / gotcha (uses semantic warning, NOT brand red) */
 .reveal .gotcha {
     border-left: 4px solid var(--ph-warning);
-    background: var(--ph-surface);
+    background: var(--ph-card-bg);
     border-radius: 0 var(--r) var(--r) 0;
     padding: 0.5em 0.8em;
     font-size: 0.8em;
@@ -172,7 +134,7 @@
     font-size: 0.62em;
     color: var(--ph-danger);
     font-family: var(--font-mono);
-    background: #fff;
+    background: var(--ph-surface);
 }
 .reveal .todo b { color: var(--ph-danger); }
 
@@ -186,8 +148,8 @@
     font-family: var(--font-mono);
     font-size: 0.46em;
     line-height: 1.45;
-    box-shadow: 0 var(--ph-shadow) 0 var(--ph-border);
-    border: 1px solid var(--ph-border);
+    box-shadow: var(--ph-shadow);
+    border: 1px solid var(--ph-border-soft);
     border-radius: var(--r);
     margin: 0.3em 0;
 }
@@ -203,7 +165,7 @@
 .reveal code { font-family: var(--font-mono); }
 .reveal :not(pre) > code {
     background: var(--ph-surface-3);
-    border: 1px solid var(--ph-border);
+    border: 1px solid var(--ph-border-soft);
     border-radius: var(--r-sm);
     padding: 0.05em 0.35em;
     font-size: 0.85em;
@@ -211,41 +173,107 @@
 
 /* ---- Title / section slides -------------------------------------------- */
 .reveal section.title-slide { display: flex; flex-direction: column; justify-content: center; height: 100%; }
-.reveal section.title-slide h1 { font-size: 2.4em; font-weight: 700; }
+.reveal section.title-slide h1 { font-size: 2.5em; font-weight: 700; }
 
 .reveal section.section-divider {
     display: flex; flex-direction: column; justify-content: center; height: 100%;
 }
 .reveal section.section-divider h2 { font-size: 2.2em; font-weight: 700; }
-.reveal .section-num { font-family: var(--font-mono); color: var(--ph-accent); font-size: 0.9em; }
+/* Section number — mono, muted (Figma "02") */
+.reveal .section-num { font-family: var(--font-mono); color: var(--ph-text-secondary); font-size: 0.8em; letter-spacing: 0.1em; }
 
-/* ---- Chrome: progress, slide number, controls -------------------------- */
-.reveal .progress { color: var(--ph-accent); height: 4px; }
-.reveal .slide-number { background: transparent; color: var(--ph-text-tertiary); font-family: var(--font-mono); font-size: 16px; }
-.reveal .controls { color: var(--ph-text-tertiary); }
-
-/* Persistent footer brand line */
-.deck-footer {
-    position: fixed; bottom: 14px; left: 22px; z-index: 30;
-    font-family: var(--font-mono); font-size: 14px; color: var(--ph-text-tertiary);
+/* ---- Chrome: bottom toolbar (logomark + progress + nav) -----------------
+   reveal's own progress, slideNumber and .controls are all disabled in
+   deck.js; this custom bar matches the Figma. */
+.deck-bottombar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; align-items: center; gap: 22px;
+    padding: 14px 20px 16px;
+    pointer-events: none;          /* clicks fall through to the slide... */
 }
-.deck-footer b { color: var(--ph-red); font-weight: 700; }
+.deck-nav { pointer-events: auto; } /* ...except the nav buttons */
+
+/* Footer brand line — logomark + meetup, mono uppercase */
+.deck-footer {
+    flex: 0 0 auto;
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ph-text-secondary);
+}
+.deck-logomark { height: 22px; width: auto; display: block; }
+
+/* Progress bar — orange fill on a rounded track */
+.deck-progress {
+    flex: 1 1 auto;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+}
+.deck-progress-fill {
+    height: 100%; width: 0;
+    background: var(--ph-orange);
+    border-radius: var(--r-pill);
+    transition: width 0.3s ease;
+}
+
+/* Nav — [←] [n / total] [→], each framed */
+.deck-nav {
+    flex: 0 0 auto;
+    display: flex; align-items: center; gap: 10px;
+}
+.deck-nav-num,
+.deck-nav-btn {
+    height: 36px;
+    background: var(--ph-surface);
+    border: none;
+    border-radius: var(--r);
+    box-shadow: var(--ph-shadow);
+    display: inline-flex; align-items: center; justify-content: center;
+    line-height: 1;
+}
+.deck-nav-num {
+    min-width: 92px;   /* fixed so the pill doesn't jump between 1- and 2-digit slides */
+    padding: 0 16px;
+    color: var(--ph-orange);
+    font-family: var(--font-title);
+    font-weight: 700; font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+.deck-nav-btn {
+    width: 44px;
+    color: #1d1d1d;
+    font-family: var(--font-body); font-size: 18px;
+    cursor: pointer; padding: 0;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.deck-nav-btn:hover { transform: translateY(-1px); box-shadow: var(--ph-shadow-lg); }
+.deck-nav-btn:active { transform: translateY(0); }
+.deck-nav-btn[disabled] { opacity: 0.4; cursor: default; transform: none; box-shadow: var(--ph-shadow); }
+
+/* Dark slides: lighten footer text + progress track (fill & pills stay) */
+body:has(.reveal section.present.has-dark-background) .deck-footer { color: rgba(255, 255, 255, 0.7); }
+body:has(.reveal section.present.has-dark-background) .deck-progress { background: rgba(255, 255, 255, 0.16); }
 
 /* ---- Diagram helpers (pure CSS boxes for the pipeline) ------------------ */
 .reveal .node {
-    border: 1px solid var(--ph-border-strong);
+    border: 1px solid var(--ph-border-soft);
     border-radius: var(--r);
-    background: var(--ph-surface);
-    box-shadow: 0 var(--ph-shadow) 0 var(--ph-border);
+    background: var(--ph-card-bg);
+    box-shadow: var(--ph-shadow);
     padding: 0.5em 0.7em;
     text-align: center;
     font-size: 0.7em;
+    backdrop-filter: blur(2px);
 }
-.reveal .node .node-title { font-family: var(--font-title); font-weight: 600; font-size: 1em; }
+.reveal .node .node-title { font-family: var(--font-title); font-weight: 700; font-size: 1em; color: var(--ph-accent); }
 .reveal .node .node-sub { color: var(--ph-text-secondary); font-size: 0.78em; font-family: var(--font-mono); }
-.reveal .node.kafka { border-color: #6b4fbb; box-shadow: 0 var(--ph-shadow) 0 #d8cef0; }
-.reveal .node.ingest { border-color: var(--ph-accent); box-shadow: 0 var(--ph-shadow) 0 var(--ph-accent-soft); }
-.reveal .node.data { border-color: var(--ph-blue); box-shadow: 0 var(--ph-shadow) 0 #cdd7ff; }
+.reveal .node.kafka { border-color: #6b4fbb; }
+.reveal .node.kafka .node-title { color: #6b4fbb; }
+.reveal .node.ingest { border-color: var(--ph-accent); }
+.reveal .node.data { border-color: var(--ph-blue); }
+.reveal .node.data .node-title { color: var(--ph-blue); }
 .reveal .arrow { display: flex; align-items: center; justify-content: center; color: var(--ph-text-tertiary); font-size: 1.4em; padding: 0 0.1em; }
 /* arrows never stretch to a flex column */
 .reveal .cols > .arrow, .reveal .pipe-row > .arrow { flex: 0 0 auto; }
@@ -256,21 +284,6 @@
 .reveal .pipe-row > .node { flex: 0 1 auto; }
 
 .reveal .stack { display: flex; flex-direction: column; gap: 0.45em; }
-
-/* ---- Dark variant (optional; toggle with `data-theme-dark` on body) ----- */
-body.dark {
-    --ph-bg: #1c1d22;
-    --ph-surface: #25262c;
-    --ph-surface-2: #2c2d34;
-    --ph-surface-3: #32333a;
-    --ph-text: #eeefe9;
-    --ph-text-secondary: #b6b7b0;
-    --ph-text-tertiary: #8a8b84;
-    --ph-border: #3a3b42;
-    --ph-border-strong: #4b4c54;
-    --ph-accent: hsl(43, 94%, 57%); /* yellow accent in dark */
-    --ph-accent-soft: hsl(43, 94%, 57%, 0.14);
-}
 
 /* ---- highlight.js — PostHog light palette ------------------------------- */
 .reveal .hljs { background: transparent; color: var(--ph-text); }
@@ -286,20 +299,22 @@ body.dark {
 .reveal .hljs-strong { font-weight: 700; }
 .reveal .hljs-deletion { background: #fbe3da; }
 .reveal .hljs-addition { background: #e3f0d8; }
+/* Code on dark slides stays legible */
+.reveal section.has-dark-background pre code { background: rgba(255, 255, 255, 0.05); }
 
 /* ---- Memes — real Imgflip images, downloaded and served locally -------- */
 .reveal .meme-tag {
     display: inline-block; font-family: var(--font-mono); font-size: 0.5em;
     text-transform: uppercase; letter-spacing: 0.1em; color: var(--ph-accent);
-    border: 1px dashed var(--ph-accent); border-radius: 999px;
+    border: 1px dashed var(--ph-accent); border-radius: var(--r-pill);
     padding: 0.1em 0.7em; margin-bottom: 0.5em;
 }
 
 /* Real meme images (downloaded from Imgflip, served locally) */
 .reveal .meme-img {
     display: block; margin: 0 auto; max-width: 100%; max-height: 500px;
-    border: 1px solid var(--ph-border); border-radius: var(--r);
-    box-shadow: 0 var(--ph-shadow) 0 var(--ph-border);
+    border: 1px solid var(--ph-border-soft); border-radius: var(--r);
+    box-shadow: var(--ph-shadow);
 }
 .reveal .meme-slide { text-align: center; }
 .reveal .meme-slide .meme-cap { margin-top: 0.5em; }
@@ -307,10 +322,9 @@ body.dark {
 /* Max the hedgehog — corner accents on bookend/divider slides only */
 .reveal .hog { position: absolute; bottom: 0; right: 12px; max-height: 240px; width: auto; pointer-events: none; z-index: 2; }
 
-/* QR code card — closing slide. Own flex row inside the section so it
-   doesn't depend on overriding reveal's section styling. */
+/* QR code card — closing slide. */
 .reveal .closing-row { display: flex; align-items: center; gap: 1.6em; width: 100%; }
 .reveal .closing-row .closing-text { flex: 1; min-width: 0; }
 .reveal .qr-card { flex: 0 0 auto; text-align: center; }
-.reveal .qr-card img { width: 220px; height: 220px; display: block; background: #fff; border: 1px solid var(--ph-border); border-radius: var(--r); box-shadow: 0 var(--ph-shadow) 0 var(--ph-border); padding: 10px; }
+.reveal .qr-card img { width: 220px; height: 220px; display: block; background: #fff; border: 1px solid var(--ph-border-soft); border-radius: var(--r); box-shadow: var(--ph-shadow); padding: 10px; }
 .reveal .qr-card .qr-cap { font-family: var(--font-mono); font-size: 14px; color: var(--ph-text-secondary); margin-top: 12px; line-height: 1.35; }

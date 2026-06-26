@@ -25,6 +25,43 @@ There is also a **code-backed slide system** in the `posthog.com` repo (the sche
 
 ---
 
+## 2026 presentation redesign (what this repo ships)
+
+The decks and landing page in this repo now implement a refreshed presentation
+look derived from the Figma file **"WIP PH BRAND — Lotties workspace" →
+`presentations` page**. The implementation source of truth is
+[`css/tokens.css`](./css/tokens.css) (imported by `css/landing.css` and every
+deck's `css/posthog-theme.css`). The values below override the older guidance in
+this file **for presentations specifically**.
+
+| Token | Value | Note |
+| ----- | ----- | ---- |
+| Accent (light) | `#ff5c1c` | Brighter than the old `#f54e00` / `hsl(19 …)`. One focal point per slide. |
+| Accent (dark slides) | `#f3c049` | Yellow, for emphasis on dark backgrounds. |
+| Chrome orange (fixed) | `#ff5c1c` | Page-number pill etc. stays orange even on dark slides. |
+| Background (light) | white + soft **multi-radial blooms** | Replaces the flat `#FFF1D5 → #DAE0EB` linear gradient. |
+| Background (dark) | `#1e1f23` + faint warm blooms | Replaces flat `#151515`. |
+| Title / body text | `#000` / `rgba(0,0,0,.6)` | |
+| Display + body font | **RoundHog**, self-hosted | PostHog's house face (rounded Inter, SIL OFL 1.1). Bold titles, SemiBold labels, Medium body; upright + italic. |
+| Mono font | **Berkeley Mono** in the brand → **Source Code Pro** here | Berkeley Mono is commercial; Source Code Pro is the free, self-hosted stand-in. Used Bold + UPPERCASE for eyebrows, labels, footer. |
+| Eyebrow / kicker | mono, UPPERCASE, `rgba(0,0,0,.6)` | e.g. `THE TEXTBOOK PATTERN`. |
+
+> ⚠️ **Three deltas from the older brand guidance in this doc:**
+> 1. **UI depth strategy changed.** For UI surfaces (cards, code blocks, diagram nodes, the page-number pill) the signature *hard* drop shadow (`0 3px 0 <border>`) is **retired** in favour of **soft, blurred elevation**. (This is separate from *illustration* style — Max/hedgehog art keeps its thick outlines + hard shadow, as described under "Imagery".)
+> 2. **Accent orange changed** from `#f54e00`/`hsl(19,100%,48%)` to `#ff5c1c`.
+> 3. **Background changed** from a 2-stop linear gradient to white + radial blooms.
+>
+> This is sourced from a **WIP** Figma exploration. The app design system in
+> [`system.md`](./system.md) (the product UI) is **intentionally left unchanged** —
+> it documents the app, not slides. If/when this brand direction is ratified, fold
+> these tokens back into the canonical handbook.
+
+Fonts are **self-hosted** in [`fonts/`](./fonts) (RoundHog + Source Code Pro
+`woff2`, both OFL), so decks render fully offline with no Google Fonts / CDN
+dependency.
+
+---
+
 ## Tooling
 
 - **Polished / external decks:** [Figma Slides](https://posthog.com/handbook/brand/in-practice#presentations) with Graphics Team templates. Request access / templates in `#design-review`.

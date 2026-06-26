@@ -10,7 +10,18 @@
     <link rel="stylesheet" href="css/posthog-theme.css" />
 </head>
 <body>
-    <div class="deck-footer"><b>PostHog</b> &nbsp;·&nbsp; Altinity OSA meetup</div>
+    <div class="deck-bottombar">
+        <div class="deck-footer">
+            <img class="deck-logomark" src="../img/posthog-logomark.svg" alt="PostHog" />
+            <span>Altinity OSA meetup</span>
+        </div>
+        <div class="deck-progress"><div class="deck-progress-fill"></div></div>
+        <nav class="deck-nav" aria-label="Slide navigation">
+            <button class="deck-nav-btn" data-nav="prev" aria-label="Previous slide">←</button>
+            <span class="deck-nav-num">1 / 34</span>
+            <button class="deck-nav-btn" data-nav="next" aria-label="Next slide">→</button>
+        </nav>
+    </div>
 
     <div class="reveal">
         <div class="slides">
@@ -18,10 +29,10 @@
             <!-- 1 · TITLE -->
             <section class="title-slide" data-auto-animate>
                 <span class="kicker">PostHog · Altinity OSA meetup</span>
-                <h1>Stateless ClickHouse<br />for stream processing</h1>
+                <h1>Stateless <em>ClickHouse</em><br />for stream processing</h1>
                 <p class="lead">How we turned ClickHouse itself into our Kafka&nbsp;→&nbsp;CH inserter — and deleted the service we were about to build.</p>
                 <p class="small muted">James Greenhill &nbsp;·&nbsp; <span class="pill">no MergeTree required</span></p>
-                <img class="hog" src="img/hogs/explorer-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
+                <img class="hog" src="img/hogs/coach-clipboard-hog.png" alt="" style="right:40px; bottom:30px; max-height:340px" />
                 <aside class="notes">
                     Welcome. Tonight: a pattern we run in production to ingest a firehose of events
                     into ClickHouse without an inserter service in the middle. The trick is that the
@@ -49,11 +60,11 @@
             </section>
 
             <!-- 3 · SECTION: THE PROBLEM -->
-            <section class="section-divider" data-background-color="#151515" data-theme-section>
+            <section class="section-divider" data-background-color="#1e1f23" data-theme-section>
                 <span class="section-num">01</span>
                 <h2 style="color:#eeefe9">The pipeline that stopped scaling</h2>
                 <p class="lead" style="color:#b6b7b0">Kafka table engines, living on the data nodes.</p>
-                <img class="hog" src="img/hogs/lost-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/detective-hog.png" alt="" style="right:24px; bottom:0; max-height:300px" />
                 <aside class="notes">The classic ClickHouse + Kafka recipe — and where it breaks.</aside>
             </section>
 
@@ -134,7 +145,7 @@ go 1.20
             </section>
 
             <!-- 7 · SECTION: THE INSIGHT -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">02</span>
                 <h2 style="color:#eeefe9">The insight</h2>
                 <p class="lead" style="color:#b6b7b0">We didn't need a new service. We needed a new <em style="color:var(--ph-yellow)">role</em> for ClickHouse.</p>
@@ -206,11 +217,11 @@ go 1.20
             </section>
 
             <!-- 11 · SECTION: HOW IT WORKS -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">03</span>
                 <h2 style="color:#eeefe9">How it works</h2>
                 <p class="lead" style="color:#b6b7b0">Four objects. Two node roles. One native-protocol hop.</p>
-                <img class="hog" src="img/hogs/builder-hog.png" alt="" style="right:24px; bottom:0; max-height:280px" />
+                <img class="hog" src="img/hogs/builder-hog-waving.png" alt="" style="right:24px; bottom:0; max-height:280px" />
             </section>
 
             <!-- 12 · The four objects -->
@@ -391,11 +402,11 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
             </section>
 
             <!-- 20 · SECTION: IN PRODUCTION -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">04</span>
                 <h2 style="color:#eeefe9">In production</h2>
                 <p class="lead" style="color:#b6b7b0">Two regions, ~60 stateless ingestion nodes, zero stored bytes.</p>
-                <img class="hog" src="img/hogs/swole-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/muscle-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
             </section>
 
             <!-- 21 · Topology numbers -->
@@ -556,10 +567,10 @@ clickhouse_disk_balancer_enabled: false</code></pre>
             </section>
 
             <!-- 25 · SECTION: LESSONS -->
-            <section class="section-divider" data-background-color="#151515">
+            <section class="section-divider" data-background-color="#1e1f23">
                 <span class="section-num">05</span>
                 <h2 style="color:#eeefe9">What we learned</h2>
-                <img class="hog" src="img/hogs/security-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
+                <img class="hog" src="img/hogs/graduate-hog.png" alt="" style="right:28px; bottom:0; max-height:300px" />
             </section>
 
             <!-- 26 · Gotchas -->
