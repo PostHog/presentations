@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta charset="utf-8">
+  <title>PostHog Agent Platform — Live Demo</title>
+      <link href="vendor/fonts/fonts.css" rel="stylesheet">
+  <script src="image-slot.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #0E0F12; }
+    a { color: #F54E00; } a:hover { color: #F9BD2B; }
+  </style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+  <!-- 0 · Title -->
+  <section data-label="Title" data-screen-label="Title" data-speaker-notes="Intro yourself, then advance to the cold open." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 96px; width: 260px; height: 44px;"><div style="width: 160px; height: 28px; display: flex; flex-direction: row; gap: 12px; align-items: center; transform: scale(1.35); transform-origin: 0 0;"><x-import component-from-global-scope="PrimativeLogomark" from="./assets/Components.bundle.js" logomark="white" hint-size="52px,28px"></x-import><x-import component-from-global-scope="PrimativeWordmark" from="./assets/Components.bundle.js" color="white" hint-size="96px,24px"></x-import></div></div>
+    <div style="position: absolute; left: 120px; top: 380px; width: 1400px; display: flex; flex-direction: column; gap: 24px;">
+      <div style="font-weight: 700; font-size: 108px; line-height: 1.08; letter-spacing: -0.02em;">PostHog agent platform</div>
+      <div style="font-weight: 600; font-size: 40px; color: #9A9CA6;">"Live" demo</div>
+    </div>
+    <div style="position: absolute; left: 120px; top: 772px; width: 205px; height: 261px;">
+      <div style="position: absolute; left: 0; top: 54.4px; width: 204.9px; height: 204.9px; border-radius: 50%; background: #F54E00;"></div>
+      <div style="position: absolute; left: 0; top: 0; width: 204.6px; height: 260.1px; border-radius: 0 0 102px 102px; overflow: hidden;">
+        <img src="assets/dylan-portrait-cutout.png" alt="Dylan Martin" style="position: absolute; left: -14px; top: 22px; width: 232px; height: 248px; object-fit: cover; object-position: top center;">
+      </div>
+    </div>
+    <div style="position: absolute; left: 350px; top: 873px; display: flex; flex-direction: column; gap: 17px; color: #C7C9CF;">
+      <div style="font-weight: 600; font-size: 40px; line-height: 1;">Dylan Martin</div>
+      <div style="font-weight: 400; font-size: 40px; line-height: 1; color: #9A9CA6;">AI product engineering lead, PostHog</div>
+    </div>
+  </section>
+
+  <!-- 1 · Title / cold open -->
+  <section data-label="Cold open" data-screen-label="Cold open" data-speaker-notes="Read nothing. Paste this exact prompt into the builder and hit enter while the audience reads it. Then talk." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 96px; width: 260px; height: 44px;"><div style="width: 160px; height: 28px; display: flex; flex-direction: row; gap: 12px; align-items: center; transform: scale(1.35); transform-origin: 0 0;"><x-import component-from-global-scope="PrimativeLogomark" from="./assets/Components.bundle.js" logomark="white" hint-size="52px,28px"></x-import><x-import component-from-global-scope="PrimativeWordmark" from="./assets/Components.bundle.js" color="white" hint-size="96px,24px"></x-import></div></div>
+    <div style="position: absolute; left: 120px; top: 268px; width: 1560px; font-weight: 700; font-size: 108px; line-height: 1.08; letter-spacing: -0.02em;">Describe an agent. <span style="color: rgb(245, 78, 0);">Ship it live in minutes.</span></div>
+    <div style="position: absolute; left: 120px; top: 540px; font-weight: 600; font-size: 34px; color: #9A9CA6;"><br></div>
+    <div style="position: absolute; left: 120px; top: 664px; width: 1520px; background: #101114; border: 1.5px solid #2E3037; border-radius: 14px; padding: 40px 48px; box-sizing: border-box; font-family: 'IBM Plex Mono', monospace; font-size: 30px; line-height: 1.55; color: #D9DADE;">
+      <span style="color: rgb(245, 78, 0);">❯</span> Create and deploy a live agent called <span style="color: rgb(249, 189, 43);">repo-explorer-demo</span>: an assistant that answers questions about any public GitHub repo's architecture using the DeepWiki remote MCP server (<span style="color: rgb(240, 163, 94);">https://mcp.deepwiki.com/mcp</span> — public, no auth).
+    </div>
+  </section>
+
+  <!-- 2 · Architecture: spec -->
+  <section data-label="Versioned spec" data-screen-label="Versioned spec" data-speaker-notes="The builder is already working. An agent is just a versioned spec: authors write it through the control plane, it lands in the revisions store, the sealed bundle in S3." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 76px; font-weight: 700; font-size: 64px; letter-spacing: -0.015em;">An agent is a versioned spec</div>
+    <div style="position: absolute; left: 180px; top: 210px; width: 1560px; height: 820px;">
+      <svg width="1560" height="820" viewBox="0 0 1560 820" style="position: absolute; left: 0; top: 0;">
+        <defs>
+          <marker id="ah-s2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#4A4D56"></path></marker>
+          <marker id="ahx-s2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#F54E00"></path></marker>
+        </defs>
+        <path d="M340,96 V172" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s2)"></path>
+        <text x="356" y="142" font-family="IBM Plex Mono" font-size="24" fill="#F54E00">author spec + tools</text>
+        <path d="M340,332 V364" stroke="#F54E00" stroke-width="3" fill="none" marker-start="url(#ahx-s2)" marker-end="url(#ahx-s2)"></path>
+        <path d="M340,536 V676" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s2)"></path>
+        <path d="M570,438 H840 V730 H876" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s2)"></path>
+        <path d="M1190,96 V248" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s2)"></path>
+        <text x="1206" y="180" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">run</text>
+        <path d="M1450,307 H1530 V730 H1504" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s2)"></path>
+        <path d="M1360,680 V570" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s2)"></path>
+        <text x="1376" y="634" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">claim</text>
+        <path d="M1000,566 V676" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s2)"></path>
+        <path d="M1390,252 V100" stroke="#4A4D56" stroke-width="2" stroke-dasharray="8 8" fill="none" marker-end="url(#ah-s2)"></path>
+        <text x="1404" y="180" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">SSE stream</text>
+      </svg>
+      <div style="position: absolute; left: 60px; top: 0px; width: 560px; height: 96px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Authors</div>
+        <div style="font-size: 24px; color: #9A9CA6;">MCP · console · Claude Code</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 0px; width: 620px; height: 96px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Triggers</div>
+        <div style="font-size: 24px; color: #9A9CA6;">chat · webhook · Slack · cron · MCP</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 176px; width: 560px; height: 360px; border: 1.5px dashed #F54E00; border-radius: 16px; box-sizing: border-box;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #F54E00;">Control plane — author &amp; promote</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 252px; width: 460px; height: 80px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Django REST</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 368px; width: 460px; height: 140px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-janitor</div>
+        <div style="font-size: 24px; color: #9A9CA6;">bundle CRUD · freeze · validate</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 176px; width: 620px; height: 430px; border: 1.5px dashed #35373F; border-radius: 16px; box-sizing: border-box; opacity: 0.22;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #9A9CA6;">Data plane — run</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 252px; width: 520px; height: 110px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-ingress</div>
+        <div style="font-size: 24px; color: #9A9CA6;">auth · route slug → live revision</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 396px; width: 520px; height: 170px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-runner</div>
+        <div style="font-size: 24px; color: #9A9CA6;">model loop · tool dispatch</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 680px; width: 560px; height: 100px; background: #1A1B20; border: 1.5px solid #F54E00; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE;">applications · revisions (spec + bundle)</div>
+      <div style="position: absolute; left: 880px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #F54E00; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE;">bundle store · S3</div>
+      <div style="position: absolute; left: 1220px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #35373F; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE; opacity: 0.22;">session queue</div>
+    </div>
+  </section>
+
+  <!-- 3 · Architecture: lifecycle -->
+  <section data-label="Lifecycle" data-screen-label="Lifecycle" data-speaker-notes="Freeze validates and seals the bundle. Promote is instant — it flips the live pointer in the revisions store. Rollback is just re-promoting an old revision." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 76px; font-weight: 700; font-size: 64px; letter-spacing: -0.015em; font-family: 'IBM Plex Mono', monospace;">draft <span style="color: #F54E00;">→</span> freeze <span style="color: #F54E00;">→</span> promote</div>
+    <div style="position: absolute; left: 180px; top: 210px; width: 1560px; height: 820px;">
+      <svg width="1560" height="820" viewBox="0 0 1560 820" style="position: absolute; left: 0; top: 0;">
+        <defs>
+          <marker id="ah-s3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#4A4D56"></path></marker>
+          <marker id="ahx-s3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#F54E00"></path></marker>
+        </defs>
+        <path d="M340,96 V172" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <text x="356" y="142" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">author spec + tools</text>
+        <path d="M340,332 V364" stroke="#F54E00" stroke-width="3" fill="none" marker-start="url(#ahx-s3)" marker-end="url(#ahx-s3)"></path>
+        <path d="M340,536 V676" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s3)"></path>
+        <text x="356" y="592" font-family="IBM Plex Mono" font-size="24" fill="#F54E00">revisions</text>
+        <path d="M570,438 H840 V730 H876" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <path d="M1190,96 V248" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <text x="1206" y="180" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">run</text>
+        <path d="M1450,307 H1530 V730 H1504" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <path d="M1360,680 V570" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <text x="1376" y="634" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">claim</text>
+        <path d="M1000,566 V676" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s3)"></path>
+        <path d="M1390,252 V100" stroke="#4A4D56" stroke-width="2" stroke-dasharray="8 8" fill="none" marker-end="url(#ah-s3)"></path>
+        <text x="1404" y="180" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">SSE stream</text>
+      </svg>
+      <div style="position: absolute; left: 60px; top: 0px; width: 560px; height: 96px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Authors</div>
+        <div style="font-size: 24px; color: #9A9CA6;">MCP · console · Claude Code</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 0px; width: 620px; height: 96px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Triggers</div>
+        <div style="font-size: 24px; color: #9A9CA6;">chat · webhook · Slack · cron · MCP</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 176px; width: 560px; height: 360px; border: 1.5px dashed #F54E00; border-radius: 16px; box-sizing: border-box;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #F54E00;">Control plane — author &amp; promote</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 252px; width: 460px; height: 80px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Django REST</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 368px; width: 460px; height: 140px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-janitor</div>
+        <div style="font-size: 24px; color: #9A9CA6;">bundle CRUD · freeze · validate</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 176px; width: 620px; height: 430px; border: 1.5px dashed #35373F; border-radius: 16px; box-sizing: border-box; opacity: 0.22;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #9A9CA6;">Data plane — run</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 252px; width: 520px; height: 110px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-ingress</div>
+        <div style="font-size: 24px; color: #9A9CA6;">auth · route slug → live revision</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 396px; width: 520px; height: 170px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-runner</div>
+        <div style="font-size: 24px; color: #9A9CA6;">model loop · tool dispatch</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 680px; width: 560px; height: 100px; background: #1A1B20; border: 1.5px solid #F54E00; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE;">applications · revisions (spec + bundle)</div>
+      <div style="position: absolute; left: 880px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #35373F; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE; opacity: 0.22;">bundle store · S3</div>
+      <div style="position: absolute; left: 1220px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #35373F; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE; opacity: 0.22;">session queue</div>
+    </div>
+  </section>
+
+  <!-- 4 · Architecture: front doors -->
+  <section data-label="Front doors" data-screen-label="Front doors" data-speaker-notes="Same live revision serves every trigger — chat, webhook, Slack, cron, MCP — no redeploys. Mention the approval gate: one line in the spec." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 76px; font-weight: 700; font-size: 64px; letter-spacing: -0.015em;">One agent, five front doors</div>
+    <div style="position: absolute; left: 180px; top: 210px; width: 1560px; height: 820px;">
+      <svg width="1560" height="820" viewBox="0 0 1560 820" style="position: absolute; left: 0; top: 0;">
+        <defs>
+          <marker id="ah-s4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#4A4D56"></path></marker>
+          <marker id="ahx-s4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#F54E00"></path></marker>
+        </defs>
+        <path d="M340,96 V172" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s4)"></path>
+        <text x="356" y="142" font-family="IBM Plex Mono" font-size="24" fill="#5A5D66">author spec + tools</text>
+        <path d="M340,332 V364" stroke="#4A4D56" stroke-width="2" fill="none" marker-start="url(#ah-s4)" marker-end="url(#ah-s4)"></path>
+        <path d="M340,536 V676" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s4)"></path>
+        <path d="M570,438 H840 V730 H876" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s4)"></path>
+        <path d="M1190,96 V248" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s4)"></path>
+        <text x="1206" y="180" font-family="IBM Plex Mono" font-size="24" fill="#F54E00">run</text>
+        <path d="M1450,307 H1530 V730 H1504" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s4)"></path>
+        <path d="M1360,680 V570" stroke="#F54E00" stroke-width="3" fill="none" marker-end="url(#ahx-s4)"></path>
+        <text x="1376" y="634" font-family="IBM Plex Mono" font-size="24" fill="#F54E00">claim</text>
+        <path d="M1000,566 V676" stroke="#4A4D56" stroke-width="2" fill="none" marker-end="url(#ah-s4)"></path>
+        <path d="M1390,252 V100" stroke="#F54E00" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#ahx-s4)"></path>
+        <text x="1404" y="180" font-family="IBM Plex Mono" font-size="24" fill="#F54E00">SSE stream</text>
+      </svg>
+      <div style="position: absolute; left: 60px; top: 0px; width: 560px; height: 96px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Authors</div>
+        <div style="font-size: 24px; color: #9A9CA6;">MCP · console · Claude Code</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 0px; width: 620px; height: 96px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Triggers</div>
+        <div style="font-size: 24px; color: #9A9CA6;">chat · webhook · Slack · cron · MCP</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 176px; width: 560px; height: 360px; border: 1.5px dashed #35373F; border-radius: 16px; box-sizing: border-box; opacity: 0.22;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #9A9CA6;">Control plane — author &amp; promote</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 252px; width: 460px; height: 80px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">Django REST</div>
+      </div>
+      <div style="position: absolute; left: 110px; top: 368px; width: 460px; height: 140px; background: #1F2025; border: 1.5px solid #35373F; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box; opacity: 0.22;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-janitor</div>
+        <div style="font-size: 24px; color: #9A9CA6;">bundle CRUD · freeze · validate</div>
+      </div>
+      <div style="position: absolute; left: 880px; top: 176px; width: 620px; height: 430px; border: 1.5px dashed #F54E00; border-radius: 16px; box-sizing: border-box;">
+        <div style="position: absolute; left: 26px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; color: #F54E00;">Data plane — run</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 252px; width: 520px; height: 110px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-ingress</div>
+        <div style="font-size: 24px; color: #9A9CA6;">auth · route slug → live revision</div>
+      </div>
+      <div style="position: absolute; left: 930px; top: 396px; width: 520px; height: 170px; background: #1F2025; border: 1.5px solid #F54E00; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 28px; box-sizing: border-box;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 30px;">agent-runner</div>
+        <div style="font-size: 24px; color: #9A9CA6;">model loop · tool dispatch</div>
+        <div style="font-size: 24px; line-height: 1.25; color: #F54E00;">tool calls can be gated behind human approval</div>
+      </div>
+      <div style="position: absolute; left: 60px; top: 680px; width: 560px; height: 100px; background: #1A1B20; border: 1.5px solid #35373F; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE; opacity: 0.22;">applications · revisions (spec + bundle)</div>
+      <div style="position: absolute; left: 880px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #35373F; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE; opacity: 0.22;">bundle store · S3</div>
+      <div style="position: absolute; left: 1220px; top: 680px; width: 280px; height: 100px; background: #1A1B20; border: 1.5px solid #F54E00; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 32px; box-sizing: border-box; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: #D9DADE;">session queue</div>
+    </div>
+  </section>
+
+  <!-- 5 · Payoff cue -->
+  <section data-label="Payoff cue" data-screen-label="Payoff cue" data-speaker-notes="Cue slide — read the mock exchange, then switch to the live client UI." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 300px; width: 1400px; font-weight: 700; font-size: 96px; line-height: 1.1; letter-spacing: -0.02em;">Ask it anything with a repo.</div>
+    <div style="position: absolute; left: 120px; top: 540px; display: flex; flex-direction: column; gap: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 32px; line-height: 1.4;">
+      <div style="color: #D9DADE;">&gt; how does posthog/posthog handle session replay ingestion?</div>
+      <div style="color: #9A9CA6;"><span style="color: #F54E00;">⚙</span> deepwiki · ask_question(repo: "posthog/posthog", ...)</div>
+    </div>
+    <div style="position: absolute; right: 120px; bottom: 100px; font-family: 'IBM Plex Mono', monospace; font-size: 40px; color: #F54E00;">live demo →</div>
+  </section>
+
+  <!-- 6 · Close -->
+  <section data-label="Close" data-screen-label="Close" data-speaker-notes="Land the three points slowly. Then Q&amp;A." style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #151619; font-family: 'IBM Plex Sans', sans-serif; color: #F5F4F0;">
+    <div style="position: absolute; left: 120px; top: 260px; width: 1400px; font-weight: 700; font-size: 112px; line-height: 1.05; letter-spacing: -0.02em;">Spec in. <span style="color: #F54E00;">Agent out.</span></div>
+    <div style="position: absolute; left: 120px; top: 560px; display: flex; flex-direction: column; gap: 44px; font-size: 42px; line-height: 1.3; color: #D9DADE;">
+      <div>Built live from a single prompt</div>
+      <div>Versioned by default; rolling back is one command</div>
+      <div>Reachable from chat, Slack, webhooks, cron, and MCP</div>
+    </div>
+    <div style="position: absolute; left: 120px; top: 952px; width: 260px; height: 40px;"><div style="width: 160px; height: 28px; display: flex; flex-direction: row; gap: 12px; align-items: center; transform: scale(1.2); transform-origin: 0 0;"><x-import component-from-global-scope="PrimativeLogomark" from="./assets/Components.bundle.js" logomark="white" hint-size="52px,28px"></x-import><x-import component-from-global-scope="PrimativeWordmark" from="./assets/Components.bundle.js" color="white" hint-size="96px,24px"></x-import></div></div>
+  </section>
+
+  <!-- 7 · Backup -->
+  
+
+</x-import>
+</x-dc>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # PostHog presentations
 
-Talks and presentations from the PostHog team, hosted as static reveal.js decks.
+Talks and presentations from the PostHog team, hosted as static HTML decks (reveal.js or a self-contained slide engine).
 
 **Live site:** https://posthog.github.io/presentations/
 
@@ -9,6 +9,8 @@ Talks and presentations from the PostHog team, hosted as static reveal.js decks.
 | Talk | Venue | Path |
 | ---- | ----- | ---- |
 | Stateless ClickHouse for stream processing | Altinity OSA meetup | [`altinity-stateless-clickhouse/`](./altinity-stateless-clickhouse/) |
+| PostHog agent platform: "live" demo | Internal demo | [`agent-platform-demo/`](./agent-platform-demo/) |
+| From Snakes to Crabs — feature flags in Rust | PostHog × One Rust meetup | [`snakes-to-crabs/`](./snakes-to-crabs/) |
 
 ## Viewing locally
 

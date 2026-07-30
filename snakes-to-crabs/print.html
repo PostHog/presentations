@@ -1,0 +1,2719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>From Snakes to Crabs</title>
+<link href="vendor/fonts/fonts.css" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F1E9;
+  --bg-warm: #ECE7DA;
+  --ink: #1B1714;
+  --ink-soft: #4A453F;
+  --ink-mute: #8B847A;
+  --line: #D8D1C0;
+  --line-soft: #E6E0CF;
+  --accent: #C04A1E;
+  --accent-soft: #E89A78;
+  --code-bg: #1B1714;
+  --code-ink: #ECE6D6;
+  --code-mute: #8B7F6C;
+  --code-accent: #E89A78;
+
+  --type-jumbo: 220px;
+  --type-display: 140px;
+  --type-title: 72px;
+  --type-subtitle: 44px;
+  --type-body: 32px;
+  --type-small: 26px;
+  --type-meta: 24px;
+  --type-label: 28px;
+
+  --pad-x: 120px;
+  --pad-top: 96px;
+  --pad-bottom: 140px;
+  --gap-title: 56px;
+  --gap-item: 32px;
+
+  --tracking-label: 0.18em;
+}
+
+deck-stage:not(:defined) { visibility: hidden; }
+
+deck-stage section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-feature-settings: "ss01", "ss02";
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ── Reusable bits ─────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--type-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.eyebrow .em {
+  color: var(--ink);
+}
+
+.slide-title {
+  font-size: var(--type-title);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  margin: 0;
+  max-width: 1500px;
+  text-wrap: balance;
+}
+
+.slide-title.tight { max-width: 1300px; }
+
+.slide-subtitle {
+  font-size: var(--type-subtitle);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 1400px;
+}
+.lat {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  color: var(--accent);
+  margin-left: 0.3em;
+}
+.endpoint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62em;
+  font-weight: 500;
+  color: var(--accent);
+  background: rgba(0,0,0,0.04);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.12em 0.5em;
+  margin-left: 0.45em;
+  vertical-align: 0.14em;
+  white-space: nowrap;
+}
+
+.header-block {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.header-block + * {
+  margin-top: var(--gap-title);
+}
+
+.body { font-size: var(--type-body); line-height: 1.35; color: var(--ink); }
+.body-soft { color: var(--ink-soft); }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+.brand-mark {
+  position: absolute;
+  top: 50px;
+  right: 64px;
+  width: 50px;
+  height: auto;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 2;
+}
+.page-mark {
+  position: absolute;
+  bottom: 36px;
+  left: var(--pad-x);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--type-meta);
+  color: var(--ink-mute);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* ── Slide-specific ──────────────────────────────────────────── */
+
+/* 1. Title */
+.title-slide {
+  justify-content: space-between;
+  background: var(--bg);
+}
+.title-slide .titlemark {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.title-slide h1.literal { font-size: 92px; line-height: 1.06; letter-spacing: -0.02em; max-width: 16ch; }
+.title-slide h1 {
+  font-size: 184px;
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.028em;
+  margin: 0;
+}
+.title-slide h1 .arrow {
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  font-size: 0.7em;
+  vertical-align: 0.08em;
+  padding: 0 0.06em;
+}
+.title-slide .sub {
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  max-width: 1300px;
+  margin-top: 36px;
+  line-height: 1.25;
+}
+.title-slide .speaker {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--line);
+  padding-top: 32px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--type-meta);
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+.title-slide .speaker .name { color: var(--ink); white-space: nowrap; }
+.title-slide .speaker .who { display: flex; gap: 36px; white-space: nowrap; }
+
+/* Pop quiz */
+.quiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 56px;
+  max-width: 1500px;
+}
+.quiz-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: baseline;
+  gap: 48px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.quiz-item:last-child { border-bottom: none; }
+.quiz-item.ghost .quiz-num { color: var(--line); }
+.quiz-item.ghost .quiz-q { color: transparent; }
+.who-roles .ghost-role { height: 50px; }
+.quiz-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 56px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.quiz-q {
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.18;
+  color: var(--ink);
+}
+
+/* Who I am */
+.who-slide {
+  justify-content: center;
+}
+.who-name {
+  font-size: 96px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0;
+}
+.who-roles {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  line-height: 1.25;
+}
+.who-roles .em { color: var(--ink); }
+
+/* Three-step / numbered lists */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 8px;
+  max-width: 1550px;
+}
+/* Header-only lists: grow to fill and center vertically so trimmed
+   slides don't cling to the top with a void beneath them. */
+.steps:not(.tight),
+.reasons-v,
+.lessons,
+.roadmap-list {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+/* Progressive disclosure: unrevealed rows hold their slot but stay invisible,
+   so the cluster never shifts — items pop into fixed positions. */
+.pd-ghost { visibility: hidden; }
+.step {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 48px;
+  align-items: baseline;
+  padding-top: 32px;
+  border-top: 1px solid var(--line-soft);
+}
+.step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.step-h {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.step-d {
+  font-size: 28px;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  max-width: 1300px;
+}
+
+/* Two-column compare (stakes slide) */
+.compare-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: var(--gap-title);
+}
+.compare-2 .col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 36px;
+  border-top: 2px solid var(--ink);
+}
+.compare-2 .col.muted { border-top-color: var(--line); }
+.compare-2 .col .h {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.compare-2 .col.lead .h { color: var(--accent); }
+.compare-2 .col .lede {
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.compare-2 .col .detail {
+  font-size: 28px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  max-width: 640px;
+}
+/* Blast-radius chain (stakes slide) */
+.blast {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.blast-node {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 25px;
+  padding: 16px 24px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+.blast-node.you { border-color: var(--ink); color: var(--ink); }
+.blast-node.hit { border-color: var(--accent); color: var(--accent); background: rgba(217,119,87,0.08); }
+.blast-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: var(--ink-mute); }
+.blast-arrow.hot { color: var(--accent); }
+.blast-stop {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px; color: var(--ink-mute); white-space: nowrap;
+  display: flex; align-items: center; gap: 14px;
+}
+.blast-stop::before { content: "✕"; color: var(--ink-mute); font-size: 26px; }
+
+/* Request waterfall (stakes slide) */
+.wfall { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: var(--gap-title); }
+.wf-panel { display: flex; flex-direction: column; gap: 20px; padding-top: 32px; border-top: 2px solid var(--ink); }
+.wf-panel.muted { border-top-color: var(--line); }
+.wf-cap { font-family: 'IBM Plex Mono', monospace; font-size: 26px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-mute); }
+.wf-panel.lead .wf-cap { color: var(--accent); }
+.wf-rows { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+.wf-row { display: grid; grid-template-columns: 215px 1fr; align-items: center; gap: 24px; }
+.wf-lab { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--ink-soft); text-align: right; }
+.wf-track { position: relative; height: 46px; background: var(--line-soft); border-radius: 6px; }
+.wf-bar { position: absolute; top: 0; height: 100%; border-radius: 6px; display: flex; align-items: center; padding: 0 16px; box-sizing: border-box; font-family: 'IBM Plex Mono', monospace; font-size: 24px; white-space: nowrap; }
+.wf-bar.done { background: var(--ink); color: var(--bg); }
+.wf-bar.slow { background: var(--ink-mute); opacity: 0.4; }
+.wf-bar.block { background: var(--accent); color: #fff; }
+.wf-bar.wait { background: rgba(217,119,87,0.08); border: 2px dashed var(--accent); color: var(--accent); }
+.wf-note { font-size: 31px; color: var(--ink-soft); line-height: 1.3; margin-top: 14px; }
+.wf-panel.lead .wf-note { color: var(--ink); }
+.wf-note .em { color: var(--accent); font-weight: 500; }
+
+/* Big numbers (starting point) */
+.bignums {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 80px;
+  margin-top: var(--gap-title);
+  align-items: end;
+}
+.bignum .n {
+  font-size: 200px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.bignum .l {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+  margin-top: 24px;
+  text-transform: uppercase;
+}
+.bignums-footnote {
+  margin-top: auto;
+  font-size: 36px;
+  color: var(--ink-soft);
+  line-height: 1.3;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
+  max-width: 1300px;
+}
+.bignums-footnote .em { color: var(--ink); font-weight: 500; }
+
+/* Roadmap */
+.roadmap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 40px;
+}
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: baseline;
+  gap: 48px;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+}
+.roadmap-row:last-of-type { border-bottom: 1px solid var(--line); }
+.roadmap-row .rn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.roadmap-row .rsec {
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.roadmap-row .rq {
+  font-size: 34px;
+  color: var(--ink-soft);
+  line-height: 1.25;
+}
+.roadmap-foot {
+  margin-top: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 28px;
+  font-size: 32px;
+  color: var(--ink-mute);
+}
+.roadmap-foot .arr { font-family: 'IBM Plex Mono', monospace; color: var(--accent); }
+.roadmap-foot .em { color: var(--ink); font-weight: 500; }
+
+/* Problem overview with diagram */
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: var(--gap-title);
+}
+.rg-box {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 40px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 250px;
+}
+.rg-box .rn { font-family: 'IBM Plex Mono', monospace; font-size: 34px; color: var(--accent); }
+.rg-box .rsec { font-size: 42px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; margin-top: 4px; }
+.rg-box .rdesc { font-size: 27px; color: var(--ink-soft); line-height: 1.3; margin-top: auto; }
+.prob-split {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: 64px;
+  margin-top: var(--gap-title);
+  align-items: center;
+}
+.prob-list { display: flex; flex-direction: column; gap: 14px; }
+.prob-item { padding: 26px 0; border-top: 1px solid var(--line); }
+.prob-item:last-child { border-bottom: 1px solid var(--line); }
+.prob-item .rn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px; color: var(--accent); letter-spacing: 0.04em;
+}
+.prob-item .h { font-size: 36px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; margin-top: 8px; }
+.prob-item .d { font-size: 25px; color: var(--ink-soft); line-height: 1.3; margin-top: 8px; }
+.prob-split .pic img {
+  width: 100%; height: auto; display: block;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: #FFFFFF; padding: 14px; box-sizing: border-box;
+}
+
+
+/* Problem overview — diagram rings (progressive) */
+.prob-split .pic-frame {
+  position: relative;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: #FFFFFF; padding: 14px;
+}
+.prob-split .pic-frame img { width: 100%; height: auto; display: block; border: 0; border-radius: 0; padding: 0; background: none; }
+.pring {
+  position: absolute;
+  border: 4px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px rgba(217,119,87,0.12);
+  pointer-events: none;
+}
+.pring .lbl {
+  position: absolute; top: -22px; left: -18px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+}
+.pring.p1 { left: 21%; top: 61%; width: 50%; height: 25%; }
+.pring.p2 { left: 27.5%; top: 16%; width: 23%; height: 35%; border-radius: 50%; }
+.pring.p3 { left: 32%; top: 49%; width: 21.5%; height: 16%; }
+.prob-item { transition: none; }
+.prob-item.dim { opacity: 0.32; }
+.prob-item.on .h { color: var(--accent); }
+
+
+/* DB problem aids */
+.growbars { margin-top: var(--gap-title); display: flex; flex-direction: column; gap: 30px; max-width: 1500px; }
+.growrow { display: grid; grid-template-columns: 220px 1fr; align-items: center; gap: 40px; }
+.growrow .glabel { font-family: 'IBM Plex Mono', monospace; font-size: 30px; color: var(--ink-soft); text-align: right; }
+.growrow .gtrack { height: 50px; background: var(--line-soft); border-radius: 8px; overflow: hidden; }
+.growrow .gbar { height: 100%; background: var(--ink); border-radius: 8px; min-width: 14px; }
+.growrow .gbar.hot { background: var(--accent); }
+.grow-note { margin-top: 48px; font-size: 34px; color: var(--ink-soft); line-height: 1.3; max-width: 1400px; }
+.bridge-lede { margin-top: var(--gap-title); font-size: 48px; font-weight: 500; color: var(--ink); line-height: 1.25; max-width: 1500px; letter-spacing: -0.01em; }
+.grow-note .em { color: var(--accent); font-weight: 500; }
+.shim-list { margin-top: var(--gap-title); display: flex; flex-direction: column; gap: 0; max-width: 1300px; }
+.shim-row { display: grid; grid-template-columns: 360px 60px 1fr; align-items: center; gap: 28px; padding: 30px 0; border-top: 1px solid var(--line); }
+.shim-row:last-child { border-bottom: 1px solid var(--line); }
+.shim-row .op { font-size: 38px; font-weight: 500; color: var(--ink); }
+.shim-row .arr { font-family: 'IBM Plex Mono', monospace; font-size: 32px; color: var(--ink-mute); }
+.shim-row .hack { font-family: 'IBM Plex Mono', monospace; font-size: 28px; color: var(--accent); }
+
+
+/* Runtime / connections problem aids */
+.miniflow { margin-top: var(--gap-title); display: flex; align-items: stretch; gap: 24px; }
+.miniflow .aid-node { flex: 1; }
+.miniflow .aid-arrow { flex: 0 0 auto; }
+.cores-wrap { margin-top: var(--gap-title); display: flex; flex-direction: column; gap: 24px; }
+.cores-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 26px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-mute); }
+.cores { display: flex; gap: 18px; }
+.core { width: 116px; height: 116px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg-warm); }
+.core.hot { background: var(--accent); border-color: var(--accent); }
+.cascade { margin-top: var(--gap-title); display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 920px; }
+.cascade .aid-node { width: 100%; align-items: center; text-align: center; }
+.aid-arrow.down { font-size: 40px; }
+
+
+/* Implementation loop — cycle diagram */
+.loopcycle {
+  margin-top: var(--gap-title);
+  display: grid;
+  grid-template-columns: 1fr 150px 1fr;
+  grid-template-rows: auto 96px auto;
+  align-items: center;
+  gap: 18px;
+  max-width: 1480px;
+}
+.loopcard {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg-warm);
+  padding: 34px 40px;
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 150px; justify-content: center;
+}
+.loopcard .ln { font-family: 'IBM Plex Mono', monospace; font-size: 30px; color: var(--accent); }
+.loopcard .lh { font-size: 40px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+.loop-ar { display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 46px; color: var(--accent); }
+.loop-hub { display: flex; align-items: center; justify-content: center; }
+.loop-hub .ic { font-family: 'IBM Plex Mono', monospace; font-size: 80px; color: var(--accent); line-height: 1; }
+
+/* Rust-specifics beat */
+.rust-eyebrow .em { color: var(--accent); }
+.codeblock .ty { color: #C7A0E0; }
+.codeblock .fn { color: #E8C07D; }
+.codeblock .str { color: #9CC9A0; }
+.rust-take { margin-top: 40px; font-size: 34px; color: var(--ink-soft); line-height: 1.3; max-width: 1500px; }
+.rust-take .em { color: var(--accent); font-weight: 500; }
+
+/* Section dividers */
+.statement {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.statement h2 {
+  font-size: 116px;
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin: 0;
+  max-width: 1500px;
+  text-wrap: balance;
+  color: var(--ink);
+}
+.divider {
+  justify-content: center;
+  background: var(--ink);
+  color: var(--bg);
+  padding: var(--pad-top) var(--pad-x);
+}
+.divider .sec {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  margin-bottom: 56px;
+}
+.divider h2 {
+  font-size: 128px;
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 0;
+  max-width: 1500px;
+  text-wrap: balance;
+}
+.divider .sub {
+  font-size: 40px;
+  font-weight: 300;
+  color: var(--line);
+  margin-top: 40px;
+  max-width: 1400px;
+  line-height: 1.3;
+}
+
+/* Criteria slide */
+.crit-bridge {
+  margin-top: 40px;
+  font-size: 34px;
+  color: var(--ink-soft);
+  line-height: 1.3;
+  max-width: 1400px;
+}
+.criteria {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  margin-top: var(--gap-title);
+}
+.criteria .col h3 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--ink);
+}
+.criteria .col.tiebreak h3 { color: var(--accent); border-bottom-color: var(--accent); }
+.criteria ul {
+  margin: 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; gap: 28px;
+}
+.criteria li {
+  font-size: 34px;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.criteria li .d {
+  display: block;
+  font-size: 26px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+
+/* Comparison matrix */
+.matrix-wrap { margin-top: var(--gap-title); }
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 26px;
+  table-layout: fixed;
+}
+.matrix th, .matrix td {
+  text-align: left;
+  padding: 22px 24px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line-soft);
+}
+.matrix th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 24px;
+}
+.matrix th.opt {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.matrix th.opt.pick { color: var(--accent); }
+.matrix th.opt .lang {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-weight: 400;
+}
+.matrix th.opt.pick .lang { color: var(--accent-soft); }
+.matrix td.crit {
+  color: var(--ink-soft);
+  font-size: 24px;
+}
+.matrix td.cell {
+  color: var(--ink);
+  font-size: 26px;
+}
+.matrix td.cell.pick { background: rgba(192, 74, 30, 0.06); color: var(--ink); }
+.matrix .verdict td {
+  border-bottom: none;
+  padding-top: 36px;
+  font-size: 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.matrix .verdict td.cell.pick { color: var(--accent); background: none; font-weight: 500; }
+.matrix-footnote {
+  margin-top: 36px;
+  font-size: 30px;
+  color: var(--ink-soft);
+}
+.matrix-footnote .em { color: var(--ink); font-weight: 500; }
+
+/* Reasons — vertical progressive list */
+.reasons-v {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--gap-title);
+}
+.reason-v {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 48px;
+  align-items: baseline;
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+}
+.reason-v .n {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.reason-v .h {
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.reason-v .d {
+  font-size: 27px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  margin-top: 12px;
+  max-width: 1320px;
+}
+.reason-v .d code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1em;
+  color: var(--accent);
+  background: rgba(192, 74, 30, 0.07);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* SQL code block */
+.codeblock {
+  margin-top: var(--gap-title);
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 56px 64px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: hidden;
+  max-width: 1680px;
+}
+.codeblock .cmt { color: var(--code-mute); }
+.codeblock .em { color: var(--code-accent); }
+.codeblock .kw { color: #98C7E8; }
+.codeblock.compact { margin-top: 28px; padding: 32px 44px; font-size: 25px; line-height: 1.45; }
+.compiles {
+  margin: 18px 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 25px;
+  color: var(--ink-mute);
+  display: flex; align-items: center; gap: 14px;
+}
+.compiles .arr { color: var(--accent); font-size: 28px; }
+
+/* Why-SQL list (4 reasons) */
+.reasons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 48px;
+  margin-top: var(--gap-title);
+}
+.reason {
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.reason .n {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  color: var(--ink-mute);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 14px;
+}
+.reason .rd {
+  display: block;
+  margin-top: 14px;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.reason .rd code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1em;
+  color: var(--accent);
+  background: rgba(192, 74, 30, 0.07);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* BEFORE / AFTER architecture diagram */
+.archdiag {
+  margin-top: var(--gap-title);
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+.archrow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: stretch;
+  gap: 40px;
+}
+.archrow .tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.archrow.before .tag { color: var(--ink-mute); }
+.archrow.after .tag { color: var(--accent); }
+.archpipe {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+.archpipe .endcap {
+  flex: 0 0 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.archnode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px 28px;
+  border: 1px solid var(--line);
+  background: var(--bg-warm);
+  justify-content: center;
+}
+.archnode.heavy {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.archnode.heavy .lbl,
+.archnode.heavy .sub { color: var(--bg); }
+.archnode.heavy .sub { color: var(--accent-soft); }
+.archnode.hot {
+  background: rgba(192, 74, 30, 0.12);
+  border-color: var(--accent);
+}
+.archnode.hot .lbl { color: var(--accent); }
+.archnode.fixed {
+  background: var(--bg);
+  border: 1px solid var(--ink);
+}
+.archnode .lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.archnode .name {
+  font-size: 24px;
+  font-weight: 500;
+  color: inherit;
+}
+.archnode .sub {
+  font-size: 24px;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.4;
+}
+.archarrow {
+  flex: 0 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mute);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+}
+.archarrow.hot { color: var(--accent); }
+.archcaption {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 40px;
+  margin-top: -24px;
+  font-size: 26px;
+  color: var(--ink-soft);
+  align-items: baseline;
+}
+.archcaption .empty { }
+.archcaption .em { color: var(--ink); font-weight: 500; }
+
+/* Before / After cards + benefit strip */
+.bene {
+  margin-top: 40px;
+  display: flex;
+  align-items: baseline;
+  gap: 28px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  font-size: 32px;
+  color: var(--ink);
+  line-height: 1.3;
+  max-width: 1500px;
+}
+.bene .tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.bene .em { color: var(--accent); font-weight: 500; }
+
+.ba {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: var(--gap-title);
+  border: 1px solid var(--line);
+}
+.ba .col {
+  padding: 44px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ba .col.before { background: var(--bg-warm); border-right: 1px solid var(--line); }
+.ba .col .tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+.ba .col.before .tag { color: var(--ink-mute); }
+.ba .col.after .tag { color: var(--accent); }
+.ba .col .head {
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.18;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.ba .col .desc {
+  font-size: 27px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.ba .col .desc .em { color: var(--ink); font-weight: 500; }
+.ba .col .desc code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.92em;
+  color: var(--accent);
+  background: rgba(192, 74, 30, 0.07);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* Infra change rows */
+.infra {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--gap-title);
+}
+.infra-row {
+  display: grid;
+  grid-template-columns: 340px 1fr 1fr;
+  gap: 48px;
+  padding: 36px 0;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+.infra-row:last-child { border-bottom: 1px solid var(--line); }
+.infra-row .k {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.infra-row .k .name {
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.infra-row .k .why {
+  font-size: 24px;
+  color: var(--accent);
+  line-height: 1.3;
+}
+.infra-row .side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.infra-row .side .lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.infra-row .side.after .lbl { color: var(--accent); }
+.infra-row .side .v {
+  font-size: 27px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.infra-row .side.before .v { color: var(--ink-soft); }
+
+/* Recap table */
+.recap {
+  margin-top: var(--gap-title);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 28px;
+}
+.recap th, .recap td {
+  text-align: left;
+  padding: 24px 28px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line-soft);
+}
+.recap th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border-bottom: 2px solid var(--ink);
+}
+.recap th.after { color: var(--accent); }
+.recap td.k { color: var(--ink); font-weight: 500; }
+.recap td.before { color: var(--ink-soft); }
+.recap td.after { color: var(--ink); }
+
+/* Solo (three stats vertical) */
+.solo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 80px;
+  margin-top: var(--gap-title);
+}
+.solo .n {
+  font-size: 240px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.solo .l {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+  margin-top: 24px;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+.solo .l .em { color: var(--ink); }
+
+/* Rayon mid-rollout (war story) */
+.warstory {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 96px;
+  margin-top: var(--gap-title);
+  align-items: start;
+}
+.warstory .beats {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+.warstory .beat {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+.warstory .beat .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.warstory .beat .text {
+  font-size: 32px;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.warstory .beat .text .em { color: var(--accent); }
+.warstory .punch {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 56px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-self: stretch;
+  justify-content: center;
+}
+.warstory .punch .lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+.warstory .punch .n {
+  font-size: 200px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  font-feature-settings: "tnum";
+}
+.warstory .punch .d {
+  font-size: 28px;
+  color: var(--line);
+  margin-top: 8px;
+}
+
+/* Cutover was boring */
+.statement {
+  justify-content: center;
+}
+.statement .big {
+  font-size: 152px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+  max-width: 1500px;
+  text-wrap: balance;
+}
+.statement .small {
+  font-size: 40px;
+  color: var(--ink-soft);
+  margin-top: 40px;
+  max-width: 1300px;
+  line-height: 1.3;
+}
+
+/* Latency results */
+.latency-hero {
+  margin-top: var(--gap-title);
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 80px;
+  align-items: center;
+}
+.latency-hero .perc {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+.latency-hero .nums {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 120px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-feature-settings: "tnum";
+}
+.latency-hero .nums .from { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 4px; }
+.latency-hero .nums .arrow { display: none; }
+.latency-hero .nums .to { color: var(--ink); font-size: 168px; line-height: 1; margin-top: 8px; }
+.latency-hero .note {
+  margin-top: 32px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px;
+  color: var(--ink-soft);
+}
+.latency-hero .note .em { color: var(--accent); font-weight: 500; }
+.latency-other {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.latency-other img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #0E0E11;
+}
+.latency-other .cap {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
+}
+.lat-strip {
+  display: flex;
+  gap: 72px;
+  margin-top: 56px;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 30px;
+  color: var(--ink);
+}
+.lat-strip > div { white-space: nowrap; }
+.lat-strip .p { color: var(--ink-mute); margin-right: 16px; }
+
+/* Cost slide */
+.cost-table {
+  margin-top: var(--gap-title);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cost-row {
+  display: grid;
+  grid-template-columns: 240px 1fr 80px 1fr 160px;
+  align-items: baseline;
+  gap: 40px;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cost-row:last-child { border-bottom: none; }
+.cost-row .k {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.cost-row .before {
+  font-size: 76px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+}
+.cost-row .arrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 40px;
+  color: var(--ink-mute);
+}
+.cost-row .after {
+  font-size: 76px;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+}
+.cost-row .delta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  color: var(--accent);
+  text-align: right;
+}
+.cost-row.flat .after { color: var(--ink-soft); font-weight: 400; }
+.cost-row.flat .delta { color: var(--ink-mute); }
+.cost-foot {
+  margin-top: 48px;
+  font-size: 36px;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+/* Reliability */
+.rely-main {
+  margin-top: var(--gap-title);
+  font-size: 96px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 1500px;
+}
+.rely-main .lead {
+  display: block;
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.rely-aside {
+  margin-top: auto;
+  padding-top: 48px;
+  border-top: 1px solid var(--line);
+  font-size: 28px;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-family: 'IBM Plex Serif', serif;
+  max-width: 1200px;
+  line-height: 1.4;
+}
+.rely-aside .em { color: var(--ink); font-style: normal; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; }
+
+/* Lessons */
+.lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: var(--gap-title);
+}
+.lesson {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 80px;
+  padding: 44px 0;
+  border-top: 1px solid var(--line);
+}
+.lesson:last-child { border-bottom: 1px solid var(--line); }
+.lesson .h {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.lesson .d {
+  font-size: 28px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+/* Takeaways */
+.takeaways {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 64px;
+  margin-top: var(--gap-title);
+}
+.takeaway {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 36px;
+  border-top: 2px solid var(--ink);
+}
+.takeaway .num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+.takeaway .h {
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.takeaway .d {
+  font-size: 26px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* Coda / teaser slide */
+.coda { padding-top: 100px; }
+.coda-grid {
+  margin-top: var(--gap-title);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 96px;
+  align-items: center;
+}
+.coda-stat .perc {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+}
+.coda-stat .now {
+  font-size: 280px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  font-feature-settings: "tnum";
+}
+.coda-stat .from {
+  margin-top: 36px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px;
+  color: var(--ink-soft);
+}
+.coda-stat .from .old { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--ink-mute); }
+.coda-stat .from .em { color: var(--accent); font-weight: 500; }
+.coda-stat .alts {
+  margin-top: 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px;
+  color: var(--ink);
+  display: flex;
+  gap: 36px;
+}
+.coda-stat .alts .p { color: var(--ink-mute); margin-right: 10px; }
+.coda-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 620px;
+}
+.coda-chart img {
+  display: block;
+  width: 100%;
+  max-height: 580px;
+  height: auto;
+  object-fit: contain;
+  object-position: top center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #0E0E11;
+}
+.coda-chart .cap {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
+}
+.coda-foot {
+  margin-top: 56px;
+  font-size: 32px;
+  color: var(--ink);
+  line-height: 1.3;
+  max-width: 1400px;
+}
+.coda-foot .em { color: var(--accent); font-weight: 500; }
+
+/* Thanks */
+.thanks {
+  justify-content: space-between;
+}
+.thanks h2 {
+  font-size: 180px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 0.96;
+  margin: 0;
+}
+.thanks h2 .q {
+  display: block;
+  color: var(--accent);
+  font-weight: 400;
+  margin-top: 16px;
+}
+.thanks-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  border-top: 1px solid var(--line);
+  padding-top: 40px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.thanks-col h4 {
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 18px;
+  font-weight: 500;
+}
+.thanks-col ul {
+  margin: 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; gap: 12px;
+  font-size: 28px;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.thanks-col ul .lead { color: var(--ink-mute); }
+
+/* ── Image placements ──────────────────────────────────────────── */
+
+/* Title slide */
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 60px;
+}
+.title-wordmark { height: 56px; width: auto; }
+.title-main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.title-portrait {
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Who I Am */
+.who-slide {
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 110px;
+  padding-bottom: 100px;
+}
+.who-right {
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
+}
+
+/* LinkedIn rec card (slide 7 joke) */
+.linkedin-rec {
+  margin-top: 36px;
+  background: #FFFFFF;
+  border: 1px solid #E1E1E1;
+  padding: 0;
+  max-width: 820px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.linkedin-rec img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Hedgehog corner mascot */
+.mascot-corner {
+  position: absolute;
+  pointer-events: none;
+}
+.mascot-corner img { width: 100%; height: auto; }
+.mascot-fire {
+  right: 96px;
+  bottom: 112px;
+  width: 320px;
+  transform: rotate(-6deg);
+}
+.mascot-party {
+  right: 60px;
+  bottom: 60px;
+  width: 240px;
+  transform: rotate(8deg);
+}
+
+/* Thanks mark */
+.thanks-mark {
+  position: absolute;
+  right: var(--pad-x);
+  top: var(--pad-top);
+  height: 56px;
+  width: auto;
+}
+
+/* ── Old architecture diagram ──────────────────────────────── */
+.oldarch {
+  margin-top: var(--gap-title);
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.oa-flow { display: flex; align-items: stretch; gap: 0; }
+.oa-node {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--bg-warm);
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+.oa-node .oa-lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.oa-node .oa-name { font-size: 28px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; line-height: 1.15; }
+.oa-node .oa-sub { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--ink-soft); line-height: 1.35; }
+.oa-node.io { flex: 0 0 150px; background: transparent; border: 1px dashed var(--line); }
+.oa-node.bouncer { background: rgba(192,74,30,0.10); border-color: var(--accent); }
+.oa-node.bouncer .oa-lbl, .oa-node.bouncer .oa-sub { color: var(--accent); }
+.oa-node.pg { background: var(--ink); border-color: var(--ink); }
+.oa-node.pg .oa-lbl { color: var(--accent-soft); }
+.oa-node.pg .oa-name { color: var(--bg); }
+.oa-node.pg .oa-sub { color: var(--line); }
+.oa-arrow {
+  flex: 0 0 46px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; color: var(--ink-mute); font-size: 26px;
+}
+.oa-flags {
+  display: flex;
+  gap: 56px;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+}
+.oa-flag {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: baseline;
+  font-size: 28px;
+  color: var(--ink-soft);
+  line-height: 1.3;
+}
+.oa-flag .x { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--accent); }
+.oa-flag .em { color: var(--ink); font-weight: 500; }
+
+/* ── Layer visual aids ─────────────────────────────────────── */
+.aid-node {
+  border: 1px solid var(--line);
+  background: var(--bg-warm);
+  padding: 26px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  justify-content: center;
+}
+.aid-node .lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.aid-node .name { font-size: 32px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+.aid-node .sub { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--ink-soft); }
+.aid-node.dark { background: var(--ink); border-color: var(--ink); }
+.aid-node.dark .lbl { color: var(--accent-soft); }
+.aid-node.dark .name { color: var(--bg); }
+.aid-node.dark .sub { color: var(--line); }
+.aid-node.hot { background: rgba(192,74,30,0.10); border-color: var(--accent); }
+.aid-node.hot .lbl { color: var(--accent); }
+.aid-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-size: 34px;
+}
+
+/* Functional testing — two sources merge */
+.fdiag {
+  margin-top: var(--gap-title);
+  display: grid;
+  grid-template-columns: 1fr 130px 1fr;
+  align-items: center;
+}
+.fsources { display: flex; flex-direction: column; gap: 40px; }
+
+/* Synthetic comparison — fork to two services → diff */
+.cmpdiag { margin-top: var(--gap-title); display: flex; align-items: center; gap: 26px; }
+.cmpdiag .aid-node { flex: 1; min-height: 120px; }
+.cmp-services { display: flex; flex-direction: column; gap: 26px; flex: 1.1; }
+.cmp-verdict {
+  flex: 0.9;
+  font-size: 30px;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  padding-left: 8px;
+}
+.cmp-verdict .em { color: var(--accent); font-weight: 500; }
+.loop-foot {
+  margin-top: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  font-size: 29px;
+  color: var(--ink);
+}
+.loop-foot .loop { font-family: 'IBM Plex Mono', monospace; font-size: 38px; color: var(--accent); line-height: 1; }
+.loop-foot .em { color: var(--accent); font-weight: 500; }
+.steps.tight { gap: 24px; }
+.steps.tight .step { padding-top: 24px; }
+.steps.tight + .loop-foot { margin-top: 32px; }
+.imgonly { justify-content: center; align-items: center; padding: 56px 80px; }
+.imgonly { justify-content: flex-start; align-items: stretch; padding: 64px 90px 112px; }
+.img-eyebrow { margin-bottom: 28px; flex: 0 0 auto; text-transform: uppercase; }
+.img-eyebrow .em { color: var(--ink); }
+.imgonly .archfull { margin-top: 0; max-height: none; min-height: 0; flex: 1 1 auto; }
+.imgonly .archfull img { max-height: 100%; max-width: 1680px; padding: 16px; }
+.sidebyside { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: var(--gap-title); align-items: start; }
+.sidebyside figure { margin: 0; display: flex; flex-direction: column; gap: 16px; }
+.sidebyside img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 8px; background: #FFFFFF; padding: 12px; box-sizing: border-box; }
+.sidebyside figcaption { font-family: 'IBM Plex Mono', monospace; font-size: 26px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-mute); }
+.sidebyside figcaption.new { color: var(--accent); }
+
+/* Hashed rollout — ramp */
+.rampdiag { margin-top: 48px; }
+.ramp-bars { display: flex; align-items: flex-end; gap: 44px; height: 380px; }
+.ramp-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 18px; height: 100%; justify-content: flex-end; }
+.ramp-pct { font-size: 36px; font-weight: 500; color: var(--ink); font-feature-settings: "tnum"; }
+.ramp-track { width: 100%; flex: 1; background: var(--line-soft); border-radius: 4px; position: relative; overflow: hidden; }
+.ramp-fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); opacity: 0.85; }
+.ramp-week { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--ink-mute); letter-spacing: 0.04em; }
+.ramp-base {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 26px;
+  color: var(--ink-soft);
+}
+.ramp-base .em { color: var(--accent); }
+
+/* Full architecture image slide */
+.archfull {
+  margin-top: 40px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.archfull img {
+  max-width: 100%;
+  max-height: 720px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* URL footer */
+.url-footer {
+  position: absolute;
+  bottom: 36px;
+  right: var(--pad-x);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  width: max-content;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+.divider .url-footer { color: rgba(236, 230, 214, 0.45); }
+</style>
+<script type="application/json" id="speaker-notes">
+[
+  "Intro myself, set the premise: we rewrote PostHog's feature flag service from Django to Rust. This is the story of how, and what actually mattered. Keep it light to start.",
+  "Quick on me, keep it short. I led the feature flags team at PostHog — this rewrite was mine. And the LinkedIn rec: 'a bit smart or whatever.' Get the laugh, move on.",
+  "Here's our feature flag service — the old Django version, the thing we're about to pull apart. Three beats. One: parse the request, auth the team off Redis — fast, 1 to 5 ms. Two: fetch flags and cohorts from Postgres and compute the matches — the slow step, 100 to 900 ms, where the whole talk lives. Three: post-process and return, all in memory, about a millisecond. For scale: 500k requests a minute on 300 pods.",
+  "Section one: the problem. Three things were structurally wrong with the old Python service — I'll walk each, then what replaces it.",
+  "Three things, in order. First, the ORM — the deepest. All the flag matching happened down here in Postgres, built by Django's ORM into one giant generated query.",
+  "Here's the shape of it. Every flag condition evaluated inside one giant SQL query the ORM builds — property matches, cohort joins, all inline in Postgres. One query per request, one expression per flag. We were CPU-bound in the database even when the DB itself was healthy.",
+  "Why that one query didn't scale — and it's all about running big queries over denormalized JSONB. One: a JSONB property can't use a btree index, so every flag check is a sequential scan. Two: cost grows with every flag — each one is another inline expression Postgres has to parse, plan, and execute, every request. Three: operators like regex, version compares, and relative dates have no clean SQL form, so we faked them with flaky hand-rolled shims. SQL's a great tool; this was the wrong job for it.",
+  "Second, the runtime. This Django service, 300 pods of it, couldn't actually use the hardware it ran on.",
+  "The runtime. Sync Django's unit of concurrency is an OS process — a worker handles one request start to finish, holding 50 to 150 megs while blocked on the DB. And the GIL pins Python to one core per worker, so adding cores bought us nothing. We scaled the only way we could: more pods, 300 of them, and it still buckled under spikes.",
+  "And third, connection pooling — this PgBouncer box between Django and Postgres, where our timeouts were trapped. Here's the catch with it.",
+  "Connections. Postgres falls over in the low hundreds, so thousands of workers had to funnel through PgBouncer. And that's where our timeouts lived — in PgBouncer settings, not our code. Clunky to tune, and when the DB slowed they fired bluntly and the service just went down. No graceful failover — that's the Feb 2024 incident.",
+  "Section two: choosing Rust. Now we know exactly what's broken — so what do we replace it with? Here's the bar, and why Rust cleared it.",
+  "What the replacement had to solve. Three things. One: evaluate flags outside the database — decouple property fetching from computation, get off the ORM. Two: a genuinely fast async runtime; Python's async exists but the runtime's still slow. Three: connection pooling without PgBouncer, in-process, so timeouts live in our code. And one constraint over all of it — the team has to be able to ship it.",
+  "Line the options up. Async Python with FastAPI: can't get eval off the ORM, runtime still slow — same problems deferred. Node with HyperExpress: clears most of it but needs a proxy for pooling, and the framework's a niche binding. Rust with Axum: eval in app code, fast and async, and sqlx pools natively so PgBouncer disappears. The only question mark was 'can the team ship it' — and that was a yes too. Won or tied on everything.",
+  "Section three: implementation. We know what to build and how to architect it. Now — how do you actually build it, solo, without losing the years of knowledge baked into the old service?",
+  "It was a loop. Stand up a new Rust endpoint I could hit locally. Then per module: rewrite it, port its existing tests so the hard-won edge cases come with it, add new integration tests for what Rust introduced. Repeat, module by module, until the whole app works end to end.",
+  "Then a synthetic test framework. Pull all production flags into a local build, generate a test-bed of users designed to match across all of them, and run every user through both endpoints — old Django and new Rust — and diff. Every divergence is an edge case to fix. Once it matches across the board, we're ready to test in prod at scale.",
+  "Here's the new service, three changes highlighted. One: flag evaluation moved out of SQL into app memory. Two: cohort membership cached in-memory instead of re-joined every request. Three: data stores split, connected with a native in-process pool — PgBouncer gone, timeouts in our code. And the honest point: none of this strictly needed Rust; the win is the database stops doing application work. Also — this ran alongside the old service, both live, which sets up the rollout.",
+  "Now the Rust that actually mattered, since you're the right crowd for it. First: sqlx owns the connection pool, in-process — one bounded pool per pod, shared across all the async tasks, no PgBouncer in the path. And because it's our code, the deadline is too: a real per-request timeout wrapping the query, the thing we could never reach from PgBouncer.",
+  "Second: we fetch the raw properties once, then fan the matching out across cores with rayon — par_iter, one closure per flag. This is exactly what the GIL never let us do in Python: one global lock means only one thread runs at a time, so CPU-bound matching was effectively single-core. Rust proves thread-safety at compile time instead, so par_iter genuinely runs on every core at once. And don't conflate the two kinds of parallel here: tokio handles the I/O concurrency — awaiting Redis and Postgres without blocking a thread — while rayon handles the CPU-bound matching. Two different problems, two different tools. Postgres stops doing application work, and the match runs on all the cores, in memory. This is the real win — and notice it didn't strictly need Rust, but Rust made it clean and safe.",
+  "Section four: the rollout. Even with a service that passes every test, you don't flip 500k requests a minute in one go. Here's how we shipped it gradually, measured the whole way, without an incident.",
+  "Hashed by API token, so each customer deterministically hits one service — no flapping. Dialed up gradually over weeks on a single percentage knob, easy to roll back. And it doubled as a load test: real traffic shape, no synthetic harness needed.",
+  "Section five: the results. So what did all of that buy us? Three numbers.",
+  "Latency. p99 from 904 ms to 85 ms — about 10.6x, a 90% cut. You can see it in the chart right at cutover. p95, p90, p50 all dropped hard too.",
+  "Cost. Pods from 300 to 90, spend from $8.8k to $2.8k a month — about 68% off. And the kicker: traffic grew, not held — 730k a minute by the time we finished, up from 500k. More traffic, a third of the cost.",
+  "One more thing. This talk is from last October. Here's our p99 today: 25 ms. We kept going.",
+  "Stepping back. A few honest reflections — what I'd do differently, and what I'd most want you to take home.",
+  "First, property-based testing. It wouldn't have changed the outcome much — my hand-rolled synthetic tests already caught a lot. But it would've sped up the test loop, and maybe found a few more edge cases.",
+  "Second, load testing infrastructure. Honestly that's more useful spinning up a brand-new service. Here, the gradual rollout on real traffic did the job a load test would have.",
+  "And last, leverage AI more heavily. The implementation was mostly hand-written. With today's models, I'd bet that whole part — the porting, the translation, the harness — takes about two weeks.",
+  "Thanks. Two blog posts go deeper if you want them. Happy to take questions."
+]
+</script>
+</head>
+
+<body>
+<deck-stage width="1920" height="1080">
+
+<!-- 1. TITLE -->
+<section data-label="Title" class="title-slide">
+  <div class="title-row">
+    <div class="titlemark">PostHog × One | Rust meetup</div>
+    <img class="title-wordmark" src="assets/image1.png" alt="PostHog" style="filter: invert(0.92);">
+  </div>
+  <div class="title-main">
+    <div>
+      <h1>From Snakes to Crabs</h1>
+      <div class="sub">Rewriting PostHog’s feature flag platform in Rust.</div>
+    </div>
+    <img class="title-portrait" src="assets/image6.png" alt="Dylan Martin">
+  </div>
+  <div class="speaker">
+    <div class="name">Dylan Martin</div>
+    <div class="who">
+      <span>@dmarticus</span>
+      <span>Tech lead, PostHog</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHO I AM -->
+<section data-label="Who I am" class="who-slide">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="who-right">
+    <div class="eyebrow" style="margin-bottom: 32px;">Who I am</div>
+    <h2 class="who-name">Dylan Martin</h2>
+    <div class="who-roles">
+      <div>(Former) tech lead, Feature Flags @ PostHog</div>
+    </div>
+    <div class="linkedin-rec">
+      <img src="assets/image5.jpg" alt="LinkedIn recommendation: A bit smart or whatever.">
+    </div>
+  </div>
+  <div class="page-mark">02</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- OLD ARCHITECTURE -->
+<section data-label="Mental model" class="imgonly">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="eyebrow img-eyebrow">Mental model · <span class="em">what our service does</span></div>
+  <div class="archfull"><img src="assets/old-architecture-diagram.png" alt="The old Django decide service architecture"></div>
+  <div class="page-mark">03</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- SECTION 1 DIVIDER -->
+<section data-label="Section 1 / The problem" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">Section 01</div>
+  <h2>The problem.</h2>
+  <div class="sub">What was structurally wrong with the old Python service.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- PROBLEM OVERVIEW (progressive) -->
+<!-- PROBLEM OVERVIEW (build 1) -->
+<section data-label="Three problems / 1">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem</div>
+    <h2 class="slide-title">Three things were wrong with the old service.</h2>
+  </div>
+  <div class="prob-split">
+    <div class="prob-list">
+      <div class="prob-item on">
+        <div class="rn">01</div>
+        <div class="h">The ORM</div>
+      </div>
+      <div class="prob-item pd-ghost">
+        <div class="rn">02</div>
+        <div class="h">The runtime</div>
+      </div>
+      <div class="prob-item pd-ghost">
+        <div class="rn">03</div>
+        <div class="h">Connection pooling</div>
+      </div>
+    </div>
+    <div class="pic">
+      <div class="pic-frame">
+        <img src="assets/old-architecture-diagram.png" alt="The old Django decide service architecture">
+      <div class="pring p1"><span class="lbl">01</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-mark">05</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 11. CONDITIONS IN SQL -->
+<section data-label="Conditions in SQL">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem · The ORM</div>
+    <h2 class="slide-title">Evaluating all flags was one big mega-query</h2>
+  </div>
+  <pre class="codeblock"><span class="cmt">-- ONE query per request. Conditions for EVERY flag,
+-- evaluated inline by Postgres:</span>
+<span class="kw">SELECT</span> person.id, person.properties,
+  <span class="em">(person.properties-&gt;&gt;'email' LIKE '%@acme.com' AND
+   (person.properties-&gt;&gt;'plan')::text = 'enterprise')</span> <span class="kw">AS</span> flag_a,
+  <span class="em">(cohort.id = ANY($2))</span> <span class="kw">AS</span> flag_b,
+  <span class="cmt">-- ... one expression per flag, for every flag</span>
+<span class="kw">FROM</span> person
+  <span class="kw">LEFT JOIN</span> cohortpeople <span class="kw">ON</span> cohortpeople.person_id = person.id
+  <span class="kw">LEFT JOIN</span> cohort <span class="kw">ON</span> cohort.id = cohortpeople.cohort_id
+<span class="kw">WHERE</span> person.team_id = $1 <span class="kw">AND</span> person.id = $3;</pre>
+  <div class="page-mark">06</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- DB PROBLEM — why it didn't scale (summary) -->
+<section data-label="Why it didn't scale">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem · The ORM</div>
+    <h2 class="slide-title">Why that one query didn't scale.</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-h">JSONB matching can't use an index</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-h">Query cost grows with every flag</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-h">Operators with no SQL form</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-mark">07</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- PROBLEM OVERVIEW (build 2) -->
+<section data-label="Three problems / 2">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem</div>
+    <h2 class="slide-title">Three things were wrong with the old service.</h2>
+  </div>
+  <div class="prob-split">
+    <div class="prob-list">
+      <div class="prob-item dim">
+        <div class="rn">01</div>
+        <div class="h">The ORM</div>
+      </div>
+      <div class="prob-item on">
+        <div class="rn">02</div>
+        <div class="h">The runtime</div>
+      </div>
+      <div class="prob-item pd-ghost">
+        <div class="rn">03</div>
+        <div class="h">Connection pooling</div>
+      </div>
+    </div>
+    <div class="pic">
+      <div class="pic-frame">
+        <img src="assets/old-architecture-diagram.png" alt="The old Django decide service architecture">
+      <div class="pring p1"><span class="lbl">01</span></div>
+      <div class="pring p2"><span class="lbl">02</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-mark">08</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- RUNTIME — one core per process -->
+<section data-label="One core per process">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem · The runtime</div>
+    <h2 class="slide-title">Python couldn't use the box.</h2>
+  </div>
+  <div class="cores-wrap">
+    <div class="cores-lbl">Pod · 8 cores</div>
+    <div class="cores">
+      <div class="core hot"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+      <div class="core"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+    </div>
+  </div>
+  <div class="grow-note">Sync workers block a whole process on the DB, and the GIL pins Python to one core per worker</div>
+  <div class="page-mark">09</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- PROBLEM OVERVIEW (build 3) -->
+<section data-label="Three problems / 3">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem</div>
+    <h2 class="slide-title">Three things were wrong with the old service.</h2>
+  </div>
+  <div class="prob-split">
+    <div class="prob-list">
+      <div class="prob-item dim">
+        <div class="rn">01</div>
+        <div class="h">The ORM</div>
+      </div>
+      <div class="prob-item dim">
+        <div class="rn">02</div>
+        <div class="h">The runtime</div>
+      </div>
+      <div class="prob-item on">
+        <div class="rn">03</div>
+        <div class="h">Connection pooling</div>
+      </div>
+    </div>
+    <div class="pic">
+      <div class="pic-frame">
+        <img src="assets/old-architecture-diagram.png" alt="The old Django decide service architecture">
+      <div class="pring p1"><span class="lbl">01</span></div>
+      <div class="pring p2"><span class="lbl">02</span></div>
+      <div class="pring p3"><span class="lbl">03</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-mark">10</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- CONNECTIONS — timeouts in pgbouncer -->
+<section data-label="Timeouts in PgBouncer">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 01</span> / The problem · Connection pooling</div>
+    <h2 class="slide-title">Timeouts trapped in PgBouncer.</h2>
+  </div>
+  <pre class="codeblock"><span class="cmt"># Postgres caps out in the low hundreds, so thousands of
+# workers funnel through PgBouncer. Our deadlines live there too:</span>
+query_timeout      = 15
+query_wait_timeout = 10
+
+<span class="cmt"># in the Django request handler:</span>
+<span class="em"># …no real per-request deadline we could reach.</span></pre>
+  <div class="grow-note">A separate system, clunky to tune</div>
+  <div class="page-mark">11</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- SECTION 2 DIVIDER: CHOOSING RUST -->
+<section data-label="Section 2 / Choosing Rust" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">Section 02</div>
+  <h2>Choosing Rust.</h2>
+  <div class="sub">What the replacement had to do, and why Rust cleared the bar.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- CRITERIA — build 2: the table -->
+<section data-label="What it had to solve">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 02</span> / Choosing Rust</div>
+    <h2 class="slide-title">What the replacement had to solve.</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-h">Evaluate flags outside the database</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-h">A genuinely fast async runtime</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-h">Connection pooling without PgBouncer</div>
+      </div>
+    </div>
+  </div>
+  <div class="crit-bridge">
+</div>
+  <div class="page-mark">13</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 9. COMPARISON MATRIX -->
+<section data-label="Why Rust won">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 02</span> / Choosing Rust</div>
+    <h2 class="slide-title">Why Rust won.</h2>
+  </div>
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <colgroup>
+        <col style="width: 31%">
+        <col style="width: 23%">
+        <col style="width: 23%">
+        <col style="width: 23%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th></th>
+          <th class="opt">Async Python<span class="lang">FastAPI</span></th>
+          <th class="opt">Node<span class="lang">HyperExpress</span></th>
+          <th class="opt pick">Rust<span class="lang">Tokio</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="crit">Eval off the ORM</td>
+          <td class="cell">No</td>
+          <td class="cell">Yes</td>
+          <td class="cell pick">Yes</td>
+        </tr>
+        <tr>
+          <td class="crit">Fast async runtime</td>
+          <td class="cell">Async, still slow</td>
+          <td class="cell">Async, slower than Rust</td>
+          <td class="cell pick">Fast and async</td>
+        </tr>
+        <tr>
+          <td class="crit">Pool without PgBouncer</td>
+          <td class="cell">No</td>
+          <td class="cell">Needs a proxy</td>
+          <td class="cell pick">Native, via sqlx</td>
+        </tr>
+        <tr>
+          <td class="crit">Team can ship it</td>
+          <td class="cell">Yes</td>
+          <td class="cell">Yes</td>
+          <td class="cell pick">Yes</td>
+        </tr>
+        <tr class="verdict">
+          <td>Verdict</td>
+          <td class="cell">Same problems, deferred</td>
+          <td class="cell">Forced into a proxy</td>
+          <td class="cell pick">Won or tied on everything</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-mark">14</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- ACT 2: IMPLEMENTATION DIVIDER -->
+<section data-label="Section 3 / Implementation" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">Section 03</div>
+  <h2>Build it without losing what we knew.</h2>
+  <div class="sub">Tests were my best friend.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- IMPLEMENTATION — THE LOOP (cycle) -->
+<section data-label="The loop">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 03</span> / Implementation · The loop</div>
+    <h2 class="slide-title">One module at a time.</h2>
+  </div>
+  <div class="loopcycle">
+    <div class="loopcard"><div class="ln">01</div><div class="lh">Stand up the new endpoint</div></div>
+    <div class="loop-ar">→</div>
+    <div class="loopcard"><div class="ln">02</div><div class="lh">Rewrite a module</div></div>
+    <div class="loop-ar">↑</div>
+    <div class="loop-hub"><span class="ic">↺</span></div>
+    <div class="loop-ar">↓</div>
+    <div class="loopcard"><div class="ln">04</div><div class="lh">Add integration tests</div></div>
+    <div class="loop-ar">←</div>
+    <div class="loopcard"><div class="ln">03</div><div class="lh">Port its tests</div></div>
+  </div>
+  <div class="grow-note">
+</div>
+  <div class="page-mark">16</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- IMPLEMENTATION — SYNTHETIC FRAMEWORK -->
+<section data-label="Synthetic test framework">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 03</span> / Implementation · Synthetic test framework</div>
+    <h2 class="slide-title">Then, test it with real data.</h2>
+  </div>
+  <div class="cmpdiag">
+    <div class="aid-node">
+      <div class="lbl">Local build</div>
+      <div class="name">All prod flags + a test-bed of users</div>
+      <div class="sub">users built to match across every flag</div>
+    </div>
+    <div class="aid-arrow">──▶</div>
+    <div class="cmp-services">
+      <div class="aid-node"><div class="lbl">Old</div><div class="name">Django, local</div></div>
+      <div class="aid-node hot"><div class="lbl">New</div><div class="name">Rust, local</div></div>
+    </div>
+    <div class="aid-arrow">──▶</div>
+    <div class="aid-node dark">
+      <div class="lbl">Diff</div>
+      <div class="name">Fix edge cases</div>
+      <div class="sub">↺ repeat</div>
+    </div>
+  </div>
+  <div class="page-mark">17</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- NEW SERVICE — CHANGES HIGHLIGHTED -->
+<section data-label="What changed">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 03</span> / Implementation</div>
+    <h2 class="slide-title">What changed in the new service.</h2>
+  </div>
+  <div class="prob-split">
+    <div class="prob-list">
+      <div class="prob-item">
+        <div class="rn">01</div>
+        <div class="h">Evaluation in app memory</div>
+        <div class="d">Flag matching moved out of Postgres SQL — fetched raw, matched in parallel.</div>
+      </div>
+      <div class="prob-item">
+        <div class="rn">02</div>
+        <div class="h">Cohorts cached in-memory</div>
+        <div class="d">No re-joining membership on every request.</div>
+      </div>
+      <div class="prob-item">
+        <div class="rn">03</div>
+        <div class="h">Direct pool management</div>
+        <div class="d">Pools managed through sqlx at the app level. PgBouncer gone.</div>
+      </div>
+    </div>
+    <div class="pic">
+      <div class="pic-frame">
+        <img src="assets/new-architecture.png" alt="New Rust flags architecture with the key changes highlighted">
+        <div class="pring" style="left:4%;top:39%;width:27%;height:19%"><span class="lbl">01</span></div>
+        <div class="pring" style="left:17%;top:55%;width:17%;height:13%"><span class="lbl">02</span></div>
+        <div class="pring" style="left:4%;top:75%;width:21%;height:19%"><span class="lbl">03</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-mark">18</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- RUST — native pooling via sqlx -->
+<section data-label="Native pooling (sqlx)">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow rust-eyebrow"><span class="em">Section 03</span> / Implementation · The Rust that mattered</div>
+    <h2 class="slide-title">Pooling moves in-process.</h2>
+  </div>
+  <pre class="codeblock"><span class="cmt">// sqlx owns the pool — no PgBouncer in the path.</span>
+<span class="kw">let</span> pool = <span class="ty">PgPoolOptions</span>::new()
+    .max_connections(<span class="em">20</span>)
+    .acquire_timeout(<span class="ty">Duration</span>::from_millis(<span class="em">50</span>))
+    .connect(&url).<span class="kw">await</span>?;
+
+<span class="cmt">// And the deadline lives in our code, per request:</span>
+<span class="kw">let</span> row = <span class="ty">timeout</span>(<span class="ty">Duration</span>::from_millis(<span class="em">100</span>), q.fetch_one(&pool)).<span class="kw">await</span>?;</pre>
+  <div class="rust-take">One pool per pod, bounded and shared across tasks. <span class="em">PgBouncer gone, timeouts back where we can reach them.</span></div>
+  <div class="page-mark">19</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- RUST — parallel evaluation -->
+<section data-label="Parallel evaluation">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow rust-eyebrow"><span class="em">Section 03</span> / Implementation · The Rust that mattered</div>
+    <h2 class="slide-title">Match every flag in parallel.</h2>
+  </div>
+  <pre class="codeblock"><span class="cmt">// Fetch raw properties once, then fan the matching
+// out across cores — the thing the GIL never allowed.</span>
+<span class="kw">let</span> results: <span class="ty">Vec</span>&lt;<span class="ty">FlagMatch</span>&gt; = flags
+    .<span class="fn">par_iter</span>()                       <span class="cmt">// rayon</span>
+    .map(|flag| flag.<span class="fn">evaluate</span>(&props))
+    .collect();</pre>
+  <div class="rust-take">Postgres stops doing application work; the CPU-bound match runs on <span class="em">all the cores, in memory</span>.</div>
+  <div class="page-mark">20</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- ACT 3: ROLLOUT DIVIDER -->
+<section data-label="Section 4 / Rollout" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">Section 04</div>
+  <h2>Shipping it without breaking production.</h2>
+  <div class="sub">Taking advantage of an existing service.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 20. LAYER 3 -->
+<section data-label="Rollout / Hashed by API token">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 04</span> / Rollout</div>
+    <h2 class="slide-title">Roll out by hashing the API token.</h2>
+  </div>
+  <div class="rampdiag">
+    <div class="ramp-bars">
+      <div class="ramp-col">
+        <div class="ramp-pct">1%</div>
+        <div class="ramp-track"><div class="ramp-fill" style="height: 3%;"></div></div>
+        <div class="ramp-week">wk 1</div>
+      </div>
+      <div class="ramp-col">
+        <div class="ramp-pct">10%</div>
+        <div class="ramp-track"><div class="ramp-fill" style="height: 10%;"></div></div>
+        <div class="ramp-week">wk 2</div>
+      </div>
+      <div class="ramp-col">
+        <div class="ramp-pct">35%</div>
+        <div class="ramp-track"><div class="ramp-fill" style="height: 35%;"></div></div>
+        <div class="ramp-week">wk 3</div>
+      </div>
+      <div class="ramp-col">
+        <div class="ramp-pct">70%</div>
+        <div class="ramp-track"><div class="ramp-fill" style="height: 70%;"></div></div>
+        <div class="ramp-week">wk 4</div>
+      </div>
+      <div class="ramp-col">
+        <div class="ramp-pct">100%</div>
+        <div class="ramp-track"><div class="ramp-fill" style="height: 100%;"></div></div>
+        <div class="ramp-week">wk 5</div>
+      </div>
+    </div>
+    <div class="ramp-base">
+      <span>
+</span>
+      <span><span class="em"></span></span>
+    </div>
+  </div>
+  <div class="page-mark">22</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- RESULTS DIVIDER -->
+<section data-label="Section 5 / Results" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">Section 05</div>
+  <h2>The results.</h2>
+  <div class="sub">What the rewrite actually bought us.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 23. LATENCY -->
+<section data-label="Results / Latency">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 05</span> / Results</div>
+    <h2 class="slide-title">Latency.</h2>
+  </div>
+  <div class="latency-hero">
+    <div>
+      <div class="perc">p99</div>
+      <div class="nums">
+        <span class="from">904ms</span>
+        <span class="to">85ms</span>
+      </div>
+      <div class="note"><span class="em">10.6× faster</span> · 90.5% reduction</div>
+    </div>
+    <div class="latency-other">
+      <img src="assets/latency-chart.png" alt="Response time chart across cutover">
+      <div class="cap">Response time across the rollout. Cutover ≈ 21:15.</div>
+    </div>
+  </div>
+  <div class="lat-strip">
+    <div><span class="p">p95</span>381 → 43 ms</div>
+    <div><span class="p">p90</span>160 → 31 ms</div>
+    <div><span class="p">p50</span>22 → 12 ms</div>
+  </div>
+  <div class="page-mark">24</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 24. COST -->
+<section data-label="Results / Cost">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 05</span> / Results</div>
+    <h2 class="slide-title">Cost.</h2>
+  </div>
+  <div class="cost-table">
+    <div class="cost-row">
+      <div class="k">Pods</div>
+      <div class="before">300</div>
+      <div class="arrow">→</div>
+      <div class="after">90</div>
+      <div class="delta">−70%</div>
+    </div>
+    <div class="cost-row">
+      <div class="k">Compute spend</div>
+      <div class="before">$8.8k</div>
+      <div class="arrow">→</div>
+      <div class="after">$2.8k</div>
+      <div class="delta">−68%</div>
+    </div>
+    <div class="cost-row">
+      <div class="k">Traffic</div>
+      <div class="before">500k rpm</div>
+      <div class="arrow">→</div>
+      <div class="after">730k rpm</div>
+      <div class="delta">+46%</div>
+    </div>
+  </div>
+  <div class="page-mark">25</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 33. CODA / TEASER -->
+<section data-label="Coda / now" class="coda">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 05</span> / Results · where it stands now</div>
+    <h2 class="slide-title">Bonus: here's now</h2>
+  </div>
+  <div class="coda-grid">
+    <div class="coda-stat">
+      <div class="perc">p99 today</div>
+      <div class="now">25ms</div>
+    </div>
+    <div class="coda-chart">
+      <img src="assets/latency-now.png" alt="Current latency dashboard">
+      <div class="cap">Live dashboard · May 2026.</div>
+    </div>
+  </div>
+  <div class="page-mark">26</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- ACT 4: REFLECTION DIVIDER -->
+<section data-label="Section 6 / Reflection" class="divider">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="sec">SECTION 06</div>
+  <h2>Reflection.</h2>
+  <div class="sub">What I'd do differently, and what to take home.</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- WHAT I'D DO DIFFERENTLY (progressive) -->
+<!-- WHAT I'D DO DIFFERENTLY (build 1) -->
+<section data-label="What I'd do differently / 1">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 06</span> / Reflection</div>
+    <h2 class="slide-title">What I'd do differently.</h2>
+  </div>
+  <div class="lessons">
+    <div class="lesson">
+      <div class="h">Property-based testing.</div>
+    </div>
+    <div class="lesson pd-ghost">
+      <div class="h">Load testing infrastructure.</div>
+    </div>
+    <div class="lesson pd-ghost">
+      <div class="h">Leverage AI more heavily.</div>
+    </div>
+  </div>
+  <div class="page-mark">28</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- WHAT I'D DO DIFFERENTLY (build 2) -->
+<section data-label="What I'd do differently / 2">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 06</span> / Reflection</div>
+    <h2 class="slide-title">What I'd do differently.</h2>
+  </div>
+  <div class="lessons">
+    <div class="lesson">
+      <div class="h">Property-based testing.</div>
+    </div>
+    <div class="lesson">
+      <div class="h">Load testing infrastructure.</div>
+    </div>
+    <div class="lesson pd-ghost">
+      <div class="h">Leverage AI more heavily.</div>
+    </div>
+  </div>
+  <div class="page-mark">29</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- WHAT I'D DO DIFFERENTLY (build 3) -->
+<section data-label="What I'd do differently / 3">
+  <img class="brand-mark" src="assets/posthog-mark.png" alt="PostHog">
+  <div class="header-block">
+    <div class="eyebrow"><span class="em">Section 06</span> / Reflection</div>
+    <h2 class="slide-title">What I'd do differently.</h2>
+  </div>
+  <div class="lessons">
+    <div class="lesson">
+      <div class="h">Property-based testing.</div>
+    </div>
+    <div class="lesson">
+      <div class="h">Load testing infrastructure.</div>
+    </div>
+    <div class="lesson">
+      <div class="h">Leverage AI more heavily.</div>
+    </div>
+  </div>
+  <div class="page-mark">30</div>
+  <div class="url-footer">dylanamartin.com/media/snakes-to-crabs-posthog-rust-2026.pdf</div>
+</section>
+
+<!-- 34. THANKS -->
+<section data-label="Thanks" class="thanks">
+  <img class="thanks-mark" src="assets/image1.png" alt="PostHog" style="filter: invert(0.92);">
+  <div>
+    <div class="eyebrow" style="margin-bottom: 32px;">End</div>
+    <h2>Thank you.<span class="q">Questions?</span></h2>
+  </div>
+  <div class="thanks-bottom">
+    <div class="thanks-col">
+      <h4>Read more</h4>
+      <ul>
+        <li><span class="lead">Part 1 ·</span> posthog.com/blog/even-faster-more-reliable-flags</li>
+        <li><span class="lead">Part 2 ·</span> posthog.com/blog/untangling-tokio-and-rayon</li>
+      </ul>
+    </div>
+    <div class="thanks-col">
+      <h4>Find me</h4>
+      <ul>
+        <li>dylanamartin.com</li>
+        <li>github.com/dmarticus</li>
+        <li>linkedin.com/in/dmarticus</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+<script>
+(async () => {
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  @page { margin: 0.5cm; }\n  html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }\n  section, article, figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>
