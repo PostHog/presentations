@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  SKELETON DECK — PostHog talk                                         │
+  │                                                                       │
+  │  Layout: the <deck-stage> web component (deck-stage.js) renders a     │
+  │  resizable THUMBNAIL RAIL on the left (the "side nav") and the        │
+  │  active slide on the right. Same engine as Dylan's decks.             │
+  │                                                                       │
+  │  How to edit:                                                         │
+  │   • Each <section> below is one slide AND one rail thumbnail.         │
+  │     data-label="…" is the name shown in the rail.                     │
+  │   • Duplicate a <section> to add a slide; delete one to remove it.    │
+  │   • Drag thumbnails to reorder; right-click a thumbnail for           │
+  │     Skip / Move / Delete.                                             │
+  │   • Text in {{ double braces }} / .ph spans is a placeholder — swap   │
+  │     it for real copy. .slot boxes are where images/diagrams go.       │
+  │   • Do NOT set width/height/position on <section> — the component     │
+  │     sizes and positions each slide for you.                           │
+  │                                                                       │
+  │  Serve from the repo root:  python3 -m http.server 8000               │
+  │  then open  http://localhost:8000/new-talk/                          │
+  │  Navigate: ← → / Space. S = notes, F = fullscreen, O = overview.      │
+  │  Export PDF: File → Print (one page per slide).                       │
+  └─────────────────────────────────────────────────────────────────────┘
+-->
+<title>{{ Talk title }} — PostHog</title>
+<link rel="icon" href="assets/posthog-logomark.svg">
+<link href="vendor/fonts/fonts.css" rel="stylesheet">
+<style>
+:root {
+  /* ── PostHog brand surface: warm-beige → cool top-to-bottom gradient ── */
+  --bg-top:    #FFF1D5;
+  --bg-bottom: #DAE0EB;
+
+  /* Ink */
+  --ink:      #15171C;   /* near-black, primary text */
+  --ink-soft: #4B4F58;   /* secondary text */
+  --ink-mute: #7C818B;   /* muted / meta / placeholders */
+  --line:     rgba(21,23,28,0.14);
+  --line-2:   rgba(21,23,28,0.28);
+  --surface:  rgba(255,255,255,0.55);
+
+  /* Accent — "look here", one focal point per slide (light-context orange). */
+  --accent:      hsl(19 100% 48%);
+  --brand-blue:  #1D4AFF;
+  --brand-yellow:#F9BD2B;
+
+  /* Code surface */
+  --code-bg:  #15171C;
+  --code-ink: #ECE9E1;
+  --code-mut: #8A8F99;
+  --code-acc: #FF9F6B;
+
+  /* Type scale (tuned for the 1280×720 canvas) */
+  --t-jumbo:    86px;
+  --t-display:  64px;
+  --t-title:    54px;
+  --t-subtitle: 30px;
+  --t-body:     24px;
+  --t-small:    20px;
+  --t-meta:     18px;
+  --t-label:    18px;
+
+  /* Rhythm */
+  --pad-x:   84px;
+  --pad-top: 66px;
+  --pad-bot: 78px;
+  --gap-title: 34px;
+
+  --track-label: 0.16em;
+  --shadow-hard: 6px 6px 0 rgba(21,23,28,0.12);
+}
+
+deck-stage:not(:defined) { visibility: hidden; }
+
+deck-stage section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bot);
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ── Reusable bits ───────────────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+}
+.eyebrow .em { color: var(--ink); }
+.eyebrow .dot { color: var(--accent); }
+
+.slide-title {
+  font-size: var(--t-title);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.slide-subtitle {
+  font-size: var(--t-subtitle);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 34ch;
+}
+.body { font-size: var(--t-body); line-height: 1.4; color: var(--ink); }
+.accent { color: var(--accent); }
+.ph { color: var(--ink-mute); font-weight: inherit; }   /* placeholder text */
+
+.header-block { display: flex; flex-direction: column; gap: 18px; }
+.header-block + * { margin-top: var(--gap-title); }
+
+/* Brand mark, page number, footer — shared furniture */
+.brand-mark {
+  position: absolute; top: var(--pad-top); right: var(--pad-x);
+  height: 30px; width: auto; opacity: 0.9;
+}
+.page-mark {
+  position: absolute; left: var(--pad-x); bottom: 34px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+  color: var(--ink-mute); letter-spacing: 0.04em;
+}
+.footer-note {
+  position: absolute; right: var(--pad-x); bottom: 34px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+  color: var(--ink-mute);
+}
+
+/* Bulleted "key points" list */
+.points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.points li {
+  font-size: var(--t-body); line-height: 1.36; color: var(--ink);
+  padding-left: 40px; position: relative; max-width: 40ch;
+}
+.points li::before {
+  content: ""; position: absolute; left: 0; top: 0.55em;
+  width: 16px; height: 3px; background: var(--accent); border-radius: 2px;
+}
+.points li .sub { display: block; color: var(--ink-soft); font-size: var(--t-small); margin-top: 4px; }
+
+/* Numbered agenda */
+.agenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: ag; }
+.agenda li {
+  display: flex; align-items: baseline; gap: 22px;
+  font-size: 30px; line-height: 1.2; padding-bottom: 16px; border-bottom: 1px solid var(--line);
+}
+.agenda li::before {
+  counter-increment: ag; content: counter(ag, decimal-leading-zero);
+  font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--accent);
+  font-weight: 500; min-width: 2.2ch;
+}
+.agenda li .note { margin-left: auto; font-size: var(--t-small); color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; }
+
+/* Two-column split (text | visual) */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; flex: 1; min-height: 0; }
+.split.text-wide { grid-template-columns: 1.1fr 0.9fr; }
+
+/* Image / diagram placeholder */
+.slot {
+  border: 2px dashed var(--line-2); border-radius: 14px;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; font-size: var(--t-small);
+  text-align: center; padding: 24px; min-height: 260px; height: 100%;
+}
+.slot .hint { max-width: 22ch; line-height: 1.4; }
+
+/* Card with the borders-first + hard-shadow treatment */
+.cards { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 24px; flex: 1; align-items: stretch; }
+.card {
+  background: var(--surface); border: 1.5px solid var(--line-2); border-radius: 14px;
+  box-shadow: var(--shadow-hard); padding: 28px 26px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.card .k { font-family: 'IBM Plex Mono', monospace; font-size: var(--t-meta); color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; }
+.card .stat { font-size: 60px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.card .stat.accent { color: var(--accent); }
+.card .desc { font-size: var(--t-small); color: var(--ink-soft); line-height: 1.35; }
+
+/* Code block */
+.code {
+  background: var(--code-bg); color: var(--code-ink); border-radius: 14px;
+  padding: 30px 34px; box-shadow: var(--shadow-hard); overflow: hidden;
+}
+.code pre {
+  margin: 0; white-space: pre; overflow-x: auto;
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px; line-height: 1.6;
+}
+.code .c { color: var(--code-mut); }        /* comment */
+.code .a { color: var(--code-acc); }        /* accent token */
+.code .caption { margin-top: 20px; font-family: 'IBM Plex Sans', sans-serif; font-size: var(--t-small); color: var(--code-mut); }
+
+/* ── Slide variants ──────────────────────────────────────────────────── */
+
+/* Title slide */
+.title-slide { justify-content: center; gap: 0; }
+.title-slide .kicker { margin-bottom: 26px; }
+.title-slide h1 {
+  font-size: var(--t-jumbo); font-weight: 700; line-height: 1.0;
+  letter-spacing: -0.03em; margin: 0; max-width: 18ch; text-wrap: balance;
+}
+.title-slide .lede { margin-top: 26px; font-size: var(--t-subtitle); color: var(--ink-soft); max-width: 38ch; }
+.presenter { margin-top: 54px; display: flex; align-items: center; gap: 18px; }
+.presenter .avatar {
+  width: 60px; height: 60px; border-radius: 50%; border: 1.5px solid var(--line-2);
+  background: var(--surface); display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow: hidden;
+}
+.presenter .who .name { font-size: 26px; font-weight: 600; line-height: 1.1; }
+.presenter .who .role { font-size: var(--t-small); color: var(--ink-mute); }
+.title-logo { position: absolute; top: var(--pad-top); left: var(--pad-x); height: 34px; }
+
+/* Section divider */
+.divider { justify-content: center; }
+.divider .num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: var(--accent);
+  letter-spacing: 0.12em; margin-bottom: 22px;
+}
+.divider h2 { font-size: var(--t-display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.02; margin: 0; max-width: 22ch; }
+.divider .rule { width: 96px; height: 4px; background: var(--accent); border-radius: 3px; margin-top: 34px; }
+
+/* Closing / thanks */
+.thanks { justify-content: center; }
+.thanks h2 { font-size: 76px; font-weight: 700; letter-spacing: -0.03em; margin: 0; line-height: 1.0; }
+.thanks h2 .q { display: block; color: var(--ink-mute); font-size: 40px; font-weight: 500; margin-top: 14px; letter-spacing: -0.01em; }
+.thanks-cols { position: absolute; left: var(--pad-x); right: var(--pad-x); bottom: 64px; display: flex; gap: 72px; align-items: flex-end; }
+.thanks-col h4 { margin: 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: var(--t-meta); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-mute); font-weight: 500; }
+.thanks-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.thanks-col li { font-size: var(--t-small); color: var(--ink); }
+.thanks-col li .lead { color: var(--ink-mute); }
+.thanks .qr { margin-left: auto; width: 128px; height: 128px; }
+.thanks .qr .slot { min-height: 0; }
+</style>
+</head>
+<body>
+
+<deck-stage width="1280" height="720">
+
+  <!-- 01 · TITLE ─────────────────────────────────────────────────────────
+       Swap: talk title, one-line lede, presenter name + role, event/date. -->
+  <section data-label="Title" class="title-slide">
+    <img class="title-logo" src="assets/posthog-logo.svg" alt="PostHog">
+    <p class="eyebrow kicker"><span class="em">{{ Event name }}</span> <span class="dot">·</span> {{ Month DD, YYYY }} <span class="dot">·</span> {{ City }}</p>
+    <h1>{{ Your talk title <span class="accent">goes here</span> }}</h1>
+    <p class="lede ph">One sentence that says what the audience walks away with.</p>
+    <div class="presenter">
+      <div class="avatar">photo</div>
+      <div class="who">
+        <div class="name">Marco G</div>
+        <div class="role ph">Role · PostHog</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · WHO AM I ──────────────────────────────────────────────────────
+       Quick intro. Portrait goes in the .slot; bullets are your context. -->
+  <section data-label="Who am I">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Intro</span></p>
+      <h2 class="slide-title">Hi, I'm Marco.</h2>
+    </div>
+    <div class="split text-wide">
+      <ul class="points">
+        <li>What I do at PostHog<span class="sub ph">Team / area you work on</span></li>
+        <li>Why I'm the one giving this talk<span class="sub ph">Your connection to the topic</span></li>
+        <li>What we won't have time for<span class="sub ph">Scope — set expectations</span></li>
+      </ul>
+      <div class="slot"><span class="hint">Portrait / photo<br>(optional)</span></div>
+    </div>
+    <div class="page-mark">02</div>
+  </section>
+
+  <!-- 03 · AGENDA ─────────────────────────────────────────────────────────
+       3–5 items. The right-hand note is optional (e.g. a time or teaser). -->
+  <section data-label="Agenda">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Agenda</span></p>
+      <h2 class="slide-title">What we'll cover.</h2>
+    </div>
+    <ol class="agenda" style="margin-top: var(--gap-title);">
+      <li>{{ First thing }}<span class="note ph">the setup</span></li>
+      <li>{{ Second thing }}<span class="note ph">the core idea</span></li>
+      <li>{{ Third thing }}<span class="note ph">how it works</span></li>
+      <li>{{ Fourth thing }}<span class="note ph">what we learned</span></li>
+    </ol>
+    <div class="page-mark">03</div>
+  </section>
+
+  <!-- 04 · SECTION DIVIDER ─────────────────────────────────────────────────
+       Reuse this between major parts. Change the number + title. -->
+  <section data-label="Section 01" class="divider">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="num">Section 01</div>
+    <h2>{{ The problem }}</h2>
+    <div class="rule"></div>
+    <div class="page-mark">04</div>
+  </section>
+
+  <!-- 05 · CONTENT — points ────────────────────────────────────────────────
+       Title + subtitle + a short bulleted list. One idea per slide. -->
+  <section data-label="The problem">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Context</span></p>
+      <h2 class="slide-title">{{ Set up the problem }}</h2>
+      <p class="slide-subtitle ph">One line of framing beneath the title.</p>
+    </div>
+    <ul class="points" style="margin-top: var(--gap-title);">
+      <li>{{ Point one }}<span class="sub ph">A supporting detail, kept short</span></li>
+      <li>{{ Point two }}<span class="sub ph">A supporting detail, kept short</span></li>
+      <li>{{ Point three }}<span class="sub ph">A supporting detail, kept short</span></li>
+    </ul>
+    <div class="page-mark">05</div>
+  </section>
+
+  <!-- 06 · CONTENT — big idea ──────────────────────────────────────────────
+       A statement slide. Accent points at the one word that matters. -->
+  <section data-label="Key idea">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The idea</span></p>
+      <h2 class="slide-title" style="max-width: 24ch;">{{ The one sentence you want them to <span class="accent">remember</span>. }}</h2>
+    </div>
+    <p class="body ph" style="margin-top: var(--gap-title); max-width: 46ch;">
+      Two or three lines of supporting explanation. Say the specific thing —
+      what it is, why it matters, what changes because of it.
+    </p>
+    <div class="page-mark">06</div>
+  </section>
+
+  <!-- 07 · CONTENT — text + visual ─────────────────────────────────────────
+       Left: the explanation. Right: a diagram, screenshot, or chart. -->
+  <section data-label="How it works">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">How it works</span></p>
+      <h2 class="slide-title">{{ Walk through the mechanism }}</h2>
+    </div>
+    <div class="split" style="margin-top: 30px;">
+      <ul class="points">
+        <li>{{ Step or component one }}</li>
+        <li>{{ Step or component two }}</li>
+        <li>{{ Step or component three }}</li>
+      </ul>
+      <div class="slot"><span class="hint">Diagram / screenshot<br>drop image in <code>assets/</code> and<br><code>&lt;img&gt;</code> it here</span></div>
+    </div>
+    <div class="page-mark">07</div>
+  </section>
+
+  <!-- 08 · CONTENT — code ──────────────────────────────────────────────────
+       Keep snippets short and legible from the back row. -->
+  <section data-label="Code / detail">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">In practice</span></p>
+      <h2 class="slide-title">{{ Show the concrete detail }}</h2>
+    </div>
+    <div class="code" style="margin-top: 30px;">
+<pre><span class="c"># replace with your snippet — keep it short</span>
+posthog.<span class="a">capture</span>(
+    distinct_id=<span class="a">"user_123"</span>,
+    event=<span class="a">"talk_slide_viewed"</span>,
+    properties={<span class="a">"section"</span>: <span class="a">"intro"</span>},
+)</pre>
+      <div class="caption ph">One line on what to notice here.</div>
+    </div>
+    <div class="page-mark">08</div>
+  </section>
+
+  <!-- 09 · SECTION DIVIDER ─────────────────────────────────────────────────-->
+  <section data-label="Section 02" class="divider">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="num">Section 02</div>
+    <h2>{{ Results &amp; what we learned }}</h2>
+    <div class="rule"></div>
+    <div class="page-mark">09</div>
+  </section>
+
+  <!-- 10 · RESULTS — stat cards ────────────────────────────────────────────
+       Numbers that make the point. Accent one that matters most. -->
+  <section data-label="Results">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Results</span></p>
+      <h2 class="slide-title">{{ What changed }}</h2>
+    </div>
+    <div class="cards" style="margin-top: 34px;">
+      <div class="card"><div class="k">Metric</div><div class="stat accent">10×</div><div class="desc ph">What this number means</div></div>
+      <div class="card"><div class="k">Metric</div><div class="stat">42%</div><div class="desc ph">What this number means</div></div>
+      <div class="card"><div class="k">Metric</div><div class="stat">&lt;5ms</div><div class="desc ph">What this number means</div></div>
+    </div>
+    <div class="page-mark">10</div>
+  </section>
+
+  <!-- 11 · TAKEAWAYS ───────────────────────────────────────────────────────
+       The 3 things to leave with. Drives toward one next action. -->
+  <section data-label="Takeaways">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Takeaways</span></p>
+      <h2 class="slide-title">If you remember three things.</h2>
+    </div>
+    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
+      <li>{{ Takeaway one }}</li>
+      <li>{{ Takeaway two }}</li>
+      <li>{{ Takeaway three }}</li>
+    </ul>
+    <div class="page-mark">11</div>
+  </section>
+
+  <!-- 12 · THANKS / QUESTIONS ──────────────────────────────────────────────
+       Links + where to find you. Swap the QR slot for a real QR image. -->
+  <section data-label="Thanks" class="thanks">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div>
+      <p class="eyebrow" style="margin-bottom: 22px;">End</p>
+      <h2>Thank you.<span class="q">Questions?</span></h2>
+    </div>
+    <div class="thanks-cols">
+      <div class="thanks-col">
+        <h4>Read more</h4>
+        <ul>
+          <li><span class="lead ph">Link ·</span> posthog.com/blog/{{ … }}</li>
+          <li><span class="lead ph">Slides ·</span> posthog.github.io/presentations/new-talk</li>
+        </ul>
+      </div>
+      <div class="thanks-col">
+        <h4>Find me</h4>
+        <ul>
+          <li class="ph">marco.g@posthog.com</li>
+          <li class="ph">github.com/…</li>
+        </ul>
+      </div>
+      <div class="qr"><div class="slot"><span class="hint">QR</span></div></div>
+    </div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+</body>
+</html>
