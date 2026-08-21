@@ -1,11 +1,14 @@
-# {{ Talk title }} — skeleton
+# The path to self-driving agents
 
-A **skeleton deck** to fill in for the talk. Same slide engine and side-nav
-thumbnail rail as the other decks in this repo (`deck-stage.js`).
+Marco G · **The Self-Driving Product** (Merge × PostHog × Redis technical
+talks, hosted by Merge.dev in NYC).
 
-> ⚠️ Placeholder. Directory is named `new-talk/` for now — rename it to an
-> event/topic slug (e.g. `posthog-atx-builders/`) once the content lands, and
-> update the `<title>` and the "Slides ·" link on the closing slide to match.
+How PostHog gets from tracing to *self-driving* — using everything a product
+knows about itself (analytics, logs, errors, infra, code) to watch, diagnose,
+and eventually fix it. Structured **Why → How → What**.
+
+Same slide engine and side-nav thumbnail rail as the other decks in this repo
+(`deck-stage.js`).
 
 ## Edit it
 
@@ -13,16 +16,18 @@ Everything is in [`index.html`](./index.html):
 
 - Each `<section data-label="…">` is **one slide** and **one thumbnail** in the
   left rail. Duplicate a section to add a slide; delete one to remove it.
-- Text in `{{ double braces }}` and muted `.ph` spans are placeholders — swap
-  them for real copy.
+- A few things are still placeholders to finalize — search the file for `{{ }}`
+  / muted `.ph` spans: the **event date** (left off the title slide), a
+  **github/x handle** on the closing slide, and the **QR** slot (point it at
+  the published slides URL).
 - `.slot` dashed boxes are where images/diagrams go: drop a file in `assets/`
-  and `<img src="assets/…">` it in.
+  and `<img src="assets/…">` it in (e.g. a portrait on slide 2).
 - Don't set `width`/`height`/`position` on a `<section>` — the component sizes
   each slide for you (canvas is 1280×720).
 
-Slide types already stubbed: title · who-am-I · agenda · section divider ·
-bulleted content · statement · text + visual split · code · results (stat
-cards) · takeaways · thanks/questions.
+Reusable slide types in the file: title · who-am-I · agenda · section divider ·
+quote · statement · bulleted content · 3-step flow · 4-rung ladder · callout ·
+takeaways · thanks.
 
 ## View it
 
@@ -30,7 +35,7 @@ Static, no build step. From the repo root:
 
 ```bash
 python3 -m http.server 8000
-# open http://localhost:8000/new-talk/
+# open http://localhost:8000/self-driving-agents/
 ```
 
 Navigate with ← → / Space. `S` speaker notes, `F` fullscreen, `O` overview.
@@ -43,9 +48,3 @@ Follows the repo's [`PRESENTATION_GUIDELINES.md`](../PRESENTATION_GUIDELINES.md)
 PostHog cream→cool gradient (`#FFF1D5 → #DAE0EB`), sentence-case titles, accent
 orange pointing at one thing per slide. Fonts (IBM Plex) are vendored under
 `vendor/` so the deck works fully offline.
-
-## Publish to the landing page (when content is ready)
-
-1. Screenshot the title slide → `thumbnail.png` (16:9).
-2. Add a card to the root [`index.html`](../index.html) and a row to the repo
-   [`README.md`](../README.md) table.

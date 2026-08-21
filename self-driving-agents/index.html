@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  The path to self-driving agents — Marco G, PostHog                   │
+  │  The Self-Driving Product · Merge × PostHog × Redis · NYC             │
+  │                                                                       │
+  │  Layout: the <deck-stage> web component (deck-stage.js) renders a     │
+  │  resizable THUMBNAIL RAIL on the left (the "side nav") and the        │
+  │  active slide on the right.                                           │
+  │                                                                       │
+  │  Editing:                                                             │
+  │   • Each <section data-label="…"> is one slide AND one rail thumb.    │
+  │     Duplicate to add; delete to remove; drag thumbnails to reorder.   │
+  │   • Anything still in {{ braces }} or a muted .ph span is a           │
+  │     placeholder to finalize (event date, socials, QR).               │
+  │   • .slot dashed boxes are where images/diagrams go.                  │
+  │   • Do NOT set width/height/position on a <section>.                  │
+  │                                                                       │
+  │  Serve:  python3 -m http.server 8000                                  │
+  │          → http://localhost:8000/self-driving-agents/                │
+  │  Nav: ← → / Space. S notes, F fullscreen, O overview. Print → PDF.    │
+  └─────────────────────────────────────────────────────────────────────┘
+-->
+<title>The path to self-driving agents — PostHog</title>
+<link rel="icon" href="assets/posthog-logomark.svg">
+<link href="vendor/fonts/fonts.css" rel="stylesheet">
+<style>
+:root {
+  /* ── PostHog brand surface: warm-beige → cool top-to-bottom gradient ── */
+  --bg-top:    #FFF1D5;
+  --bg-bottom: #DAE0EB;
+
+  /* Ink */
+  --ink:      #15171C;
+  --ink-soft: #4B4F58;
+  --ink-mute: #7C818B;
+  --line:     rgba(21,23,28,0.14);
+  --line-2:   rgba(21,23,28,0.28);
+  --surface:  rgba(255,255,255,0.55);
+
+  /* Accent — "look here", one focal point per slide. */
+  --accent:      hsl(19 100% 48%);
+  --brand-blue:  #1D4AFF;
+  --brand-yellow:#F9BD2B;
+
+  /* Code / dark surface */
+  --code-bg:  #15171C;
+  --code-ink: #ECE9E1;
+  --code-mut: #8A8F99;
+  --code-acc: #FF9F6B;
+
+  /* Type scale (tuned for the 1280×720 canvas) */
+  --t-jumbo:    82px;
+  --t-display:  62px;
+  --t-title:    54px;
+  --t-subtitle: 30px;
+  --t-body:     24px;
+  --t-small:    20px;
+  --t-meta:     18px;
+  --t-label:    18px;
+
+  /* Rhythm */
+  --pad-x:   84px;
+  --pad-top: 66px;
+  --pad-bot: 78px;
+  --gap-title: 34px;
+
+  --track-label: 0.16em;
+  --shadow-hard: 6px 6px 0 rgba(21,23,28,0.12);
+}
+
+deck-stage:not(:defined) { visibility: hidden; }
+
+deck-stage section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bot);
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ── Reusable bits ───────────────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+}
+.eyebrow .em { color: var(--ink); }
+.eyebrow .dot { color: var(--accent); }
+
+.slide-title {
+  font-size: var(--t-title);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.slide-subtitle {
+  font-size: var(--t-subtitle);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 36ch;
+}
+.body { font-size: var(--t-body); line-height: 1.42; color: var(--ink); max-width: 46ch; }
+.accent { color: var(--accent); }
+.ph { color: var(--ink-mute); font-weight: inherit; }
+
+.header-block { display: flex; flex-direction: column; gap: 18px; }
+.header-block + * { margin-top: var(--gap-title); }
+
+.brand-mark {
+  position: absolute; top: var(--pad-top); right: var(--pad-x);
+  height: 30px; width: auto; opacity: 0.9;
+}
+.page-mark {
+  position: absolute; left: var(--pad-x); bottom: 34px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+  color: var(--ink-mute); letter-spacing: 0.04em;
+}
+
+/* Bulleted "key points" list */
+.points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.points li {
+  font-size: var(--t-body); line-height: 1.34; color: var(--ink);
+  padding-left: 40px; position: relative; max-width: 42ch;
+}
+.points li::before {
+  content: ""; position: absolute; left: 0; top: 0.55em;
+  width: 16px; height: 3px; background: var(--accent); border-radius: 2px;
+}
+.points li .sub { display: block; color: var(--ink-soft); font-size: var(--t-small); margin-top: 4px; }
+
+/* Numbered agenda */
+.agenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; counter-reset: ag; }
+.agenda li {
+  display: flex; align-items: baseline; gap: 22px;
+  font-size: 32px; line-height: 1.2; padding-bottom: 18px; border-bottom: 1px solid var(--line);
+}
+.agenda li::before {
+  counter-increment: ag; content: counter(ag, decimal-leading-zero);
+  font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--accent);
+  font-weight: 500; min-width: 2.2ch;
+}
+.agenda li .note { margin-left: auto; font-size: var(--t-small); color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; }
+
+/* Two-column split (text | visual) */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; flex: 1; min-height: 0; }
+.split.text-wide { grid-template-columns: 1.1fr 0.9fr; }
+
+/* Image / diagram placeholder */
+.slot {
+  border: 2px dashed var(--line-2); border-radius: 14px; background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; font-size: var(--t-small);
+  text-align: center; padding: 24px; min-height: 260px; height: 100%;
+}
+.slot .hint { max-width: 22ch; line-height: 1.4; }
+
+/* Stat cards (borders-first + hard shadow) */
+.cards { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 24px; margin-top: 34px; align-items: stretch; }
+.card {
+  background: var(--surface); border: 1.5px solid var(--line-2); border-radius: 14px;
+  box-shadow: var(--shadow-hard); padding: 26px 26px; display: flex; flex-direction: column; gap: 10px;
+}
+.card .k { font-family: 'IBM Plex Mono', monospace; font-size: var(--t-meta); color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; }
+.card .stat { font-size: 56px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.card .stat.accent { color: var(--accent); }
+.card .desc { font-size: var(--t-small); color: var(--ink-soft); line-height: 1.35; }
+
+/* Quote */
+.quote { justify-content: center; }
+.quote .qmark { font-family: Georgia, 'Times New Roman', serif; font-size: 120px; line-height: 0.5; color: var(--accent); height: 54px; }
+.quote blockquote { margin: 0; max-width: 24ch; font-size: 56px; font-weight: 600; line-height: 1.12; letter-spacing: -0.025em; }
+.quote .after { margin-top: 30px; font-size: var(--t-subtitle); color: var(--ink-soft); max-width: 34ch; line-height: 1.28; }
+.quote .attrib { margin-top: 34px; font-family: 'IBM Plex Mono', monospace; font-size: var(--t-small); color: var(--ink-mute); letter-spacing: 0.02em; }
+
+/* Horizontal flow (3 steps) */
+.flow { display: flex; align-items: stretch; gap: 16px; margin-top: 44px; }
+.flow .step {
+  flex: 1; background: var(--surface); border: 1.5px solid var(--line-2); border-radius: 14px;
+  padding: 24px 24px; display: flex; flex-direction: column; gap: 10px;
+}
+.flow .step .k { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; }
+.flow .step .t { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.08; }
+.flow .step .d { font-size: var(--t-small); color: var(--ink-soft); line-height: 1.34; }
+.flow .step.is-end { border-color: var(--accent); box-shadow: var(--shadow-hard); }
+.flow .step.is-end .t { color: var(--accent); }
+.flow .sep { flex: 0 0 auto; align-self: center; color: var(--accent); font-size: 30px; font-weight: 600; }
+
+/* Ladder (4 rungs) */
+.ladder { display: flex; align-items: stretch; margin-top: 40px; flex: 1; }
+.rung {
+  flex: 1; position: relative; background: var(--surface); border: 1.5px solid var(--line-2);
+  border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 8px;
+}
+.rung + .rung { margin-left: 42px; }
+.rung + .rung::before {
+  content: "→"; position: absolute; left: -34px; top: 50%; transform: translate(-2px,-50%);
+  color: var(--ink-mute); font-size: 24px; font-weight: 600;
+}
+.rung .stage { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; }
+.rung .name { font-size: 25px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.06; }
+.rung .what { font-size: 17px; color: var(--ink-soft); line-height: 1.34; }
+.rung.is-goal { border-color: var(--accent); box-shadow: var(--shadow-hard); }
+.rung.is-goal .name { color: var(--accent); }
+.rung.is-goal .stage { color: var(--accent); }
+
+/* Callout line */
+.callout {
+  margin-top: 32px; border-left: 4px solid var(--accent); padding: 6px 0 6px 22px;
+  font-size: 28px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; max-width: 32ch;
+}
+
+/* ── Slide variants ──────────────────────────────────────────────────── */
+
+.title-slide { justify-content: center; gap: 0; }
+.title-slide .kicker { margin-bottom: 26px; }
+.title-slide h1 {
+  font-size: var(--t-jumbo); font-weight: 700; line-height: 1.0;
+  letter-spacing: -0.03em; margin: 0; max-width: 17ch; text-wrap: balance;
+}
+.title-slide .lede { margin-top: 26px; font-size: var(--t-subtitle); color: var(--ink-soft); max-width: 40ch; line-height: 1.28; }
+.presenter { margin-top: 50px; display: flex; align-items: center; gap: 18px; }
+.presenter .avatar {
+  width: 60px; height: 60px; border-radius: 50%; border: 1.5px solid var(--line-2);
+  background: var(--surface); display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow: hidden; flex: 0 0 auto;
+}
+.presenter .who .name { font-size: 26px; font-weight: 600; line-height: 1.1; }
+.presenter .who .role { font-size: var(--t-small); color: var(--ink-mute); }
+.title-logo { position: absolute; top: var(--pad-top); left: var(--pad-x); height: 34px; }
+
+.divider { justify-content: center; }
+.divider .num { font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 22px; }
+.divider h2 { font-size: var(--t-display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.02; margin: 0; max-width: 22ch; }
+.divider .rule { width: 96px; height: 4px; background: var(--accent); border-radius: 3px; margin-top: 34px; }
+
+.thanks { justify-content: center; }
+.thanks h2 { font-size: 74px; font-weight: 700; letter-spacing: -0.03em; margin: 0; line-height: 1.0; }
+.thanks h2 .q { display: block; color: var(--ink-mute); font-size: 38px; font-weight: 500; margin-top: 14px; letter-spacing: -0.01em; }
+.thanks-cols { position: absolute; left: var(--pad-x); right: var(--pad-x); bottom: 62px; display: flex; gap: 64px; align-items: flex-end; }
+.thanks-col h4 { margin: 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: var(--t-meta); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-mute); font-weight: 500; }
+.thanks-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.thanks-col li { font-size: var(--t-small); color: var(--ink); }
+.thanks-col li .lead { color: var(--ink-mute); }
+.thanks .qr { margin-left: auto; width: 124px; height: 124px; }
+.thanks .qr .slot { min-height: 0; }
+</style>
+</head>
+<body>
+
+<deck-stage width="1280" height="720">
+
+  <!-- 01 · TITLE -->
+  <section data-label="Title" class="title-slide">
+    <img class="title-logo" src="assets/posthog-logo.svg" alt="PostHog">
+    <p class="eyebrow kicker">The Self-Driving Product <span class="dot">·</span> Merge <span class="em">×</span> PostHog <span class="em">×</span> Redis <span class="dot">·</span> New York City</p>
+    <h1>The path to <span class="accent">self-driving</span> agents.</h1>
+    <p class="lede">Using everything a product knows about itself — analytics, logs, errors, infra, code — to watch, diagnose, and eventually fix it. On its own.</p>
+    <div class="presenter">
+      <div class="avatar">MG</div>
+      <div class="who">
+        <div class="name">Marco G</div>
+        <div class="role">PM, AI Observability · PostHog</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · WHO AM I -->
+  <section data-label="Who am I">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Intro</span></p>
+      <h2 class="slide-title">Hi, I'm Marco.</h2>
+    </div>
+    <div class="split text-wide">
+      <ul class="points">
+        <li>PM for AI Observability at PostHog<span class="sub">How teams see — and trust — what their AI features actually do</span></li>
+        <li>I spend my days close to traces, evals, and the messy reality of shipping LLM products</li>
+        <li>Today: where "self-driving" is headed — and how a product gets there</li>
+      </ul>
+      <div class="slot"><span class="hint">Portrait / photo<br>(optional — drop in <code>assets/</code>)</span></div>
+    </div>
+    <div class="page-mark">02</div>
+  </section>
+
+  <!-- 03 · AGENDA -->
+  <section data-label="Agenda">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Agenda</span></p>
+      <h2 class="slide-title">Why, how, and what.</h2>
+    </div>
+    <ol class="agenda" style="margin-top: var(--gap-title);">
+      <li>Why self-driving?<span class="note">the case for it</span></li>
+      <li>How self-driving?<span class="note">PostHog's bet: context</span></li>
+      <li>What self-driving?<span class="note">tracing → self-driving</span></li>
+    </ol>
+    <div class="page-mark">03</div>
+  </section>
+
+  <!-- 04 · SECTION 01 -->
+  <section data-label="Section 01 · Why" class="divider">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="num">Section 01</div>
+    <h2>Why self-driving?</h2>
+    <div class="rule"></div>
+    <div class="page-mark">04</div>
+  </section>
+
+  <!-- 05 · QUOTE (Paul Graham) -->
+  <section data-label="Startups grow fast" class="quote">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="qmark">&ldquo;</div>
+    <blockquote>A startup is a company designed to <span class="accent">grow fast</span>.</blockquote>
+    <p class="after">The only essential thing is growth. Everything else we associate with startups follows from it.</p>
+    <div class="attrib">Paul Graham · "Startup = Growth," 2012</div>
+    <div class="page-mark">05</div>
+  </section>
+
+  <!-- 06 · WHY IT MATTERS -->
+  <section data-label="Compress the loop">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The case</span></p>
+      <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the product loop.</h2>
+    </div>
+    <p class="body" style="margin-top: var(--gap-title);">
+      Growth comes from iterating fast. Most of that cycle is spent noticing —
+      finding what broke, why it broke, and what to try next. If the product can
+      do that watching itself and propose the fix, teams get to spend their time
+      on judgment instead. Same team, a much shorter loop.
+    </p>
+    <div class="page-mark">06</div>
+  </section>
+
+  <!-- 07 · SECTION 02 -->
+  <section data-label="Section 02 · How" class="divider">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="num">Section 02</div>
+    <h2>How? It starts with context.</h2>
+    <div class="rule"></div>
+    <div class="page-mark">07</div>
+  </section>
+
+  <!-- 08 · CONTEXT — PostHog's angle -->
+  <section data-label="One graph of your product">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">PostHog's bet</span></p>
+      <h2 class="slide-title">You can't fix what you can't see.</h2>
+      <p class="slide-subtitle">Self-driving runs on context — and PostHog already has the whole picture in one place.</p>
+    </div>
+    <ul class="points" style="margin-top: 30px;">
+      <li>Product analytics<span class="sub">What users actually do</span></li>
+      <li>Logs &amp; error tracking<span class="sub">What's breaking, and where</span></li>
+      <li>Infra &amp; performance metrics<span class="sub">How it holds up under load</span></li>
+      <li>The codebase itself<span class="sub">Why it behaves the way it does</span></li>
+    </ul>
+    <div class="page-mark">08</div>
+  </section>
+
+  <!-- 09 · FLOW — context → diagnosis → action -->
+  <section data-label="Data to decisions">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The mechanism</span></p>
+      <h2 class="slide-title">From data to decisions.</h2>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <span class="k">Context</span>
+        <div class="t">All in one place</div>
+        <div class="d">Analytics, logs, errors, infra, and code — one connected picture.</div>
+      </div>
+      <div class="sep">→</div>
+      <div class="step">
+        <span class="k">Diagnosis</span>
+        <div class="t">What's right, what's wrong</div>
+        <div class="d">Read the signal across sources to find what's actually broken.</div>
+      </div>
+      <div class="sep">→</div>
+      <div class="step is-end">
+        <span class="k">Action</span>
+        <div class="t">Fix &amp; improve</div>
+        <div class="d">Propose — and eventually ship — the change automatically.</div>
+      </div>
+    </div>
+    <div class="page-mark">09</div>
+  </section>
+
+  <!-- 10 · SECTION 03 -->
+  <section data-label="Section 03 · What" class="divider">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="num">Section 03</div>
+    <h2>What does self-driving look like?</h2>
+    <div class="rule"></div>
+    <div class="page-mark">10</div>
+  </section>
+
+  <!-- 11 · LADDER — the maturity curve -->
+  <section data-label="Four rungs">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The maturity curve</span></p>
+      <h2 class="slide-title">Four rungs, one direction.</h2>
+    </div>
+    <div class="ladder">
+      <div class="rung">
+        <span class="stage">Today</span>
+        <div class="name">Tracing</div>
+        <div class="what">Capture every step an agent takes.</div>
+      </div>
+      <div class="rung">
+        <span class="stage">Rung 2</span>
+        <div class="name">Automated monitoring</div>
+        <div class="what">Evals score those traces, continuously.</div>
+      </div>
+      <div class="rung">
+        <span class="stage">Rung 3</span>
+        <div class="name">Smart monitoring</div>
+        <div class="what">Cluster failures into reports that explain themselves.</div>
+      </div>
+      <div class="rung is-goal">
+        <span class="stage">The goal</span>
+        <div class="name">Self-driving</div>
+        <div class="what">Reports become signals — and signals become fixes.</div>
+      </div>
+    </div>
+    <div class="page-mark">11</div>
+  </section>
+
+  <!-- 12 · WHAT SELF-DRIVING MEANS -->
+  <section data-label="Signals become fixes">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The last rung</span></p>
+      <h2 class="slide-title">Signals that add up to a fix.</h2>
+    </div>
+    <p class="body" style="margin-top: 26px;">
+      Reports flow into signals. A signal from analytics, paired with one from
+      errors, infra, and the code that ties them together, combines into a single
+      picture: here's what's wrong, here's why, here's the change.
+    </p>
+    <div class="callout">Reports → signals across products → a potential insight <span class="accent">＋ fix</span>.</div>
+    <div class="page-mark">12</div>
+  </section>
+
+  <!-- 13 · TAKEAWAYS -->
+  <section data-label="Takeaways">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Takeaways</span></p>
+      <h2 class="slide-title">If you remember three things.</h2>
+    </div>
+    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
+      <li>Self-driving is about <span class="accent">speed</span> — compressing the loop between a problem and its fix.</li>
+      <li>It runs on <span class="accent">context</span> — analytics, logs, errors, infra, and code in one place.</li>
+      <li>We get there rung by rung: tracing → evals → reports → signals → fixes.</li>
+    </ul>
+    <div class="page-mark">13</div>
+  </section>
+
+  <!-- 14 · THANKS -->
+  <section data-label="Thanks" class="thanks">
+    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <div>
+      <p class="eyebrow" style="margin-bottom: 22px;">End</p>
+      <h2>Thank you.<span class="q">Questions?</span></h2>
+    </div>
+    <div class="thanks-cols">
+      <div class="thanks-col">
+        <h4>Read more</h4>
+        <ul>
+          <li><span class="lead">LLM analytics ·</span> posthog.com/docs/llm-analytics</li>
+          <li><span class="lead">Slides ·</span> posthog.github.io/presentations/self-driving-agents</li>
+        </ul>
+      </div>
+      <div class="thanks-col">
+        <h4>Find me</h4>
+        <ul>
+          <li>marco.g@posthog.com</li>
+          <li class="ph">{{ github / x handle }}</li>
+        </ul>
+      </div>
+      <div class="qr"><div class="slot"><span class="hint">QR →<br>slides</span></div></div>
+    </div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+</body>
+</html>
