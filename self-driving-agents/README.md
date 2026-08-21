@@ -7,8 +7,17 @@ How PostHog gets from tracing to *self-driving* — using everything a product
 knows about itself (analytics, logs, errors, infra, code) to watch, diagnose,
 and eventually fix it. Structured **Why → How → What**.
 
-Same slide engine and side-nav thumbnail rail as the other decks in this repo
-(`deck-stage.js`).
+Same side-nav thumbnail rail as the other decks, via the shared
+[`../lib/deck-stage.js`](../lib/deck-stage.js) engine.
+
+## Shared resources (not vendored per-deck)
+
+This deck pulls its engine, fonts, and logos from shared repo-level paths
+rather than copying them in — so it must be served from the repo root:
+
+- Engine → [`../lib/deck-stage.js`](../lib/deck-stage.js)
+- Fonts → [`../lib/fonts/`](../lib/fonts/) (IBM Plex)
+- Logo / logomark → [`../img/`](../img/)
 
 ## Edit it
 
@@ -20,8 +29,9 @@ Everything is in [`index.html`](./index.html):
   / muted `.ph` spans: the **event date** (left off the title slide), a
   **github/x handle** on the closing slide, and the **QR** slot (point it at
   the published slides URL).
-- `.slot` dashed boxes are where images/diagrams go: drop a file in `assets/`
-  and `<img src="assets/…">` it in (e.g. a portrait on slide 2).
+- `.slot` dashed boxes are where images/diagrams go: add an `assets/` folder
+  here, drop the file in, and `<img src="assets/…">` it in (e.g. a portrait on
+  slide 2).
 - Don't set `width`/`height`/`position` on a `<section>` — the component sizes
   each slide for you (canvas is 1280×720).
 
@@ -46,5 +56,5 @@ skip/move/delete. Export to PDF via the browser's Print (one page per slide).
 
 Follows the repo's [`PRESENTATION_GUIDELINES.md`](../PRESENTATION_GUIDELINES.md):
 PostHog cream→cool gradient (`#FFF1D5 → #DAE0EB`), sentence-case titles, accent
-orange pointing at one thing per slide. Fonts (IBM Plex) are vendored under
-`vendor/` so the deck works fully offline.
+orange pointing at one thing per slide. Type is IBM Plex Sans/Mono, loaded from
+the shared [`../lib/fonts/`](../lib/fonts/) (self-hosted — no external calls).

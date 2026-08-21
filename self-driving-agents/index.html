@@ -8,16 +8,20 @@
   │  The path to self-driving agents — Marco G, PostHog                   │
   │  The Self-Driving Product · Merge × PostHog × Redis · NYC             │
   │                                                                       │
-  │  Layout: the <deck-stage> web component (deck-stage.js) renders a     │
-  │  resizable THUMBNAIL RAIL on the left (the "side nav") and the        │
-  │  active slide on the right.                                           │
+  │  Layout: the shared <deck-stage> web component (../lib/deck-stage.js) │
+  │  renders a resizable THUMBNAIL RAIL on the left (the "side nav") and  │
+  │  the active slide on the right.                                       │
+  │                                                                       │
+  │  Shared, not vendored per-deck (served from the repo root):           │
+  │   • engine → ../lib/deck-stage.js   • fonts → ../lib/fonts/           │
+  │   • logo/logomark → ../img/                                           │
   │                                                                       │
   │  Editing:                                                             │
   │   • Each <section data-label="…"> is one slide AND one rail thumb.    │
   │     Duplicate to add; delete to remove; drag thumbnails to reorder.   │
   │   • Anything still in {{ braces }} or a muted .ph span is a           │
   │     placeholder to finalize (event date, socials, QR).               │
-  │   • .slot dashed boxes are where images/diagrams go.                  │
+  │   • For images, add an assets/ folder here and <img> from it.         │
   │   • Do NOT set width/height/position on a <section>.                  │
   │                                                                       │
   │  Serve:  python3 -m http.server 8000                                  │
@@ -26,8 +30,8 @@
   └─────────────────────────────────────────────────────────────────────┘
 -->
 <title>The path to self-driving agents — PostHog</title>
-<link rel="icon" href="assets/posthog-logomark.svg">
-<link href="vendor/fonts/fonts.css" rel="stylesheet">
+<link rel="icon" href="../img/posthog-logomark.svg">
+<link href="../lib/fonts/fonts.css" rel="stylesheet">
 <style>
 :root {
   /* ── PostHog brand surface: warm-beige → cool top-to-bottom gradient ── */
@@ -269,7 +273,7 @@ deck-stage section {
 
   <!-- 01 · TITLE -->
   <section data-label="Title" class="title-slide">
-    <img class="title-logo" src="assets/posthog-logo.svg" alt="PostHog">
+    <img class="title-logo" src="../img/posthog-logo.svg" alt="PostHog">
     <p class="eyebrow kicker">The Self-Driving Product <span class="dot">·</span> Merge <span class="em">×</span> PostHog <span class="em">×</span> Redis <span class="dot">·</span> New York City</p>
     <h1>The path to <span class="accent">self-driving</span> agents.</h1>
     <p class="lede">Using everything a product knows about itself — analytics, logs, errors, infra, code — to watch, diagnose, and eventually fix it. On its own.</p>
@@ -284,7 +288,7 @@ deck-stage section {
 
   <!-- 02 · WHO AM I -->
   <section data-label="Who am I">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Intro</span></p>
       <h2 class="slide-title">Hi, I'm Marco.</h2>
@@ -302,7 +306,7 @@ deck-stage section {
 
   <!-- 03 · AGENDA -->
   <section data-label="Agenda">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Agenda</span></p>
       <h2 class="slide-title">Why, how, and what.</h2>
@@ -317,7 +321,7 @@ deck-stage section {
 
   <!-- 04 · SECTION 01 -->
   <section data-label="Section 01 · Why" class="divider">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="num">Section 01</div>
     <h2>Why self-driving?</h2>
     <div class="rule"></div>
@@ -326,7 +330,7 @@ deck-stage section {
 
   <!-- 05 · QUOTE (Paul Graham) -->
   <section data-label="Startups grow fast" class="quote">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="qmark">&ldquo;</div>
     <blockquote>A startup is a company designed to <span class="accent">grow fast</span>.</blockquote>
     <p class="after">The only essential thing is growth. Everything else we associate with startups follows from it.</p>
@@ -336,7 +340,7 @@ deck-stage section {
 
   <!-- 06 · WHY IT MATTERS -->
   <section data-label="Compress the loop">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The case</span></p>
       <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the product loop.</h2>
@@ -352,7 +356,7 @@ deck-stage section {
 
   <!-- 07 · SECTION 02 -->
   <section data-label="Section 02 · How" class="divider">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="num">Section 02</div>
     <h2>How? It starts with context.</h2>
     <div class="rule"></div>
@@ -361,7 +365,7 @@ deck-stage section {
 
   <!-- 08 · CONTEXT — PostHog's angle -->
   <section data-label="One graph of your product">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">PostHog's bet</span></p>
       <h2 class="slide-title">You can't fix what you can't see.</h2>
@@ -378,7 +382,7 @@ deck-stage section {
 
   <!-- 09 · FLOW — context → diagnosis → action -->
   <section data-label="Data to decisions">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The mechanism</span></p>
       <h2 class="slide-title">From data to decisions.</h2>
@@ -407,7 +411,7 @@ deck-stage section {
 
   <!-- 10 · SECTION 03 -->
   <section data-label="Section 03 · What" class="divider">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="num">Section 03</div>
     <h2>What does self-driving look like?</h2>
     <div class="rule"></div>
@@ -416,7 +420,7 @@ deck-stage section {
 
   <!-- 11 · LADDER — the maturity curve -->
   <section data-label="Four rungs">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The maturity curve</span></p>
       <h2 class="slide-title">Four rungs, one direction.</h2>
@@ -448,7 +452,7 @@ deck-stage section {
 
   <!-- 12 · WHAT SELF-DRIVING MEANS -->
   <section data-label="Signals become fixes">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The last rung</span></p>
       <h2 class="slide-title">Signals that add up to a fix.</h2>
@@ -464,7 +468,7 @@ deck-stage section {
 
   <!-- 13 · TAKEAWAYS -->
   <section data-label="Takeaways">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Takeaways</span></p>
       <h2 class="slide-title">If you remember three things.</h2>
@@ -479,7 +483,7 @@ deck-stage section {
 
   <!-- 14 · THANKS -->
   <section data-label="Thanks" class="thanks">
-    <img class="brand-mark" src="assets/posthog-logomark.svg" alt="PostHog">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div>
       <p class="eyebrow" style="margin-bottom: 22px;">End</p>
       <h2>Thank you.<span class="q">Questions?</span></h2>
@@ -505,6 +509,6 @@ deck-stage section {
 
 </deck-stage>
 
-<script src="deck-stage.js"></script>
+<script src="../lib/deck-stage.js"></script>
 </body>
 </html>
