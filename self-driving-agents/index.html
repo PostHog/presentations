@@ -349,7 +349,7 @@ section { counter-increment: slide; }
     <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
       <li>Self-driving is about <span class="accent">speed</span>: compressing the loop between a problem and its fix.</li>
       <li>It runs on <span class="accent">context</span>: data across multiple products in one place.</li>
-      <li>We get there by removing noise at each step: tracing → evals → reports → signals → fixes.</li>
+      <li>We get there by removing noise at each step: tracing → evals → signals → reports → fixes.</li>
     </ul>
     <div class="page-mark">03</div>
   </section>
@@ -395,7 +395,7 @@ section { counter-increment: slide; }
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">PostHog's Bet</span></p>
-      <h2 class="slide-title">The whole picture</h2>
+      <h2 class="slide-title">The <span class="accent">whole</span> picture</h2>
       <p class="slide-subtitle">The context an agent needs is captured across PostHog's products.</p>
     </div>
     <div class="prods">
@@ -428,7 +428,7 @@ section { counter-increment: slide; }
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">PostHog's Bet</span></p>
-      <h2 class="slide-title">The insight is in the overlap</h2>
+      <h2 class="slide-title">The insight is in the <span class="accent">overlap</span></h2>
       <p class="slide-subtitle">The intersection of multiple data sources gives the full story.</p>
     </div>
     <div class="inters">
@@ -475,13 +475,45 @@ section { counter-increment: slide; }
     <div class="page-mark"></div>
   </section>
 
+  <!-- BRIDGE · scope the example (one signal, one product) -->
+  <section data-label="One example">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Zooming in</span></p>
+      <h2 class="slide-title">One <span class="accent">signal</span>, one product</h2>
+      <p class="slide-subtitle">The same shape scales out across every product.</p>
+    </div>
+    <div style="display: flex; align-items: stretch; gap: 14px; margin-top: 40px;">
+      <div style="flex: 1; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 16px; text-align: center;">
+        <div style="font-size: 19px; font-weight: 700; line-height: 1.15;">PostHog</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); margin-top: 5px;">many products</div>
+      </div>
+      <div style="flex: 0 0 auto; align-self: center; color: var(--accent); font-size: 26px; font-weight: 600;">→</div>
+      <div style="flex: 1; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 16px; text-align: center;">
+        <div style="font-size: 19px; font-weight: 700; line-height: 1.15;">AI observability</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); margin-top: 5px;">one product</div>
+      </div>
+      <div style="flex: 0 0 auto; align-self: center; color: var(--accent); font-size: 26px; font-weight: 600;">→</div>
+      <div style="flex: 1; border: 1.5px solid var(--accent); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 16px; text-align: center;">
+        <div style="font-size: 19px; font-weight: 700; line-height: 1.15;">Online Evaluations</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); margin-top: 5px;">one signal</div>
+      </div>
+      <div style="flex: 0 0 auto; align-self: center; color: var(--accent); font-size: 26px; font-weight: 600;">→</div>
+      <div style="flex: 1; border: 1.5px solid var(--accent); background: rgba(245,78,0,0.06); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 16px; text-align: center;">
+        <div style="font-size: 19px; font-weight: 700; line-height: 1.15; color: var(--accent);">This example</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); margin-top: 5px;">end to end</div>
+      </div>
+    </div>
+    <div class="page-mark"></div>
+  </section>
+
   <!-- FUNNEL · the pipeline in one view (roadmap before the 4 steps) -->
   <section data-label="Distilling actions">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Online Evaluations: a signal end to end</span></p>
-      <h2 class="slide-title" style="max-width: none;">Distilling actions from data</h2>
-      <p class="slide-subtitle">Each step strips out noise to enrich the signal, until one action is left.</p>
+      <h2 class="slide-title" style="max-width: none;">Distilling <span class="accent">actions</span> from data</h2>
+      <p class="slide-subtitle">Each step strips out noise to enrich the signal.</p>
     </div>
     <div style="display: flex; align-items: flex-end; justify-content: center; gap: 24px; margin-top: 42px;">
       <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
@@ -540,15 +572,15 @@ section { counter-increment: slide; }
     <div class="evals">
       <div class="conv">
         <div class="vbadge badge-ok">✓</div>
-        <div class="bubble u">What is RLHF, in a sentence?</div>
-        <div class="bubble a">Reinforcement learning from human feedback: tuning a model on human preference data.</div>
-        <div class="qlabel" style="color: #2FA84F;">Answered · pass</div>
+        <div class="bubble u">What's new in RLHF lately?</div>
+        <div class="bubble a">Three recent ones: DPO, RLAIF, and process rewards.</div>
+        <div class="qlabel" style="color: #2FA84F;">Retrieval · pass</div>
       </div>
       <div class="conv">
         <div class="vbadge badge-no">✕</div>
         <div class="bubble u">Summarize the top papers on RLHF.</div>
         <div class="bubble a">Still working on it…</div>
-        <div class="qlabel" style="color: #E5484D;">Stalled · fail</div>
+        <div class="qlabel" style="color: #E5484D;">Retrieval · fail</div>
       </div>
     </div>
     <div class="page-mark">11</div>
