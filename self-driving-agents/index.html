@@ -5,25 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--
   ┌─────────────────────────────────────────────────────────────────────┐
-  │  The path to self-driving agents — Marco G, PostHog                   │
-  │  The Self-Driving Product · Merge × PostHog × Redis · NYC             │
+  │  The road to self-driving agents.  Marco G, PostHog                   │
+  │  The Self-Driving Product | Merge × PostHog × Redis             │
   │                                                                       │
-  │  Layout: the shared <deck-stage> web component (../lib/deck-stage.js) │
-  │  renders a resizable THUMBNAIL RAIL on the left (the "side nav") and  │
-  │  the active slide on the right.                                       │
-  │                                                                       │
-  │  Shared, not vendored per-deck (served from the repo root):           │
-  │   • engine → ../lib/deck-stage.js   • fonts → ../lib/fonts/           │
-  │   • logo/logomark → ../img/                                           │
+  │  Layout: the <deck-stage> web component (deck-stage.js) renders a     │
+  │  resizable THUMBNAIL RAIL on the left (the "side nav") and the        │
+  │  active slide on the right.                                           │
   │                                                                       │
   │  Editing:                                                             │
   │   • Each <section data-label="…"> is one slide AND one rail thumb.    │
   │     Duplicate to add; delete to remove; drag thumbnails to reorder.   │
   │   • Anything still in {{ braces }} or a muted .ph span is a           │
   │     placeholder to finalize (event date, socials, QR).               │
-  │   • Slide titles carry no trailing period (they're labels, not        │
-  │     sentences); the Paul Graham quote keeps its punctuation.          │
-  │   • For images, add an assets/ folder here and <img> from it.         │
+  │   • .slot dashed boxes are where images/diagrams go.                  │
   │   • Do NOT set width/height/position on a <section>.                  │
   │                                                                       │
   │  Serve:  python3 -m http.server 8000                                  │
@@ -31,9 +25,9 @@
   │  Nav: ← → / Space. S notes, F fullscreen, O overview. Print → PDF.    │
   └─────────────────────────────────────────────────────────────────────┘
 -->
-<title>The path to self-driving agents — PostHog</title>
+<title>The road to self-driving agents · PostHog</title>
 <link rel="icon" href="../img/posthog-logomark.svg">
-<link href="../lib/fonts/fonts.css" rel="stylesheet">
+<link href="../shared/fonts/fonts.css" rel="stylesheet">
 <style>
 :root {
   /* ── PostHog brand surface: warm-beige → cool top-to-bottom gradient ── */
@@ -48,7 +42,7 @@
   --line-2:   rgba(21,23,28,0.28);
   --surface:  rgba(255,255,255,0.55);
 
-  /* Accent — "look here", one focal point per slide. */
+  /* Accent: "look here", one focal point per slide. */
   --accent:      hsl(19 100% 48%);
   --brand-blue:  #1D4AFF;
   --brand-yellow:#F9BD2B;
@@ -81,9 +75,14 @@
 
 deck-stage:not(:defined) { visibility: hidden; }
 
-deck-stage section {
+/* `section` (not `deck-stage section`) so the rail's deep-cloned thumbnails —
+   which live in a shadow root with no <deck-stage> ancestor — still get the
+   slide's flex/padding/centering/background. ponytail: keep it plain-`section`;
+   every <section> in this file is a slide. */
+section {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   padding: var(--pad-top) var(--pad-x) var(--pad-bot);
   background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   color: var(--ink);
@@ -112,7 +111,7 @@ deck-stage section {
   line-height: 1.06;
   letter-spacing: -0.02em;
   margin: 0;
-  max-width: 20ch;
+  max-width: none;
   text-wrap: balance;
 }
 .slide-subtitle {
@@ -209,24 +208,6 @@ deck-stage section {
 .flow .step.is-end .t { color: var(--accent); }
 .flow .sep { flex: 0 0 auto; align-self: center; color: var(--accent); font-size: 30px; font-weight: 600; }
 
-/* Ladder (4 rungs) */
-.ladder { display: flex; align-items: stretch; margin-top: 40px; flex: 1; }
-.rung {
-  flex: 1; position: relative; background: var(--surface); border: 1.5px solid var(--line-2);
-  border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 8px;
-}
-.rung + .rung { margin-left: 42px; }
-.rung + .rung::before {
-  content: "→"; position: absolute; left: -34px; top: 50%; transform: translate(-2px,-50%);
-  color: var(--ink-mute); font-size: 24px; font-weight: 600;
-}
-.rung .stage { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.1em; }
-.rung .name { font-size: 25px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.06; }
-.rung .what { font-size: 17px; color: var(--ink-soft); line-height: 1.34; }
-.rung.is-goal { border-color: var(--accent); box-shadow: var(--shadow-hard); }
-.rung.is-goal .name { color: var(--accent); }
-.rung.is-goal .stage { color: var(--accent); }
-
 /* Callout line */
 .callout {
   margin-top: 32px; border-left: 4px solid var(--accent); padding: 6px 0 6px 22px;
@@ -236,20 +217,24 @@ deck-stage section {
 /* ── Slide variants ──────────────────────────────────────────────────── */
 
 .title-slide { justify-content: center; gap: 0; }
-.title-slide .kicker { margin-bottom: 26px; }
+.title-slide .kicker {
+  position: absolute; top: var(--pad-top); left: var(--pad-x);
+  margin: 0; line-height: 30px;
+}
 .title-slide h1 {
   font-size: var(--t-jumbo); font-weight: 700; line-height: 1.0;
   letter-spacing: -0.03em; margin: 0; max-width: 17ch; text-wrap: balance;
 }
 .title-slide .lede { margin-top: 26px; font-size: var(--t-subtitle); color: var(--ink-soft); max-width: 40ch; line-height: 1.28; }
-.presenter { margin-top: 50px; display: flex; align-items: center; gap: 18px; }
+.presenter { position: absolute; left: var(--pad-x); bottom: 54px; display: flex; align-items: center; gap: 22px; }
 .presenter .avatar {
-  width: 60px; height: 60px; border-radius: 50%; border: 1.5px solid var(--line-2);
-  background: var(--surface); display: flex; align-items: center; justify-content: center;
-  color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow: hidden; flex: 0 0 auto;
+  width: 116px; height: 116px; border-radius: 50%; border: none;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex: 0 0 auto;
 }
-.presenter .who .name { font-size: 26px; font-weight: 600; line-height: 1.1; }
-.presenter .who .role { font-size: var(--t-small); color: var(--ink-mute); }
+.presenter .avatar img { width: 108px; height: 108px; border-radius: 50%; object-fit: cover; object-position: center top; }
+.presenter .who .name { font-size: 30px; font-weight: 600; line-height: 1.12; }
+.presenter .who .role { font-size: 22px; color: var(--ink-mute); }
 .title-logo { position: absolute; top: var(--pad-top); left: var(--pad-x); height: 34px; }
 
 .thanks { justify-content: center; }
@@ -262,6 +247,77 @@ deck-stage section {
 .thanks-col li .lead { color: var(--ink-mute); }
 .thanks .qr { margin-left: auto; width: 124px; height: 124px; }
 .thanks .qr .slot { min-height: 0; }
+
+/* ── Product cards (PostHog's bet) ─────────────────────────────────────── */
+.prods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 34px; }
+.prod { background: var(--surface); border: 1.5px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 22px 22px; display: flex; flex-direction: column; gap: 9px; }
+.prod .pk { font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+.prod .pn { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.08; }
+.prod .pd { font-size: 16px; color: var(--ink-soft); line-height: 1.34; }
+
+/* ── Trace spans (tracing) ─────────────────────────────────────────────── */
+.trace { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; max-width: 900px; }
+.span { display: flex; align-items: center; height: 50px; border-radius: 10px; border: 1.5px solid var(--line-2); background: var(--surface); padding: 0 16px; gap: 14px; }
+.span .tag { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 9px; border-radius: 6px; flex: 0 0 auto; }
+.span .txt { font-size: 18px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.span.nest { margin-left: 46px; }
+
+/* ── Eval conversation cards ───────────────────────────────────────────── */
+.evals { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 36px; }
+.conv { position: relative; border: 1.5px solid var(--line-2); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-hard); padding: 24px 24px 22px; }
+.conv .bubble { font-size: 17px; line-height: 1.3; padding: 11px 15px; border-radius: 12px; margin-bottom: 12px; max-width: 90%; }
+.conv .bubble.u { background: rgba(29,74,255,0.10); }
+.conv .bubble.a { background: rgba(21,23,28,0.06); margin-left: auto; }
+.conv .qlabel { margin-top: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.conv .vbadge { position: absolute; top: -18px; right: -14px; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 27px; color: #fff; box-shadow: var(--shadow-hard); }
+.badge-ok { background: #2FA84F; }
+.badge-no { background: #E5484D; }
+
+/* ── Cluster + fix flow ────────────────────────────────────────────────── */
+.pipe { display: flex; align-items: center; gap: 26px; margin-top: 34px; }
+.pipe .arrow { color: var(--accent); font-size: 42px; font-weight: 700; flex: 0 0 auto; }
+.card-lg { border: 1.5px solid var(--line-2); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-hard); padding: 22px 24px; }
+.tracechip { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--line-2); border-radius: 9px; background: var(--surface); padding: 8px 12px; font-size: 15px; color: var(--ink-soft); }
+.dot-no { width: 18px; height: 18px; border-radius: 50%; background: #E5484D; color: #fff; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+
+/* Auto page numbers via a CSS counter — slides renumber themselves on any
+   add/remove/reorder, so slide markup never needs touching. Any hardcoded
+   digits in .page-mark are hidden and the counter is painted via ::before.
+   (A cloned thumbnail is a lone section, so its number reads "01" — invisible
+   at that size.) A slide with no <div class="page-mark"> shows no number. */
+body { counter-reset: slide; }
+section { counter-increment: slide; }
+.page-mark { font-size: 0; }
+.page-mark::before { content: counter(slide, decimal-leading-zero); font-size: 15px; }
+
+/* Funnel — distilling actions from data */
+.funnel { display: flex; flex-direction: column; align-items: center; gap: 7px; margin-top: 26px; }
+.flvl { border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard); padding: 13px 24px; display: flex; align-items: baseline; justify-content: center; gap: 14px; box-sizing: border-box; }
+.flvl .fk { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+.flvl .fn { font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: var(--ink-mute); }
+.flvl.is-action { border-color: var(--accent); background: rgba(245,78,0,0.06); }
+.flvl.is-action .fk { color: var(--accent); }
+.fstrip { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); display: flex; align-items: center; gap: 8px; }
+.fstrip .ar { color: var(--accent); font-size: 15px; font-weight: 700; }
+
+/* Context intersections — the overlap is the insight */
+.inters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; }
+.inter { border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 13px; }
+.venn { position: relative; width: 80px; height: 46px; }
+.venn span { position: absolute; top: 0; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--accent); background: rgba(245,78,0,0.16); }
+.venn span:first-child { left: 0; }
+.venn span:last-child { right: 0; }
+.inter .combo { font-size: 19px; font-weight: 700; line-height: 1.16; letter-spacing: -0.01em; }
+.inter .combo .op { color: var(--accent); }
+.inter .insight { font-size: 16px; color: var(--ink-soft); line-height: 1.36; }
+
+/* Cluster source chips — one signal per product (trace / error / replay / survey) */
+.srcchip { display: flex; align-items: center; gap: 9px; border: 1.5px solid var(--line-2); border-radius: 9px; background: var(--surface); padding: 8px 12px; font-size: 14px; color: var(--ink-soft); }
+.stag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 7px; border-radius: 5px; flex: 0 0 auto; }
+.tag-trace { background: rgba(29,74,255,0.12); color: #1D4AFF; }
+.tag-error { background: rgba(229,72,77,0.14); color: #E5484D; }
+.tag-replay { background: rgba(245,78,0,0.14); color: var(--accent); }
+.tag-survey { background: rgba(21,23,28,0.08); color: var(--ink); }
 </style>
 </head>
 <body>
@@ -270,12 +326,12 @@ deck-stage section {
 
   <!-- 01 · TITLE -->
   <section data-label="Title" class="title-slide">
-    <img class="title-logo" src="../img/posthog-logo.svg" alt="PostHog">
-    <p class="eyebrow kicker">The Self-Driving Product <span class="dot">·</span> Merge <span class="em">×</span> PostHog <span class="em">×</span> Redis <span class="dot">·</span> New York City</p>
-    <h1>The path to <span class="accent">self-driving</span> agents</h1>
-    <p class="lede">Using everything a product knows about itself — analytics, logs, errors, infra, code — to watch, diagnose, and eventually fix it. On its own.</p>
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <p class="eyebrow kicker">The Self-Driving Product <span class="em">|</span> Merge <span class="em">×</span> PostHog <span class="em">×</span> Redis</p>
+    <h1>The road to <span class="accent">self-driving</span> agents</h1>
+    <p class="lede">Using product context & LLMs to go from observability to self-driving</p>
     <div class="presenter">
-      <div class="avatar">MG</div>
+      <div class="avatar"><img src="assets/marco.jpg" alt="Marco G"></div>
       <div class="who">
         <div class="name">Marco G</div>
         <div class="role">PM, AI Observability · PostHog</div>
@@ -283,186 +339,336 @@ deck-stage section {
     </div>
   </section>
 
-  <!-- 02 · WHO AM I -->
-  <section data-label="Who am I">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Intro</span></p>
-      <h2 class="slide-title">Hi, I'm Marco</h2>
-    </div>
-    <div class="split text-wide">
-      <ul class="points">
-        <li>PM for AI Observability at PostHog<span class="sub">How teams see — and trust — what their AI features actually do</span></li>
-        <li>I spend my days close to traces, evals, and the messy reality of shipping LLM products</li>
-        <li>Today: where "self-driving" is headed — and how a product gets there</li>
-      </ul>
-      <div class="slot"><span class="hint">Portrait / photo<br>(optional — drop in <code>assets/</code>)</span></div>
-    </div>
-    <div class="page-mark">02</div>
-  </section>
-
-  <!-- 03 · AGENDA -->
+  <!-- AGENDA · sneak preview -->
   <section data-label="Agenda">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Agenda</span></p>
-      <h2 class="slide-title">Why, how, and what</h2>
+      <h2 class="slide-title">What we'll talk about today</h2>
     </div>
-    <ol class="agenda" style="margin-top: var(--gap-title);">
-      <li>Why self-driving?<span class="note">the case for it</span></li>
-      <li>How self-driving?<span class="note">PostHog's bet: context</span></li>
-      <li>What self-driving?<span class="note">tracing → self-driving</span></li>
-    </ol>
+    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
+      <li>Self-driving is about <span class="accent">speed</span>: compressing the loop between a problem and its fix.</li>
+      <li>It runs on <span class="accent">context</span>: data across multiple products in one place.</li>
+      <li>We get there by removing noise at each step: tracing → evals → reports → signals → fixes.</li>
+    </ul>
     <div class="page-mark">03</div>
   </section>
 
-  <!-- 04 · QUOTE (Paul Graham) — quote keeps its punctuation -->
-  <section data-label="Startups grow fast" class="quote">
+  <!-- THE LOOP · self-driving compresses it -->
+  <section data-label="Compress the loop">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="qmark">&ldquo;</div>
-    <blockquote>A startup is a company designed to <span class="accent">grow fast</span>.</blockquote>
-    <p class="after">The only essential thing is growth. Everything else we associate with startups follows from it.</p>
-    <div class="attrib">Paul Graham · "Startup = Growth," 2012</div>
-    <div class="page-mark">04</div>
-  </section>
-
-  <!-- 05 · CONTEXT — PostHog's angle -->
-  <section data-label="One graph of your product">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">PostHog's bet</span></p>
-      <h2 class="slide-title">You can't fix what you can't see</h2>
-      <p class="slide-subtitle">Self-driving runs on context — and PostHog already has the whole picture in one place.</p>
-    </div>
-    <ul class="points" style="margin-top: 30px;">
-      <li>Product analytics<span class="sub">What users actually do</span></li>
-      <li>Logs &amp; error tracking<span class="sub">What's breaking, and where</span></li>
-      <li>Infra &amp; performance metrics<span class="sub">How it holds up under load</span></li>
-      <li>The codebase itself<span class="sub">Why it behaves the way it does</span></li>
-    </ul>
-    <div class="page-mark">05</div>
-  </section>
-
-  <!-- 06 · FLOW — context → diagnosis → action -->
-  <section data-label="Data to decisions">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">The mechanism</span></p>
-      <h2 class="slide-title">From data to decisions</h2>
-    </div>
-    <div class="flow">
-      <div class="step">
-        <span class="k">Context</span>
-        <div class="t">All in one place</div>
-        <div class="d">Analytics, logs, errors, infra, and code — one connected picture.</div>
+    <div class="split" style="gap: 52px;">
+      <div>
+        <div class="header-block">
+          <p class="eyebrow"><span class="em">The case</span></p>
+          <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the product loop</h2>
+          <p class="slide-subtitle">The faster you get around it, the faster the product improves.</p>
+        </div>
       </div>
-      <div class="sep">→</div>
-      <div class="step">
-        <span class="k">Diagnosis</span>
-        <div class="t">What's right, what's wrong</div>
-        <div class="d">Read the signal across sources to find what's actually broken.</div>
-      </div>
-      <div class="sep">→</div>
-      <div class="step is-end">
-        <span class="k">Action</span>
-        <div class="t">Fix &amp; improve</div>
-        <div class="d">Propose — and eventually ship — the change automatically.</div>
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 420 410" style="width: 100%; max-width: 440px; height: auto;" fill="none">
+          <defs>
+            <marker id="larr" markerWidth="9" markerHeight="9" refX="6.5" refY="3.2" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M0,0 L7,3.2 L0,6.4 Z" fill="#F54E00"/>
+            </marker>
+          </defs>
+          <path d="M256.4,67.3 A150,150 0 0 1 331.4,121.8" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M360,210 A150,150 0 0 1 331.4,298.2" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M256.4,352.7 A150,150 0 0 1 163.6,352.7" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M88.6,298.2 A150,150 0 0 1 60,210" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M88.6,121.8 A150,150 0 0 1 163.6,67.3" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <g font-family="'IBM Plex Sans', sans-serif" font-size="16.5" font-weight="600">
+            <g transform="translate(210,60)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Feedback</text></g>
+            <g transform="translate(352.7,163.6)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Research</text></g>
+            <g transform="translate(298.2,331.4)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Spec</text></g>
+            <g transform="translate(121.8,331.4)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Engineering</text></g>
+            <g transform="translate(67.3,163.6)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Ship</text></g>
+          </g>
+        </svg>
       </div>
     </div>
     <div class="page-mark">06</div>
   </section>
 
-  <!-- 07 · LADDER — the maturity curve -->
-  <section data-label="Four rungs">
+  <!-- 08 · CONTEXT: PostHog's angle -->
+  <section data-label="One graph of your product">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">The maturity curve</span></p>
-      <h2 class="slide-title">Four rungs, one direction</h2>
+      <p class="eyebrow"><span class="em">PostHog's Bet</span></p>
+      <h2 class="slide-title">The whole picture</h2>
+      <p class="slide-subtitle">The context an agent needs is captured across PostHog's products.</p>
     </div>
-    <div class="ladder">
-      <div class="rung">
-        <span class="stage">Today</span>
-        <div class="name">Tracing</div>
-        <div class="what">Capture every step an agent takes.</div>
+    <div class="prods">
+      <div class="prod">
+        <div class="pk">Observe</div>
+        <div class="pn">AI observability</div>
+        <div class="pd">Every agent step: prompts, tools, reasoning, cost.</div>
       </div>
-      <div class="rung">
-        <span class="stage">Rung 2</span>
-        <div class="name">Automated monitoring</div>
-        <div class="what">Evals score those traces, continuously.</div>
+      <div class="prod">
+        <div class="pk">Watch</div>
+        <div class="pn">Session replay</div>
+        <div class="pd">Replay the real session, now read by AI vision.</div>
       </div>
-      <div class="rung">
-        <span class="stage">Rung 3</span>
-        <div class="name">Smart monitoring</div>
-        <div class="what">Cluster failures into reports that explain themselves.</div>
+      <div class="prod">
+        <div class="pk">Catch</div>
+        <div class="pn">Error tracking</div>
+        <div class="pd">The exact exception the agent hit, with its stack.</div>
       </div>
-      <div class="rung is-goal">
-        <span class="stage">The goal</span>
-        <div class="name">Self-driving</div>
-        <div class="what">Reports become signals — and signals become fixes.</div>
+      <div class="prod">
+        <div class="pk">Ask</div>
+        <div class="pn">Surveys</div>
+        <div class="pd">A 👍 / 👎 on every answer, captured as data.</div>
       </div>
     </div>
-    <div class="page-mark">07</div>
-  </section>
-
-  <!-- 08 · WHAT SELF-DRIVING MEANS -->
-  <section data-label="Signals become fixes">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">The last rung</span></p>
-      <h2 class="slide-title">Signals that add up to a fix</h2>
-    </div>
-    <p class="body" style="margin-top: 26px;">
-      Reports flow into signals. A signal from analytics, paired with one from
-      errors, infra, and the code that ties them together, combines into a single
-      picture: here's what's wrong, here's why, here's the change.
-    </p>
-    <div class="callout">Reports → signals across products → a potential insight <span class="accent">＋ fix</span>.</div>
     <div class="page-mark">08</div>
   </section>
 
-  <!-- 09 · TAKEAWAYS -->
-  <section data-label="Takeaways">
+  <!-- CONTEXT INTERSECTIONS · the overlap is the insight -->
+  <section data-label="The overlap">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">Takeaways</span></p>
-      <h2 class="slide-title">If you remember three things</h2>
+      <p class="eyebrow"><span class="em">PostHog's Bet</span></p>
+      <h2 class="slide-title">The insight is in the overlap</h2>
+      <p class="slide-subtitle">The intersection of multiple data sources gives the full story.</p>
     </div>
-    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
-      <li>Self-driving is about <span class="accent">speed</span> — compressing the loop between a problem and its fix.</li>
-      <li>It runs on <span class="accent">context</span> — analytics, logs, errors, infra, and code in one place.</li>
-      <li>We get there rung by rung: tracing → evals → reports → signals → fixes.</li>
-    </ul>
-    <div class="page-mark">09</div>
+    <div class="inters">
+      <div class="inter">
+        <div class="venn"><span></span><span></span></div>
+        <div class="combo">AI observability <span class="op">+</span> Surveys</div>
+        <div class="insight">Every trace carries the user's 👍 / 👎, so you see which answers actually landed.</div>
+      </div>
+      <div class="inter">
+        <div class="venn"><span></span><span></span></div>
+        <div class="combo">AI observability <span class="op">+</span> Session replay</div>
+        <div class="insight">The trace looks done, but the replay shows rage-clicks on a frozen response.</div>
+      </div>
+      <div class="inter">
+        <div class="venn"><span></span><span></span></div>
+        <div class="combo">AI observability <span class="op">+</span> Error tracking</div>
+        <div class="insight">The real exception from inside the agent loop, tied to the step that threw it.</div>
+      </div>
+    </div>
+    <div class="page-mark"></div>
   </section>
 
-  <!-- 10 · THANKS -->
+  <!-- SIGNALS vs SCOUTS · the two modes (high-level, before the Online Evaluations deep-dive) -->
+  <section data-label="Signals & scouts">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">PostHog's Bet</span></p>
+      <h2 class="slide-title">Signals and scouts</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 32px;">
+      <div style="border: 1.5px solid var(--accent); background: rgba(245,78,0,0.05); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 24px 28px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Reactive</div>
+        <div style="font-size: 30px; font-weight: 700; margin: 8px 0 10px;">Signals</div>
+        <div style="font-size: 19px; color: var(--ink-soft); line-height: 1.4;">Something happened: a pattern in the data becomes a signal you can act on.</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 14px;">Online Evaluations · error spikes · survey drops</div>
+      </div>
+      <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 24px 28px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Proactive</div>
+        <div style="font-size: 30px; font-weight: 700; margin: 8px 0 10px;">Scouts</div>
+        <div style="font-size: 19px; color: var(--ink-soft); line-height: 1.4;">Nothing's broken yet: scouts go looking for the users and behavior worth a closer look.</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 14px;">costly or unusual users</div>
+      </div>
+    </div>
+    <div class="page-mark"></div>
+  </section>
+
+  <!-- FUNNEL · the pipeline in one view (roadmap before the 4 steps) -->
+  <section data-label="Distilling actions">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Online Evaluations: a signal end to end</span></p>
+      <h2 class="slide-title" style="max-width: none;">Distilling actions from data</h2>
+      <p class="slide-subtitle">Each step strips out noise to enrich the signal, until one action is left.</p>
+    </div>
+    <div style="display: flex; align-items: flex-end; justify-content: center; gap: 24px; margin-top: 42px;">
+      <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
+        <div style="width: 100%; height: 232px; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
+        <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Traces</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">10k events</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
+        <div style="width: 100%; height: 150px; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
+        <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Evals</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">200 fails</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
+        <div style="width: 100%; height: 100px; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
+        <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Signals</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">2 signals</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
+        <div style="width: 100%; height: 66px; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
+        <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Reports</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">1 report</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
+        <div style="width: 100%; height: 50px; border: 1.5px solid var(--accent); background: rgba(245,78,0,0.08); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
+        <div style="font-size: 21px; font-weight: 700; margin-top: 15px; color: var(--accent);">Actions</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">1 PR</div>
+      </div>
+    </div>
+    <div style="text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-mute); margin-top: 22px;">numbers are one example run</div>
+    <div class="page-mark"></div>
+  </section>
+
+  <!-- 10 · MATURITY: tracing -->
+  <section data-label="Tracing">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Step 1 · Traces</span></p>
+      <h2 class="slide-title" style="max-width: none;"><span class="accent">Tracing</span> captures every step</h2>
+    </div>
+    <div class="trace">
+      <div class="span"><span class="tag" style="background: rgba(29,74,255,0.12); color: #1D4AFF;">User</span><span class="txt">"Summarize the top papers on RLHF."</span></div>
+      <div class="span nest"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Reasoning</span><span class="txt">Search the web, then read each source.</span></div>
+      <div class="span nest"><span class="tag" style="background: rgba(245,78,0,0.14); color: var(--accent);">Tool</span><span class="txt">fetch_page(arxiv.org) → 500 (retry 7×)</span></div>
+      <div class="span"><span class="tag" style="background: rgba(21,23,28,0.82); color: #fff;">Assistant</span><span class="txt">"Still working on it…"</span></div>
+    </div>
+    <div class="page-mark">10</div>
+  </section>
+
+  <!-- 12 · MATURITY: evals -->
+  <section data-label="Evals">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Step 2 · Evals</span></p>
+      <h2 class="slide-title">Evals score <span class="accent">every</span> trace</h2>
+    </div>
+    <div class="evals">
+      <div class="conv">
+        <div class="vbadge badge-ok">✓</div>
+        <div class="bubble u">What is RLHF, in a sentence?</div>
+        <div class="bubble a">Reinforcement learning from human feedback: tuning a model on human preference data.</div>
+        <div class="qlabel" style="color: #2FA84F;">Answered · pass</div>
+      </div>
+      <div class="conv">
+        <div class="vbadge badge-no">✕</div>
+        <div class="bubble u">Summarize the top papers on RLHF.</div>
+        <div class="bubble a">Still working on it…</div>
+        <div class="qlabel" style="color: #E5484D;">Stalled · fail</div>
+      </div>
+    </div>
+    <div class="page-mark">11</div>
+  </section>
+
+  <!-- 13 · MATURITY: clustering -->
+  <section data-label="Grouping">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Step 3 · Signals</span></p>
+      <h2 class="slide-title" style="max-width: none;">Eval runs are <span class="accent">grouped</span> into signals</h2>
+    </div>
+    <div class="pipe">
+      <div style="display: flex; flex-direction: column; gap: 9px; flex: 0 0 auto; width: 340px;">
+        <div class="srcchip"><span class="stag tag-replay">Retrieval</span> stalled on page fetch</div>
+        <div class="srcchip"><span class="stag tag-trace">Cost</span> 42k tokens on one query</div>
+        <div class="srcchip"><span class="stag tag-replay">Retrieval</span> arxiv 500, 7 retries</div>
+        <div class="srcchip"><span class="stag tag-trace">Cost</span> pricey, still in budget</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); padding-left: 4px;">+ 250 more eval runs</div>
+      </div>
+      <div class="arrow">→</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+        <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Retrieval quality</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">214 failing runs</div>
+        </div>
+        <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Cost</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">40 flagged runs</div>
+        </div>
+      </div>
+    </div>
+    <div class="page-mark">12</div>
+  </section>
+
+  <!-- MATURITY: which signal is worth a report -->
+  <section data-label="Signal to report">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Step 4 · Reports</span></p>
+      <h2 class="slide-title" style="max-width: none;">Not every signal is worth a <span class="accent">report</span></h2>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px;">
+      <div style="border: 1.5px solid var(--accent); background: rgba(245,78,0,0.05); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal · Retrieval quality</div>
+        <div style="margin: 18px 0 6px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">arxiv fetch timeout</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 78%; background: var(--accent);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">78%</span></div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">rate limit</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 12%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">12%</span></div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">other</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 10%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">10%</span></div>
+        </div>
+        <div style="font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 14px;">One clear cause → report created</div>
+      </div>
+      <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute);">Signal · Cost</div>
+        <div style="display: flex; align-items: baseline; gap: 12px; margin: 22px 0 14px;">
+          <span style="font-size: 54px; font-weight: 700; line-height: 1;">94%</span>
+          <span style="font-size: 18px; color: var(--ink-soft);">of runs within budget</span>
+        </div>
+        <div style="height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 12px;"><div style="height: 100%; width: 94%; background: rgba(21,23,28,0.3);"></div></div>
+        <div style="font-size: 15px; color: var(--ink-mute);">No cost spike; the few failures are scattered.</div>
+        <div style="font-size: 17px; font-weight: 700; color: var(--ink-mute); margin-top: 16px;">Nothing to act on → no report</div>
+      </div>
+    </div>
+    <div class="page-mark"></div>
+  </section>
+
+  <!-- 14 · MATURITY: self-driving fix -->
+  <section data-label="Self-driving">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Step 5 · Actions</span></p>
+      <h2 class="slide-title">The report becomes a <span class="accent">fix</span></h2>
+    </div>
+    <div class="pipe" style="gap: 22px;">
+      <div class="card-lg" style="flex: 1;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Report</div>
+        <div style="font-size: 20px; font-weight: 700; margin-top: 8px;">214 sessions stalled in a retry loop</div>
+      </div>
+      <div class="arrow">→</div>
+      <img src="../img/posthog-logomark.svg" alt="PostHog AI" style="width: 74px; height: 74px; flex: 0 0 auto;">
+      <div class="arrow">→</div>
+      <div class="card-lg" style="flex: 1; border-color: var(--accent);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Fix · PR #4212</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; line-height: 1.5; margin-top: 10px;"><span style="color: #2FA84F;">+ retriever: follow 3xx redirects</span><br><span style="color: var(--ink-mute);">&nbsp;&nbsp;fixes the 500 at the source</span></div>
+      </div>
+    </div>
+    <div class="page-mark">13</div>
+  </section>
+
+  <!-- 14 · THANKS -->
   <section data-label="Thanks" class="thanks">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div>
-      <p class="eyebrow" style="margin-bottom: 22px;">End</p>
       <h2>Thank you<span class="q">Questions?</span></h2>
     </div>
     <div class="thanks-cols">
       <div class="thanks-col">
         <h4>Read more</h4>
         <ul>
-          <li><span class="lead">LLM analytics ·</span> posthog.com/docs/llm-analytics</li>
+          <li><span class="lead">AI observability ·</span> posthog.com/ai-observability</li>
           <li><span class="lead">Slides ·</span> posthog.github.io/presentations/self-driving-agents</li>
         </ul>
       </div>
       <div class="thanks-col">
         <h4>Find me</h4>
         <ul>
-          <li>marco.g@posthog.com</li>
-          <li class="ph">{{ github / x handle }}</li>
+          <li>marco.gancitano.com</li>
+          <li>github.com/mgancita</li>
         </ul>
       </div>
-      <div class="qr"><div class="slot"><span class="hint">QR →<br>slides</span></div></div>
+      <div class="qr" style="height: auto; display: flex; flex-direction: column; align-items: center;">
+        <img src="assets/qr-ai-observability.svg" alt="QR code to posthog.com/ai-observability" style="width: 120px; height: 120px; display: block; border-radius: 10px; border: 1.5px solid var(--line-2);">
+      </div>
     </div>
   </section>
 
 </deck-stage>
 
-<script src="../lib/deck-stage.js"></script>
+<script src="../shared/deck-stage.js"></script>
 </body>
 </html>
