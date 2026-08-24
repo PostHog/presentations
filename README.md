@@ -8,6 +8,7 @@ Talks and presentations from the PostHog team, hosted as static HTML decks (reve
 
 | Talk | Venue | Path |
 | ---- | ----- | ---- |
+| The road to self-driving agents | The Self-Driving Product (Merge × PostHog × Redis), NYC | [`self-driving-agents/`](./self-driving-agents/) |
 | Stateless ClickHouse for stream processing | Altinity OSA meetup | [`altinity-stateless-clickhouse/`](./altinity-stateless-clickhouse/) |
 | PostHog agent platform: "live" demo | Internal demo | [`agent-platform-demo/`](./agent-platform-demo/) |
 | From Snakes to Crabs — feature flags in Rust | PostHog × One Rust meetup | [`snakes-to-crabs/`](./snakes-to-crabs/) |
