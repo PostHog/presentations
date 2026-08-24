@@ -34,10 +34,11 @@ Everything is in [`index.html`](./index.html):
   slide 2).
 - Don't set `width`/`height`/`position` on a `<section>` — the component sizes
   each slide for you (canvas is 1280×720).
+- Slide titles carry **no trailing period** (they're labels, not sentences); the
+  Paul Graham quote keeps its punctuation.
 
-Reusable slide types in the file: title · who-am-I · agenda · section divider ·
-quote · statement · bulleted content · 3-step flow · 4-rung ladder · callout ·
-takeaways · thanks.
+Reusable slide types in the file: title · who-am-I · agenda · quote · bulleted
+content · 3-step flow · 4-rung ladder · callout · takeaways · thanks.
 
 ## View it
 

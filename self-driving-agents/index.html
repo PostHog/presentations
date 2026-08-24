@@ -21,6 +21,8 @@
   │     Duplicate to add; delete to remove; drag thumbnails to reorder.   │
   │   • Anything still in {{ braces }} or a muted .ph span is a           │
   │     placeholder to finalize (event date, socials, QR).               │
+  │   • Slide titles carry no trailing period (they're labels, not        │
+  │     sentences); the Paul Graham quote keeps its punctuation.          │
   │   • For images, add an assets/ folder here and <img> from it.         │
   │   • Do NOT set width/height/position on a <section>.                  │
   │                                                                       │
@@ -250,11 +252,6 @@ deck-stage section {
 .presenter .who .role { font-size: var(--t-small); color: var(--ink-mute); }
 .title-logo { position: absolute; top: var(--pad-top); left: var(--pad-x); height: 34px; }
 
-.divider { justify-content: center; }
-.divider .num { font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 22px; }
-.divider h2 { font-size: var(--t-display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.02; margin: 0; max-width: 22ch; }
-.divider .rule { width: 96px; height: 4px; background: var(--accent); border-radius: 3px; margin-top: 34px; }
-
 .thanks { justify-content: center; }
 .thanks h2 { font-size: 74px; font-weight: 700; letter-spacing: -0.03em; margin: 0; line-height: 1.0; }
 .thanks h2 .q { display: block; color: var(--ink-mute); font-size: 38px; font-weight: 500; margin-top: 14px; letter-spacing: -0.01em; }
@@ -275,7 +272,7 @@ deck-stage section {
   <section data-label="Title" class="title-slide">
     <img class="title-logo" src="../img/posthog-logo.svg" alt="PostHog">
     <p class="eyebrow kicker">The Self-Driving Product <span class="dot">·</span> Merge <span class="em">×</span> PostHog <span class="em">×</span> Redis <span class="dot">·</span> New York City</p>
-    <h1>The path to <span class="accent">self-driving</span> agents.</h1>
+    <h1>The path to <span class="accent">self-driving</span> agents</h1>
     <p class="lede">Using everything a product knows about itself — analytics, logs, errors, infra, code — to watch, diagnose, and eventually fix it. On its own.</p>
     <div class="presenter">
       <div class="avatar">MG</div>
@@ -291,7 +288,7 @@ deck-stage section {
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Intro</span></p>
-      <h2 class="slide-title">Hi, I'm Marco.</h2>
+      <h2 class="slide-title">Hi, I'm Marco</h2>
     </div>
     <div class="split text-wide">
       <ul class="points">
@@ -309,7 +306,7 @@ deck-stage section {
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Agenda</span></p>
-      <h2 class="slide-title">Why, how, and what.</h2>
+      <h2 class="slide-title">Why, how, and what</h2>
     </div>
     <ol class="agenda" style="margin-top: var(--gap-title);">
       <li>Why self-driving?<span class="note">the case for it</span></li>
@@ -319,56 +316,22 @@ deck-stage section {
     <div class="page-mark">03</div>
   </section>
 
-  <!-- 04 · SECTION 01 -->
-  <section data-label="Section 01 · Why" class="divider">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="num">Section 01</div>
-    <h2>Why self-driving?</h2>
-    <div class="rule"></div>
-    <div class="page-mark">04</div>
-  </section>
-
-  <!-- 05 · QUOTE (Paul Graham) -->
+  <!-- 04 · QUOTE (Paul Graham) — quote keeps its punctuation -->
   <section data-label="Startups grow fast" class="quote">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="qmark">&ldquo;</div>
     <blockquote>A startup is a company designed to <span class="accent">grow fast</span>.</blockquote>
     <p class="after">The only essential thing is growth. Everything else we associate with startups follows from it.</p>
     <div class="attrib">Paul Graham · "Startup = Growth," 2012</div>
-    <div class="page-mark">05</div>
+    <div class="page-mark">04</div>
   </section>
 
-  <!-- 06 · WHY IT MATTERS -->
-  <section data-label="Compress the loop">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">The case</span></p>
-      <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the product loop.</h2>
-    </div>
-    <p class="body" style="margin-top: var(--gap-title);">
-      Growth comes from iterating fast. Most of that cycle is spent noticing —
-      finding what broke, why it broke, and what to try next. If the product can
-      do that watching itself and propose the fix, teams get to spend their time
-      on judgment instead. Same team, a much shorter loop.
-    </p>
-    <div class="page-mark">06</div>
-  </section>
-
-  <!-- 07 · SECTION 02 -->
-  <section data-label="Section 02 · How" class="divider">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="num">Section 02</div>
-    <h2>How? It starts with context.</h2>
-    <div class="rule"></div>
-    <div class="page-mark">07</div>
-  </section>
-
-  <!-- 08 · CONTEXT — PostHog's angle -->
+  <!-- 05 · CONTEXT — PostHog's angle -->
   <section data-label="One graph of your product">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">PostHog's bet</span></p>
-      <h2 class="slide-title">You can't fix what you can't see.</h2>
+      <h2 class="slide-title">You can't fix what you can't see</h2>
       <p class="slide-subtitle">Self-driving runs on context — and PostHog already has the whole picture in one place.</p>
     </div>
     <ul class="points" style="margin-top: 30px;">
@@ -377,15 +340,15 @@ deck-stage section {
       <li>Infra &amp; performance metrics<span class="sub">How it holds up under load</span></li>
       <li>The codebase itself<span class="sub">Why it behaves the way it does</span></li>
     </ul>
-    <div class="page-mark">08</div>
+    <div class="page-mark">05</div>
   </section>
 
-  <!-- 09 · FLOW — context → diagnosis → action -->
+  <!-- 06 · FLOW — context → diagnosis → action -->
   <section data-label="Data to decisions">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The mechanism</span></p>
-      <h2 class="slide-title">From data to decisions.</h2>
+      <h2 class="slide-title">From data to decisions</h2>
     </div>
     <div class="flow">
       <div class="step">
@@ -406,24 +369,15 @@ deck-stage section {
         <div class="d">Propose — and eventually ship — the change automatically.</div>
       </div>
     </div>
-    <div class="page-mark">09</div>
+    <div class="page-mark">06</div>
   </section>
 
-  <!-- 10 · SECTION 03 -->
-  <section data-label="Section 03 · What" class="divider">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="num">Section 03</div>
-    <h2>What does self-driving look like?</h2>
-    <div class="rule"></div>
-    <div class="page-mark">10</div>
-  </section>
-
-  <!-- 11 · LADDER — the maturity curve -->
+  <!-- 07 · LADDER — the maturity curve -->
   <section data-label="Four rungs">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The maturity curve</span></p>
-      <h2 class="slide-title">Four rungs, one direction.</h2>
+      <h2 class="slide-title">Four rungs, one direction</h2>
     </div>
     <div class="ladder">
       <div class="rung">
@@ -447,15 +401,15 @@ deck-stage section {
         <div class="what">Reports become signals — and signals become fixes.</div>
       </div>
     </div>
-    <div class="page-mark">11</div>
+    <div class="page-mark">07</div>
   </section>
 
-  <!-- 12 · WHAT SELF-DRIVING MEANS -->
+  <!-- 08 · WHAT SELF-DRIVING MEANS -->
   <section data-label="Signals become fixes">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">The last rung</span></p>
-      <h2 class="slide-title">Signals that add up to a fix.</h2>
+      <h2 class="slide-title">Signals that add up to a fix</h2>
     </div>
     <p class="body" style="margin-top: 26px;">
       Reports flow into signals. A signal from analytics, paired with one from
@@ -463,30 +417,30 @@ deck-stage section {
       picture: here's what's wrong, here's why, here's the change.
     </p>
     <div class="callout">Reports → signals across products → a potential insight <span class="accent">＋ fix</span>.</div>
-    <div class="page-mark">12</div>
+    <div class="page-mark">08</div>
   </section>
 
-  <!-- 13 · TAKEAWAYS -->
+  <!-- 09 · TAKEAWAYS -->
   <section data-label="Takeaways">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Takeaways</span></p>
-      <h2 class="slide-title">If you remember three things.</h2>
+      <h2 class="slide-title">If you remember three things</h2>
     </div>
     <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
       <li>Self-driving is about <span class="accent">speed</span> — compressing the loop between a problem and its fix.</li>
       <li>It runs on <span class="accent">context</span> — analytics, logs, errors, infra, and code in one place.</li>
       <li>We get there rung by rung: tracing → evals → reports → signals → fixes.</li>
     </ul>
-    <div class="page-mark">13</div>
+    <div class="page-mark">09</div>
   </section>
 
-  <!-- 14 · THANKS -->
+  <!-- 10 · THANKS -->
   <section data-label="Thanks" class="thanks">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div>
       <p class="eyebrow" style="margin-bottom: 22px;">End</p>
-      <h2>Thank you.<span class="q">Questions?</span></h2>
+      <h2>Thank you<span class="q">Questions?</span></h2>
     </div>
     <div class="thanks-cols">
       <div class="thanks-col">
