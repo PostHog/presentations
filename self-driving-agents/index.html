@@ -272,6 +272,10 @@ section {
 .conv .vbadge { position: absolute; top: -18px; right: -14px; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 27px; color: #fff; box-shadow: var(--shadow-hard); }
 .badge-ok { background: #2FA84F; }
 .badge-no { background: #E5484D; }
+.conv .toolcall { display: flex; width: fit-content; align-items: center; gap: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-soft); border: 1.5px solid var(--line-2); border-radius: 9px; background: rgba(255,255,255,0.55); padding: 7px 11px; margin-bottom: 12px; }
+.conv .toolcall .tk { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 5px; background: rgba(245,78,0,0.14); color: var(--accent); }
+.conv .toolcall.missing { border-style: dashed; opacity: 0.6; }
+.conv .toolcall.missing .tk { background: rgba(21,23,28,0.08); color: var(--ink-mute); }
 
 /* ── Cluster + fix flow ────────────────────────────────────────────────── */
 .pipe { display: flex; align-items: center; gap: 26px; margin-top: 34px; }
@@ -555,9 +559,9 @@ section { counter-increment: slide; }
     </div>
     <div class="trace">
       <div class="span"><span class="tag" style="background: rgba(29,74,255,0.12); color: #1D4AFF;">User</span><span class="txt">"Summarize the top papers on RLHF."</span></div>
-      <div class="span nest"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Reasoning</span><span class="txt">Search the web, then read each source.</span></div>
-      <div class="span nest"><span class="tag" style="background: rgba(245,78,0,0.14); color: var(--accent);">Tool</span><span class="txt">fetch_page(arxiv.org) → 500 (retry 7×)</span></div>
-      <div class="span"><span class="tag" style="background: rgba(21,23,28,0.82); color: #fff;">Assistant</span><span class="txt">"Still working on it…"</span></div>
+      <div class="span nest"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Reasoning</span><span class="txt">I already know these — no need to search.</span></div>
+      <div class="span nest" style="border-style: dashed; opacity: 0.65;"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Tool</span><span class="txt">search_papers(…) · never called</span></div>
+      <div class="span"><span class="tag" style="background: rgba(21,23,28,0.82); color: #fff;">Assistant</span><span class="txt">"The top papers are PPO, InstructGPT, and DPO."</span></div>
     </div>
     <div class="page-mark">10</div>
   </section>
@@ -573,14 +577,16 @@ section { counter-increment: slide; }
       <div class="conv">
         <div class="vbadge badge-ok">✓</div>
         <div class="bubble u">What's new in RLHF lately?</div>
+        <div class="toolcall"><span class="tk">Tool</span> search_papers("RLHF") → 3 results</div>
         <div class="bubble a">Three recent ones: DPO, RLAIF, and process rewards.</div>
-        <div class="qlabel" style="color: #2FA84F;">Retrieval · pass</div>
+        <div class="qlabel" style="color: #2FA84F;">Tool use · pass</div>
       </div>
       <div class="conv">
         <div class="vbadge badge-no">✕</div>
         <div class="bubble u">Summarize the top papers on RLHF.</div>
-        <div class="bubble a">Still working on it…</div>
-        <div class="qlabel" style="color: #E5484D;">Retrieval · fail</div>
+        <div class="toolcall missing"><span class="tk">Tool</span> search_papers(…) · not called</div>
+        <div class="bubble a">The top papers are PPO, InstructGPT, and DPO.</div>
+        <div class="qlabel" style="color: #E5484D;">Tool use · fail — no tool call</div>
       </div>
     </div>
     <div class="page-mark">11</div>
@@ -595,23 +601,23 @@ section { counter-increment: slide; }
     </div>
     <div class="pipe">
       <div style="display: flex; flex-direction: column; gap: 9px; flex: 0 0 auto; width: 340px;">
-        <div class="srcchip"><span class="stag tag-replay">Retrieval</span> stalled on page fetch</div>
-        <div class="srcchip"><span class="stag tag-trace">Cost</span> 42k tokens on one query</div>
-        <div class="srcchip"><span class="stag tag-replay">Retrieval</span> arxiv 500, 7 retries</div>
-        <div class="srcchip"><span class="stag tag-trace">Cost</span> pricey, still in budget</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); padding-left: 4px;">+ 250 more eval runs</div>
+        <div class="srcchip"><span class="stag tag-replay">Missing</span> answered without searching</div>
+        <div class="srcchip"><span class="stag tag-replay">Missing</span> no search_papers call</div>
+        <div class="srcchip"><span class="stag tag-error">Broken</span> search_papers → 500, 7 retries</div>
+        <div class="srcchip"><span class="stag tag-trace">Cost</span> a hair over average — fine</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); padding-left: 4px;">+ 196 more eval runs</div>
       </div>
       <div class="arrow">→</div>
       <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
         <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
-          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Retrieval quality</div>
-          <div style="font-size: 16px; color: var(--ink-soft);">214 failing runs</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Missing tool call</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">194 failing runs</div>
         </div>
         <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
           <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Cost</div>
-          <div style="font-size: 16px; color: var(--ink-soft);">40 flagged runs</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">6 flagged runs</div>
         </div>
       </div>
     </div>
@@ -627,10 +633,10 @@ section { counter-increment: slide; }
     </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px;">
       <div style="border: 1.5px solid var(--accent); background: rgba(245,78,0,0.05); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal · Retrieval quality</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal · Missing tool call</div>
         <div style="margin: 18px 0 6px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">arxiv fetch timeout</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 78%; background: var(--accent);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">78%</span></div>
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">rate limit</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 12%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">12%</span></div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">missed tool call</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 78%; background: var(--accent);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">78%</span></div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">tool errored (broken)</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 12%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">12%</span></div>
           <div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">other</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 10%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">10%</span></div>
         </div>
         <div style="font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 14px;">One clear cause → report created</div>
@@ -638,11 +644,11 @@ section { counter-increment: slide; }
       <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute);">Signal · Cost</div>
         <div style="display: flex; align-items: baseline; gap: 12px; margin: 22px 0 14px;">
-          <span style="font-size: 54px; font-weight: 700; line-height: 1;">94%</span>
+          <span style="font-size: 54px; font-weight: 700; line-height: 1;">99%</span>
           <span style="font-size: 18px; color: var(--ink-soft);">of runs within budget</span>
         </div>
-        <div style="height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 12px;"><div style="height: 100%; width: 94%; background: rgba(21,23,28,0.3);"></div></div>
-        <div style="font-size: 15px; color: var(--ink-mute);">No cost spike; the few failures are scattered.</div>
+        <div style="height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 12px;"><div style="height: 100%; width: 99%; background: rgba(21,23,28,0.3);"></div></div>
+        <div style="font-size: 15px; color: var(--ink-mute);">Flat and well within budget — nothing unusual.</div>
         <div style="font-size: 17px; font-weight: 700; color: var(--ink-mute); margin-top: 16px;">Nothing to act on → no report</div>
       </div>
     </div>
@@ -659,14 +665,14 @@ section { counter-increment: slide; }
     <div class="pipe" style="gap: 22px;">
       <div class="card-lg" style="flex: 1;">
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Report</div>
-        <div style="font-size: 20px; font-weight: 700; margin-top: 8px;">214 sessions stalled in a retry loop</div>
+        <div style="font-size: 20px; font-weight: 700; margin-top: 8px;">194 sessions answered without calling the tool</div>
       </div>
       <div class="arrow">→</div>
       <img src="../img/posthog-logomark.svg" alt="PostHog AI" style="width: 74px; height: 74px; flex: 0 0 auto;">
       <div class="arrow">→</div>
       <div class="card-lg" style="flex: 1; border-color: var(--accent);">
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Fix · PR #4212</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; line-height: 1.5; margin-top: 10px;"><span style="color: #2FA84F;">+ retriever: follow 3xx redirects</span><br><span style="color: var(--ink-mute);">&nbsp;&nbsp;fixes the 500 at the source</span></div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; line-height: 1.5; margin-top: 10px;"><span style="color: #2FA84F;">+ agent: require search_papers before answering</span><br><span style="color: var(--ink-mute);">&nbsp;&nbsp;no more answers straight from memory</span></div>
       </div>
     </div>
     <div class="page-mark">13</div>
