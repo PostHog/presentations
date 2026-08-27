@@ -343,21 +343,6 @@ section { counter-increment: slide; }
     </div>
   </section>
 
-  <!-- AGENDA · sneak preview -->
-  <section data-label="Agenda">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Agenda</span></p>
-      <h2 class="slide-title">What we'll talk about today</h2>
-    </div>
-    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
-      <li>Self-driving is about <span class="accent">speed</span>: compressing the loop between a problem and its fix.</li>
-      <li>It runs on <span class="accent">context</span>: data across multiple products in one place.</li>
-      <li>We get there by removing noise at each step: tracing → evals → signals → reports → fixes.</li>
-    </ul>
-    <div class="page-mark">03</div>
-  </section>
-
   <!-- THE LOOP · self-driving compresses it -->
   <section data-label="Compress the loop">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
@@ -365,7 +350,7 @@ section { counter-increment: slide; }
       <div>
         <div class="header-block">
           <p class="eyebrow"><span class="em">The case</span></p>
-          <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the product loop</h2>
+          <h2 class="slide-title">Self-driving <span class="accent">compresses</span> the feedback loop</h2>
           <p class="slide-subtitle">The faster you get around it, the faster the product improves.</p>
         </div>
       </div>
@@ -511,6 +496,39 @@ section { counter-increment: slide; }
     <div class="page-mark"></div>
   </section>
 
+  <!-- DATA MODEL · the shape of AI Observability data as a tree, technical name (left) ↔ plain-language lingo (right) -->
+  <section data-label="Data model">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">AI Observability · the data model</span></p>
+      <h2 class="slide-title">The data model, in <span class="accent">plain terms</span></h2>
+      <p class="slide-subtitle">Every level has a technical name and a word you already use.</p>
+    </div>
+    <div style="margin-top: 30px; width: 100%; max-width: 960px;">
+      <div style="display: flex; align-items: baseline; padding-bottom: 10px; border-bottom: 1.5px solid var(--line-2); font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute);">
+        <span>Structure</span>
+        <span style="margin-left: auto;">In plain terms</span>
+      </div>
+      <div style="display: flex; align-items: baseline; padding: 17px 0; border-bottom: 1px solid var(--line);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; white-space: pre; color: var(--ink-mute);"><strong style="color: var(--ink); font-weight: 700;">Session</strong></span>
+        <span style="margin-left: auto; font-size: 20px; color: var(--ink-soft);">chat / conversation</span>
+      </div>
+      <div style="display: flex; align-items: baseline; padding: 17px 14px; margin: 0 -14px; border-radius: 10px; background: rgba(245,78,0,0.09);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; white-space: pre; color: var(--ink-mute);">└─ <strong style="color: var(--accent); font-weight: 700;">Trace</strong></span>
+        <span style="margin-left: auto; font-size: 20px; color: var(--accent); font-weight: 600;">one message</span>
+      </div>
+      <div style="display: flex; align-items: baseline; padding: 17px 0; border-bottom: 1px solid var(--line);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; white-space: pre; color: var(--ink-mute);">   ├─ <strong style="color: var(--ink); font-weight: 700;">Span</strong></span>
+        <span style="margin-left: auto; font-size: 20px; color: var(--ink-soft);">a non-LLM call, or a grouping of work</span>
+      </div>
+      <div style="display: flex; align-items: baseline; padding: 17px 0;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; white-space: pre; color: var(--ink-mute);">   └─ <strong style="color: var(--ink); font-weight: 700;">Generation</strong></span>
+        <span style="margin-left: auto; font-size: 20px; color: var(--ink-soft);">a single LLM call</span>
+      </div>
+    </div>
+    <div class="page-mark"></div>
+  </section>
+
   <!-- FUNNEL · the pipeline in one view (roadmap before the 4 steps) -->
   <section data-label="Distilling actions">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
@@ -535,6 +553,10 @@ section { counter-increment: slide; }
         <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Signals</div>
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">2 signals</div>
       </div>
+      <!-- deterministic to the left (traces → evals → signals); the LLM enters here to write reports → actions. -->
+      <div style="align-self: stretch; width: 0; border-left: 2px dashed var(--line-2); position: relative;">
+        <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 12px; white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute);">LLM introduced</div>
+      </div>
       <div style="display: flex; flex-direction: column; align-items: center; width: 148px;">
         <div style="width: 100%; height: 66px; border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-hard);"></div>
         <div style="font-size: 21px; font-weight: 700; margin-top: 15px;">Reports</div>
@@ -546,7 +568,6 @@ section { counter-increment: slide; }
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); margin-top: 4px;">1 PR</div>
       </div>
     </div>
-    <div style="text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-mute); margin-top: 22px;">numbers are one example run</div>
     <div class="page-mark"></div>
   </section>
 
@@ -571,7 +592,7 @@ section { counter-increment: slide; }
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Step 2 · Evals</span></p>
-      <h2 class="slide-title">Evals score <span class="accent">every</span> trace</h2>
+      <h2 class="slide-title">Evals score <span class="accent">production</span> traces</h2>
     </div>
     <div class="evals">
       <div class="conv">
@@ -597,7 +618,7 @@ section { counter-increment: slide; }
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Step 3 · Signals</span></p>
-      <h2 class="slide-title" style="max-width: none;">Eval runs are <span class="accent">grouped</span> into signals</h2>
+      <h2 class="slide-title" style="max-width: none;">Evals are <span class="accent">grouped</span> into signals</h2>
     </div>
     <div class="pipe">
       <div style="display: flex; flex-direction: column; gap: 9px; flex: 0 0 auto; width: 340px;">
@@ -676,6 +697,21 @@ section { counter-increment: slide; }
       </div>
     </div>
     <div class="page-mark">13</div>
+  </section>
+
+  <!-- RECAP · high-level takeaways (mirrors the old agenda structure, as a closer) -->
+  <section data-label="Takeaways">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">Takeaways</span></p>
+      <h2 class="slide-title">What to take home</h2>
+    </div>
+    <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
+      <li>Self-driving is about <span class="accent">compressing the feedback loop</span> between an insight and its action.</li>
+      <li>It runs on <span class="accent">context</span>: data across every product in one place.</li>
+      <li>Each step <span class="accent">strips noise</span>: traces → evals → signals → reports → actions.</li>
+    </ul>
+    <div class="page-mark"></div>
   </section>
 
   <!-- 14 · THANKS -->
