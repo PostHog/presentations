@@ -306,7 +306,7 @@
     :host([noscale]) .rail { display: none; }
     .rail[data-presenting] { display: none; }
     @media (max-width: 640px) {
-      .rail, .rail-resize { display: none; }
+      .rail, .rail-resize, .rail-reopen { display: none; }
     }
     /* User-driven show/hide (the TweaksPanel toggle) slides instead of
        popping. Transitions are gated on :host([data-rail-anim]) — set only
@@ -440,6 +440,34 @@
     :host([noscale]) .rail-resize,
     .rail[data-presenting] + .rail-resize,
     .rail[data-user-hidden] + .rail-resize { display: none; }
+
+    /* Reopen tab — the only affordance left once the rail is collapsed
+       (the rail and its resize handle are both off-screen/hidden). */
+    .rail-reopen {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 64px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(24,24,26,0.92);
+      color: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      z-index: 2147482600;
+      font: 15px/1 system-ui, sans-serif;
+      user-select: none;
+    }
+    .rail-reopen:hover { color: #fff; background: rgba(24,24,26,1); }
+    .rail[data-user-hidden] ~ .rail-reopen { display: flex; }
+    .rail[data-presenting] ~ .rail-reopen { display: none; }
+    :host([no-rail]) .rail-reopen,
+    :host([noscale]) .rail-reopen { display: none; }
 
     /* Delete-confirm popup — matches the SPA's ConfirmDialog layout
        (title + message body, depressed footer with Cancel / Delete). */
@@ -902,26 +930,43 @@
       menu.addEventListener('contextmenu', (e) => e.preventDefault());
 
       // Rail resize handle — drag to set --deck-rail-w, persisted to
-      // localStorage so the width survives reloads.
+      // localStorage so the width survives reloads. A plain click (< 4px
+      // of movement) collapses the rail entirely; the .rail-reopen tab
+      // brings it back.
       const resize = document.createElement('div');
       resize.className = 'rail-resize export-hidden';
       resize.setAttribute('data-omelette-chrome', '');
+      resize.title = 'Drag to resize · click to hide';
       resize.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         resize.setPointerCapture(e.pointerId);
         resize.setAttribute('data-dragging', '');
-        const move = (ev) => this._setRailWidth(ev.clientX);
+        const startX = e.clientX;
+        let dragged = false;
+        const move = (ev) => {
+          if (Math.abs(ev.clientX - startX) >= 4) dragged = true;
+          if (dragged) this._setRailWidth(ev.clientX);
+        };
         const up = () => {
           resize.removeEventListener('pointermove', move);
           resize.removeEventListener('pointerup', up);
           resize.removeEventListener('pointercancel', up);
           resize.removeAttribute('data-dragging');
+          if (!dragged) { this._toggleRail(false); return; }
           try { localStorage.setItem('deck-stage.railWidth', String(this._railPx)); } catch (err) {}
         };
         resize.addEventListener('pointermove', move);
         resize.addEventListener('pointerup', up);
         resize.addEventListener('pointercancel', up);
       });
+
+      // Reopen tab — shown (via CSS) only while the rail is user-hidden.
+      const reopen = document.createElement('div');
+      reopen.className = 'rail-reopen export-hidden';
+      reopen.setAttribute('data-omelette-chrome', '');
+      reopen.title = 'Show thumbnails';
+      reopen.textContent = '›';
+      reopen.addEventListener('click', () => this._toggleRail(true));
 
       // Delete-confirm dialog — mirrors the SPA's ConfirmDialog layout.
       const confirm = document.createElement('div');
@@ -949,7 +994,7 @@
         this._deleteSlide(i);
       });
 
-      this._root.append(style, rail, resize, stage, overlay, menu, confirm);
+      this._root.append(style, rail, resize, reopen, stage, overlay, menu, confirm);
       this._canvas = canvas;
       this._stage = stage;
       this._slot = slot;
@@ -1223,20 +1268,27 @@
       // whether the Tweaks panel itself is open — closing the panel
       // doesn't change rail visibility. Persists alongside rail width.
       if (d && d.type === '__deck_rail_visible' && typeof d.on === 'boolean') {
-        if (d.on === this._railVisible) return;
-        this._railVisible = d.on;
-        try { localStorage.setItem('deck-stage.railVisible', d.on ? '1' : '0'); } catch (e) {}
-        // Arm the transition, commit it, then flip state — otherwise the
-        // browser coalesces both writes and nothing animates on show.
-        this.setAttribute('data-rail-anim', '');
-        void (this._rail && this._rail.offsetHeight);
-        this._syncRailHidden();
-        this._fit();
-        this._scaleThumbs();
-        clearTimeout(this._railAnimTimer);
-        this._railAnimTimer = setTimeout(() => this.removeAttribute('data-rail-anim'), 220);
+        this._toggleRail(d.on);
       }
       if (d && d.type === '__omelette_rail_enabled') this._enableRail();
+    }
+
+    /** Per-viewer rail collapse/expand — used by the resize-handle click,
+     *  the .rail-reopen tab, and the host TweaksPanel toggle. Animated via
+     *  the transient data-rail-anim gate; persisted like the rail width. */
+    _toggleRail(on) {
+      if (on === this._railVisible) return;
+      this._railVisible = on;
+      try { localStorage.setItem('deck-stage.railVisible', on ? '1' : '0'); } catch (e) {}
+      // Arm the transition, commit it, then flip state — otherwise the
+      // browser coalesces both writes and nothing animates on show.
+      this.setAttribute('data-rail-anim', '');
+      void (this._rail && this._rail.offsetHeight);
+      this._syncRailHidden();
+      this._fit();
+      this._scaleThumbs();
+      clearTimeout(this._railAnimTimer);
+      this._railAnimTimer = setTimeout(() => this.removeAttribute('data-rail-anim'), 220);
     }
 
     _syncRailHidden() {
