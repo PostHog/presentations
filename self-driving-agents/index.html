@@ -290,7 +290,7 @@ section {
    (A cloned thumbnail is a lone section, so its number reads "01" — invisible
    at that size.) A slide with no <div class="page-mark"> shows no number. */
 body { counter-reset: slide; }
-section { counter-increment: slide; }
+deck-stage > section { counter-increment: slide; } /* scoped: Chrome counts rail thumbnail clones via the flat tree */
 .page-mark { font-size: 0; }
 .page-mark::before { content: counter(slide, decimal-leading-zero); font-size: 15px; }
 
