@@ -1,4 +1,4 @@
-# Agentic discovery
+# Agentic feature discovery
 
 Marco G · **Agentic PM Kickoff** (PostHog × Linear × Supabase × Dreambase,
 San Francisco — [luma.com/posthog-tpmz](https://luma.com/posthog-tpmz)).
