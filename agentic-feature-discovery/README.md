@@ -3,13 +3,13 @@
 Marco G · **Agentic PM Kickoff** (PostHog × Linear × Supabase × Dreambase,
 San Francisco — [luma.com/posthog-tpmz](https://luma.com/posthog-tpmz)).
 
-How agents are powering product discovery, not just delivery. The PM-audience
-sibling of [`../self-driving-agents/`](../self-driving-agents/): engineers
-supervise the delivery agents, PMs supervise the discovery agents, and building
-the context pipelines (sources, evals, signals) that feed them is the new PM
-craft. Grounded in one end-to-end example: a model-benchmarking site's
-assistant that answers benchmark questions but can't answer "what does the
-industry think?" — caught by a completeness eval, reported, and fixed.
+How agents are powering product discovery, not just delivery. Agents now run
+the discovery side of the product loop (supervised by PMs) the way they run
+the delivery side (supervised by engineers). Grounded in one anonymized
+customer story, end to end: an agent that assists with spreadsheet creation
+and formula generation ("Excel for AI"), whose conversations cluster into an
+unexpected "help with accounting" ask with negative sentiment — surfaced by a
+scout that investigates and posts the report to Slack.
 
 Same slide engine and side-nav thumbnail rail as the other decks in this repo,
 shared at [`../shared/deck-stage.js`](../shared/deck-stage.js).
@@ -29,7 +29,7 @@ Static, no build step. From the repo root:
 
 ```bash
 python3 -m http.server 8000
-# open http://localhost:8000/agentic-pm/
+# open http://localhost:8000/agentic-feature-discovery/
 ```
 
 Navigate with ← → / Space. `S` speaker notes, `F` fullscreen, `O` overview.

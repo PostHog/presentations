@@ -7,9 +7,10 @@
   ┌─────────────────────────────────────────────────────────────────────┐
   │  Agentic feature discovery.  Marco G, PostHog                         │
   │  Agentic PM Kickoff | PostHog × Linear × Supabase × Dreambase, SF     │
-  │  Sibling of self-driving-agents/, refocused for a PM audience:        │
-  │  agents power discovery, not just delivery; PMs build the context     │
-  │  pipelines that feed them.                                            │
+  │  Agents power discovery, not just delivery. The example: a real       │
+  │  (anonymized) customer who built Excel for AI — conversation          │
+  │  clusters with negative sentiment around accounting asks became      │
+  │  the discovery insight, surfaced by a scout.                          │
   │                                                                       │
   │  Layout: the <deck-stage> web component (deck-stage.js) renders a     │
   │  resizable THUMBNAIL RAIL on the left (the "side nav") and the        │
@@ -21,7 +22,7 @@
   │   • Do NOT set width/height/position on a <section>.                  │
   │                                                                       │
   │  Serve:  python3 -m http.server 8000                                  │
-  │          → http://localhost:8000/agentic-pm/                          │
+  │          → http://localhost:8000/agentic-feature-discovery/           │
   │  Nav: ← → / Space. S notes, F fullscreen, O overview. Print → PDF.    │
   └─────────────────────────────────────────────────────────────────────┘
 -->
@@ -284,55 +285,87 @@ deck-stage > section { counter-increment: slide; }
     </div>
   </section>
 
-  <!-- THE SHIFT · self-driving = agentic discovery + delivery -->
+  <!-- THE SHIFT · self-driving = agentic discovery + delivery, on the product loop -->
   <section data-label="Discovery + delivery">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">The shift</span></p>
-      <h2 class="slide-title">Self-driving = <span class="accent">discovery</span> + delivery</h2>
-      <p class="slide-subtitle">Agents are now working on the discovery side of the product loop.</p>
-    </div>
-    <div class="duo" style="grid-template-columns: 1fr auto 1fr;">
-      <div class="half is-hot">
-        <div class="hk">Discovery</div>
-        <div class="ht">Feedback in, insight out</div>
-        <div class="hd">Agents ingest feedback, conduct research, and draft the specs.</div>
-        <div class="hm">feedback · research · specs</div>
-        <div class="hm" style="margin-top: 4px; color: var(--accent);">supervised by PMs</div>
+    <div class="split" style="gap: 52px;">
+      <div>
+        <div class="header-block">
+          <p class="eyebrow"><span class="em">The shift</span></p>
+          <h2 class="slide-title">Self-driving = <span class="accent">discovery</span> + delivery</h2>
+          <p class="slide-subtitle">Agents are now working on the discovery side of the product loop.</p>
+        </div>
       </div>
-      <div style="align-self: center; color: var(--accent); font-size: 42px; font-weight: 700;">→</div>
-      <div class="half">
-        <div class="hk">Delivery</div>
-        <div class="ht">Spec in, software out</div>
-        <div class="hd">Agents write the code, open the PRs, run the tests.</div>
-        <div class="hm">code · PRs · tests · deploys</div>
-        <div class="hm" style="margin-top: 4px;">supervised by engineers</div>
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+        <svg viewBox="0 0 420 410" style="width: 100%; max-width: 440px; height: auto;" fill="none">
+          <defs>
+            <marker id="larr" markerWidth="9" markerHeight="9" refX="6.5" refY="3.2" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M0,0 L7,3.2 L0,6.4 Z" fill="#F54E00"/>
+            </marker>
+          </defs>
+          <path d="M256.4,67.3 A150,150 0 0 1 331.4,121.8" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M360,210 A150,150 0 0 1 331.4,298.2" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M256.4,352.7 A150,150 0 0 1 163.6,352.7" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M88.6,298.2 A150,150 0 0 1 60,210" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <path d="M88.6,121.8 A150,150 0 0 1 163.6,67.3" stroke="#F54E00" stroke-width="2.5" marker-end="url(#larr)"/>
+          <g font-family="'IBM Plex Sans', sans-serif" font-size="16.5" font-weight="600">
+            <!-- discovery: feedback → research (accent) -->
+            <g transform="translate(210,60)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.85" stroke="#F54E00" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Feedback</text></g>
+            <g transform="translate(352.7,163.6)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.85" stroke="#F54E00" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Research</text></g>
+            <!-- spec: the transition between discovery and delivery (dashed) -->
+            <g transform="translate(298.2,331.4)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#FFFFFF" fill-opacity="0.78" stroke="#7C818B" stroke-width="2" stroke-dasharray="6 5"/><text text-anchor="middle" dominant-baseline="central" fill="#15171C">Spec</text></g>
+            <!-- delivery: engineering → ship (dark) -->
+            <g transform="translate(121.8,331.4)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#15171C"/><text text-anchor="middle" dominant-baseline="central" fill="#FFFFFF">Engineering</text></g>
+            <g transform="translate(67.3,163.6)"><rect x="-62" y="-21" width="124" height="42" rx="11" fill="#15171C"/><text text-anchor="middle" dominant-baseline="central" fill="#FFFFFF">Ship</text></g>
+          </g>
+        </svg>
       </div>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- THE OVERLAP · context lives across sources; the intersection is the insight -->
-  <!-- THE DEMO · a benchmark-comparison site with a chat assistant -->
-  <section data-label="The demo">
+  <!-- SIGNALS & SCOUTS · the two modes of discovery agent -->
+  <section data-label="Signals & scouts">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">The example</span></p>
-      <h2 class="slide-title">The demo: benchmarks, plus a <span class="accent">chat</span></h2>
-      <p class="slide-subtitle">A site that compares LLM benchmarks — with an assistant to talk through what to use for your project.</p>
+      <p class="eyebrow"><span class="em">Discovery agents</span></p>
+      <h2 class="slide-title">Signals and scouts</h2>
     </div>
     <div class="duo">
       <div class="half">
-        <div class="hk">Feature 1</div>
-        <div class="ht">Benchmark comparisons</div>
-        <div class="hd">Rankings across the public benchmarks — filter by task, cost, and size.</div>
-        <div class="hm">leaderboards · scores · rankings</div>
+        <div class="hk">Reactive</div>
+        <div class="ht">Signals</div>
+        <div class="hd">Something happened: a pattern in the data becomes a signal you can act on.</div>
+        <div class="hm">Online Evaluations · error spikes · survey drops</div>
       </div>
       <div class="half is-hot">
-        <div class="hk">Feature 2</div>
-        <div class="ht">Chat with the data</div>
-        <div class="hd">Ask which model fits your project, product, or use case — grounded in the benchmarks.</div>
-        <div class="hm">the AI surface this example follows</div>
+        <div class="hk">Proactive</div>
+        <div class="ht">Scouts</div>
+        <div class="hd">Nothing's broken yet: scouts go looking for the users and behavior worth a closer look.</div>
+        <div class="hm">costly or unusual users</div>
+      </div>
+    </div>
+    <div class="page-mark"></div>
+  </section>
+
+  <!-- THE EXAMPLE · a real customer, anonymized: Excel for AI -->
+  <section data-label="The example">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">The example · a real customer, anonymized</span></p>
+      <h2 class="slide-title">Excel for <span class="accent">AI</span></h2>
+      <p class="slide-subtitle">An agent that assists with spreadsheet creation and formula generation.</p>
+    </div>
+    <div class="duo">
+      <div class="half">
+        <div class="hk">Feature</div>
+        <div class="ht">Spreadsheet creation</div>
+        <div class="hd">Draft a full sheet from a plain-English prompt.</div>
+      </div>
+      <div class="half">
+        <div class="hk">Feature</div>
+        <div class="ht">Formula generation</div>
+        <div class="hd">Formulas written and fixed on demand.</div>
       </div>
     </div>
     <div class="page-mark"></div>
@@ -345,175 +378,183 @@ deck-stage > section { counter-increment: slide; }
       <div>
         <div class="header-block">
           <p class="eyebrow"><span class="em">The example</span></p>
-          <h2 class="slide-title">Known features, <span class="accent">ambiguous</span> wants</h2>
-          <p class="slide-subtitle">You understand what you've built. The full set of things users want is fuzzy — discovery maps the difference.</p>
+          <h2 class="slide-title">Known features, <span class="accent">unknown</span> wants</h2>
+          <p class="slide-subtitle">You understand what you've built. The full set of things users want is fuzzy.</p>
         </div>
       </div>
       <div style="display: flex; align-items: center; justify-content: center;">
         <svg viewBox="0 0 460 420" style="width: 100%; max-width: 460px; height: auto;" fill="none">
           <ellipse cx="230" cy="210" rx="215" ry="195" fill="rgba(245,78,0,0.05)" stroke="#7C818B" stroke-width="2" stroke-dasharray="9 7"/>
           <text x="230" y="58" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-size="19" font-weight="700" fill="#15171C">What users want</text>
-          <text x="230" y="80" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="13" fill="#7C818B">ambiguous</text>
+          <text x="230" y="80" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="13" fill="#7C818B">unknown</text>
           <circle cx="165" cy="265" r="105" fill="#FFFFFF" fill-opacity="0.88" stroke="#15171C" stroke-width="2"/>
           <text x="165" y="252" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-size="17" font-weight="700" fill="#15171C">What you built</text>
-          <text x="165" y="275" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#4B4F58">benchmarks · rankings</text>
-          <text x="165" y="295" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#7C818B">understood</text>
-          <text x="315" y="150" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#F54E00">industry sentiment?</text>
-          <text x="335" y="250" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#7C818B">adoption data?</text>
-          <text x="300" y="345" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#7C818B">real-world failures?</text>
+          <text x="165" y="275" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#4B4F58">spreadsheet creation</text>
+          <text x="165" y="293" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#4B4F58">formula generation</text>
+          <text x="165" y="313" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#7C818B">understood</text>
+          <text x="320" y="150" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#F54E00">expanded use-cases?</text>
+          <text x="352" y="250" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#7C818B">better education?</text>
+          <text x="305" y="345" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="14" fill="#7C818B">faster speeds?</text>
         </svg>
       </div>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- USER INTENT · a trace records what the user wants -->
-  <section data-label="User intent">
+  <!-- THE PIPELINE · traces fork into clusters + sentiment, a scout joins them into a report -->
+  <section data-label="The pipeline">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">AI Observability</span></p>
-      <h2 class="slide-title">A direct look at what users <span class="accent">want</span></h2>
-      <p class="slide-subtitle">Every trace records what the user was trying to accomplish — in their own words.</p>
+      <p class="eyebrow"><span class="em">The pipeline</span></p>
+      <h2 class="slide-title">From <span class="accent">traces</span> to a report</h2>
+      <p class="slide-subtitle">Traces split into clusters and sentiment, then a scout joins them into a report.</p>
     </div>
-    <div class="pipe" style="gap: 30px;">
-      <div class="card-lg" style="flex: 1;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute);">One trace</div>
-        <div style="font-size: 19px; line-height: 1.35; padding: 13px 16px; border-radius: 12px; background: rgba(29,74,255,0.10); margin-top: 14px;">"The benchmarks look great — but what does the industry actually think of the newest release in real projects?"</div>
-      </div>
-      <div class="arrow">→</div>
-      <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
-        <div class="srcchip" style="font-size: 16px; padding: 11px 14px;"><span class="stag tag-replay">Why</span> deciding which model to bet on</div>
-        <div class="srcchip" style="font-size: 16px; padding: 11px 14px;"><span class="stag tag-replay">How</span> ask, instead of trawling X and Hacker News</div>
-        <div class="srcchip" style="font-size: 16px; padding: 11px 14px;"><span class="stag tag-replay">What</span> real-world sentiment — not another benchmark table</div>
-      </div>
+    <div style="display: flex; justify-content: center; margin-top: 36px;">
+      <svg viewBox="0 0 1120 320" style="width: 100%; max-width: 1080px; height: auto;" fill="none">
+        <defs>
+          <marker id="parr" markerWidth="9" markerHeight="9" refX="6.5" refY="3.2" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M0,0 L7,3.2 L0,6.4 Z" fill="#F54E00"/>
+          </marker>
+        </defs>
+        <path d="M200,158 C265,158 265,71 322,71" stroke="#F54E00" stroke-width="2.5" marker-end="url(#parr)"/>
+        <path d="M200,184 C265,184 265,271 322,271" stroke="#F54E00" stroke-width="2.5" marker-end="url(#parr)"/>
+        <path d="M530,71 C595,71 595,158 652,158" stroke="#F54E00" stroke-width="2.5" marker-end="url(#parr)"/>
+        <path d="M530,271 C595,271 595,184 652,184" stroke="#F54E00" stroke-width="2.5" marker-end="url(#parr)"/>
+        <path d="M830,171 L942,171" stroke="#F54E00" stroke-width="2.5" marker-end="url(#parr)"/>
+        <g font-family="'IBM Plex Sans', sans-serif" font-size="19" font-weight="600">
+          <rect x="30" y="140" width="170" height="62" rx="12" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/>
+          <text x="115" y="171" text-anchor="middle" dominant-baseline="central" fill="#15171C">Traces</text>
+          <rect x="330" y="40" width="200" height="62" rx="12" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/>
+          <text x="430" y="71" text-anchor="middle" dominant-baseline="central" fill="#15171C">Clusters</text>
+          <rect x="330" y="240" width="200" height="62" rx="12" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/>
+          <text x="430" y="271" text-anchor="middle" dominant-baseline="central" fill="#15171C">Sentiment evals</text>
+          <rect x="660" y="140" width="170" height="62" rx="12" fill="#FFFFFF" fill-opacity="0.78" stroke="rgba(21,23,28,0.28)" stroke-width="1.5"/>
+          <text x="745" y="171" text-anchor="middle" dominant-baseline="central" fill="#15171C">Scout</text>
+          <rect x="950" y="140" width="140" height="62" rx="12" fill="rgba(245,78,0,0.08)" stroke="#F54E00" stroke-width="1.5"/>
+          <text x="1020" y="171" text-anchor="middle" dominant-baseline="central" fill="#F54E00">Report</text>
+        </g>
+      </svg>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- STEP 1 · Traces -->
-  <section data-label="Tracing">
+  <!-- STEP 1 · Traces — three messages give intent, outcome, and sentiment -->
+  <section data-label="Conversations">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
       <p class="eyebrow"><span class="em">Step 1 · Traces</span></p>
-      <h2 class="slide-title" style="max-width: none;"><span class="accent">Tracing</span> captures every step</h2>
+      <h2 class="slide-title">Messages show your users' <span class="accent">wants</span></h2>
+      <p class="slide-subtitle">You can see intent and sentiment.</p>
     </div>
-    <div class="trace">
-      <div class="span"><span class="tag" style="background: rgba(29,74,255,0.12); color: #1D4AFF;">User</span><span class="txt">"Beyond the benchmarks — what does the industry think of the newest release?"</span></div>
-      <div class="span nest"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Reasoning</span><span class="txt">I can query benchmarks — I have nothing for industry sentiment.</span></div>
-      <div class="span nest" style="border-style: dashed; opacity: 0.65;"><span class="tag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">Tool</span><span class="txt">fetch_sentiment(…) · no such tool</span></div>
-      <div class="span"><span class="tag" style="background: rgba(21,23,28,0.82); color: #fff;">Assistant</span><span class="txt">"I only have access to benchmarks, not live sentiment about each model."</span></div>
-    </div>
-    <div class="page-mark"></div>
-  </section>
-
-  <!-- STEP 2 · Evals — same trace, two eval setups, opposite results -->
-  <section data-label="Two evals">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Step 2 · Evals</span></p>
-      <h2 class="slide-title">Same trace, two <span class="accent">evals</span></h2>
-      <p class="slide-subtitle">The vague one lets it pass. The sharp one catches the missed use case.</p>
-    </div>
-    <div class="cfgs">
-      <div class="cfg">
-        <div class="ck">✕ Vague eval · accuracy</div>
-        <div class="row"><span class="rk">Rubric</span><span class="rv">"Was the response accurate?"</span></div>
-        <div class="row" style="border-bottom: none;"><span class="rk">Result</span><span class="rv" style="font-weight: 700; color: var(--ink-mute);">Pass — technically true, nothing flagged</span></div>
-        <div class="cw">The missed use case sails straight through.</div>
+    <div class="pipe" style="gap: 26px;">
+      <div class="trace" style="flex: 1.3; margin-top: 0; max-width: none;">
+        <div class="span"><span class="tag" style="background: rgba(29,74,255,0.12); color: #1D4AFF;">User</span><span class="txt">"Can you help me reconcile these two tabs?"</span></div>
+        <div class="span"><span class="tag" style="background: rgba(21,23,28,0.82); color: #fff;">Assistant</span><span class="txt">"Sorry, I can only help with structure, formatting, and formulas."</span></div>
+        <div class="span"><span class="tag" style="background: rgba(29,74,255,0.12); color: #1D4AFF;">User</span><span class="txt">"Ugh. That's what I actually needed."</span></div>
       </div>
-      <div class="cfg is-good">
-        <div class="ck">✓ Sharp eval · answer completeness</div>
-        <div class="row"><span class="rk">Rubric</span><span class="rv">"Was the user's question fully answered?"</span></div>
-        <div class="row" style="border-bottom: none;"><span class="rk">Result</span><span class="rv" style="font-weight: 700; color: #E5484D;">Fail — flagged: question unanswered</span></div>
-        <div class="cw">The gap becomes a signal. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">user questions only · 25% sample</span></div>
+      <div class="arrow">→</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+        <div class="srcchip" style="font-size: 16px; padding: 11px 14px;"><span class="stag tag-replay">Intent</span> help with accounting work</div>
+        <div class="srcchip" style="font-size: 16px; padding: 11px 14px;"><span class="stag tag-error">Sentiment</span> negative</div>
       </div>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- 14 · STEP 3 · Signals -->
-  <section data-label="Grouping">
+  <!-- STEP 2 · Clusters — similar messages grouped by embeddings -->
+  <section data-label="Clusters">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">Step 3 · Signals</span></p>
-      <h2 class="slide-title" style="max-width: none;">Evals are <span class="accent">grouped</span> into signals</h2>
-      <p class="slide-subtitle">The completeness fails cluster into one clear gap.</p>
+      <p class="eyebrow"><span class="em">Step 2 · Clusters</span></p>
+      <h2 class="slide-title">Similar messages become <span class="accent">clusters</span></h2>
+      <p class="slide-subtitle">Grouped together by embeddings.</p>
     </div>
     <div class="pipe">
       <div style="display: flex; flex-direction: column; gap: 9px; flex: 0 0 auto; width: 340px;">
-        <div class="srcchip"><span class="stag tag-replay">Missing</span> asked for industry sentiment</div>
-        <div class="srcchip"><span class="stag tag-replay">Missing</span> wanted real-world usage, got scores</div>
-        <div class="srcchip"><span class="stag tag-trace">Accuracy</span> quoted last month's leaderboard</div>
-        <div class="srcchip"><span class="stag tag-trace">Accuracy</span> rounded a score — minor</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); padding-left: 4px;">+ 192 more eval runs</div>
+        <div class="srcchip"><span class="stag tag-replay">Ask</span> reconcile these ledgers</div>
+        <div class="srcchip"><span class="stag tag-replay">Ask</span> book my journal entries</div>
+        <div class="srcchip"><span class="stag tag-replay">Ask</span> help with month-end close</div>
+        <div class="srcchip"><span class="stag tag-trace">Ask</span> build a DCF model</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ink-mute); padding-left: 4px;">+ thousands more conversations</div>
       </div>
       <div class="arrow">→</div>
       <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
-        <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
-          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Missing sentiment functionality</div>
-          <div style="font-size: 16px; color: var(--ink-soft);">187 failing runs</div>
+        <div style="border: 1.5px solid var(--accent); background: rgba(245,78,0,0.05); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Cluster</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Help with accounting work</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">418 conversations</div>
         </div>
         <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal</div>
-          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Accuracy</div>
-          <div style="font-size: 16px; color: var(--ink-soft);">9 flagged runs</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Cluster</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Financial modeling</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">5.2k conversations, the expected use</div>
         </div>
       </div>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- 15 · STEP 4 · Reports -->
-  <section data-label="Signal to report">
+  <!-- STEP 3 · Sentiment evals grade each message -->
+  <section data-label="Sentiment evals">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">Step 4 · Reports</span></p>
-      <h2 class="slide-title" style="max-width: none;">Not every signal is worth a <span class="accent">report</span></h2>
+      <p class="eyebrow"><span class="em">Step 3 · Sentiment evals</span></p>
+      <h2 class="slide-title">Evals grade message <span class="accent">sentiment</span></h2>
+      <p class="slide-subtitle">With a score of positive, neutral, or negative.</p>
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px;">
-      <div style="border: 1.5px solid var(--accent); background: rgba(245,78,0,0.05); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Signal · Missing sentiment functionality</div>
-        <div style="margin: 18px 0 6px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">industry sentiment</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 81%; background: var(--accent);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">81%</span></div>
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 9px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">real-world adoption</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 11%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">11%</span></div>
-          <div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 14px; color: var(--ink-soft); width: 150px; flex: 0 0 auto;">other</span><span style="flex: 1; height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden;"><span style="display: block; height: 100%; width: 8%; background: rgba(21,23,28,0.28);"></span></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mute); width: 34px; text-align: right; flex: 0 0 auto;">8%</span></div>
-        </div>
-        <div style="font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 14px;">One clear gap → report created</div>
+    <div class="pipe">
+      <div style="display: flex; flex-direction: column; gap: 9px; flex: 0 0 auto; width: 340px;">
+        <div class="srcchip"><span class="stag tag-error">✕</span> "NO THAT'S WRONG"</div>
+        <div class="srcchip"><span class="stag" style="background: rgba(21,23,28,0.08); color: var(--ink-mute);">~</span> "ok, moving on"</div>
+        <div class="srcchip"><span class="stag" style="background: rgba(47,168,79,0.14); color: #2FA84F;">✓</span> "perfect, thanks!"</div>
       </div>
-      <div style="border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-hard); padding: 22px 24px;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute);">Signal · Accuracy</div>
-        <div style="display: flex; align-items: baseline; gap: 12px; margin: 22px 0 14px;">
-          <span style="font-size: 54px; font-weight: 700; line-height: 1;">99%</span>
-          <span style="font-size: 18px; color: var(--ink-soft);">of sampled answers accurate</span>
+      <div class="arrow">→</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+        <div style="border: 1.5px solid #E5484D; background: rgba(229,72,77,0.06); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #E5484D;">✕ Negative</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Help with accounting</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">418 conversations</div>
         </div>
-        <div style="height: 12px; background: rgba(21,23,28,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 12px;"><div style="height: 100%; width: 99%; background: rgba(21,23,28,0.3);"></div></div>
-        <div style="font-size: 15px; color: var(--ink-mute);">A couple of stale numbers — within tolerance.</div>
-        <div style="font-size: 17px; font-weight: 700; color: var(--ink-mute); margin-top: 16px;">Nothing to act on → suppressed</div>
+        <div style="border: 1.5px solid #2FA84F; background: rgba(47,168,79,0.05); border-radius: 14px; box-shadow: var(--shadow-hard); padding: 18px 22px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #2FA84F;">✓ Positive</div>
+          <div style="font-size: 24px; font-weight: 700; margin: 6px 0 3px;">Financial modeling</div>
+          <div style="font-size: 16px; color: var(--ink-soft);">5.2k conversations</div>
+        </div>
       </div>
     </div>
     <div class="page-mark"></div>
   </section>
 
-  <!-- 16 · STEP 5 · Actions — drafted by the agent, reviewed by you -->
-  <section data-label="The fix">
+  <!-- STEP 4 · Scouts — a proactive agent finds the insight and writes the notif -->
+  <section data-label="The scout">
     <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
     <div class="header-block">
-      <p class="eyebrow"><span class="em">Step 5 · Actions</span></p>
-      <h2 class="slide-title">The report becomes a <span class="accent">fix</span></h2>
-      <p class="slide-subtitle">Drafted by the agent, reviewed by you — in reality you'd validate this with more discovery first.</p>
+      <p class="eyebrow"><span class="em">Step 4 · Scouts</span></p>
+      <h2 class="slide-title">A <span class="accent">scout</span> investigates and writes a report</h2>
     </div>
-    <div class="pipe" style="gap: 22px;">
-      <div class="card-lg" style="flex: 1;">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Report</div>
-        <div style="font-size: 20px; font-weight: 700; margin-top: 8px;">187 conversations asked for sentiment the assistant can't access</div>
+    <div class="pipe" style="gap: 26px;">
+      <div class="card-lg" style="flex: 1; border-color: var(--accent); background: rgba(245,78,0,0.05);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Scout · runs nightly</div>
+        <div style="font-size: 18px; font-weight: 700; margin-top: 8px; line-height: 1.35;">"Monitor clusters (especially new ones with negative sentiment) to see if there's any surface areas we don't support well."</div>
       </div>
       <div class="arrow">→</div>
-      <img src="../img/posthog-logomark.svg" alt="PostHog AI" style="width: 74px; height: 74px; flex: 0 0 auto;">
-      <div class="arrow">→</div>
-      <div class="card-lg" style="flex: 1; border-color: var(--accent);">
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Fix · PR #4212</div>
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; line-height: 1.5; margin-top: 10px;"><span style="color: #2FA84F;">+ assistant: add fetch_sentiment tool</span><br><span style="color: var(--ink-mute);">&nbsp;&nbsp;digests X, HN, and blog chatter per release</span></div>
+      <div style="flex: 1.15; border: 1.5px solid var(--line-2); border-radius: 12px; background: #FFFFFF; box-shadow: var(--shadow-hard); padding: 16px 18px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 122.8 122.8" style="width: 20px; height: 20px;" aria-label="Slack">
+            <path d="M25.8 77.6c0 7.1-5.8 12.9-12.9 12.9S0 84.7 0 77.6s5.8-12.9 12.9-12.9h12.9v12.9zm6.5 0c0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9v32.3c0 7.1-5.8 12.9-12.9 12.9s-12.9-5.8-12.9-12.9V77.6z" fill="#E01E5A"/>
+            <path d="M45.2 25.8c-7.1 0-12.9-5.8-12.9-12.9S38.1 0 45.2 0s12.9 5.8 12.9 12.9v12.9H45.2zm0 6.5c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9H12.9C5.8 58.1 0 52.3 0 45.2s5.8-12.9 12.9-12.9h32.3z" fill="#36C5F0"/>
+            <path d="M97 45.2c0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9-5.8 12.9-12.9 12.9H97V45.2zm-6.5 0c0 7.1-5.8 12.9-12.9 12.9s-12.9-5.8-12.9-12.9V12.9C64.7 5.8 70.5 0 77.6 0s12.9 5.8 12.9 12.9v32.3z" fill="#2EB67D"/>
+            <path d="M77.6 97c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9-12.9-5.8-12.9-12.9V97h12.9zm0-6.5c-7.1 0-12.9-5.8-12.9-12.9s5.8-12.9 12.9-12.9h32.3c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9H77.6z" fill="#ECB22E"/>
+          </svg>
+          <span style="font-weight: 700; font-size: 16px;">Discovery scout</span>
+          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.04em; background: rgba(21,23,28,0.08); color: var(--ink-mute); padding: 2px 5px; border-radius: 3px;">APP</span>
+          <span style="font-size: 13px; color: var(--ink-mute);">9:03 AM</span>
+        </div>
+        <div style="border-left: 4px solid var(--accent); padding-left: 12px; margin-top: 10px;">
+          <div style="font-size: 16px; font-weight: 700; line-height: 1.3;">🔎 Found something: help with accounting</div>
+          <div style="font-size: 15px; line-height: 1.4; color: var(--ink-soft); margin-top: 4px;">418 conversations with negative sentiment are asking for accounting workflows the product doesn't support.</div>
+          <div style="font-size: 14px; color: #1D4AFF; font-weight: 600; margin-top: 6px;">View the full report →</div>
+        </div>
       </div>
     </div>
     <div class="page-mark"></div>
@@ -527,9 +568,9 @@ deck-stage > section { counter-increment: slide; }
       <h2 class="slide-title">What to take home</h2>
     </div>
     <ul class="points" style="margin-top: var(--gap-title); gap: 24px;">
-      <li>Agents are getting good at discovery — good enough to make <span class="accent">self-driving</span> possible.</li>
+      <li>Agents are getting good at discovery, making <span class="accent">self-driving</span> possible.</li>
       <li>Engineers supervise delivery agents; PMs supervise <span class="accent">discovery</span> agents.</li>
-      <li>PMs create agentic discovery by building the <span class="accent">high-quality context pipelines</span>: sources, evals, signals.</li>
+      <li>PMs create agentic discovery by building the <span class="accent">high-quality context pipelines</span>: evals, signals, scouts.</li>
     </ul>
     <div class="page-mark"></div>
   </section>
@@ -545,7 +586,7 @@ deck-stage > section { counter-increment: slide; }
         <h4>Read more</h4>
         <ul>
           <li><span class="lead">AI observability ·</span> posthog.com/ai-observability</li>
-          <li><span class="lead">Slides ·</span> posthog.github.io/presentations/agentic-pm</li>
+          <li><span class="lead">Slides ·</span> posthog.github.io/presentations/agentic-feature-discovery</li>
         </ul>
       </div>
       <div class="thanks-col">
@@ -559,75 +600,6 @@ deck-stage > section { counter-increment: slide; }
         <img src="assets/qr-ai-observability.svg" alt="QR code to posthog.com/ai-observability" style="width: 120px; height: 120px; display: block; border-radius: 10px; border: 1.5px solid var(--line-2);">
       </div>
     </div>
-  </section>
-
-  <!-- APPENDIX · good context drives good discovery (backup slide) -->
-  <section data-label="The overlap">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Appendix · Discovery · quantitative</span></p>
-      <h2 class="slide-title">Good <span class="accent">context</span> drives good discovery</h2>
-      <p class="slide-subtitle">Context lives across sources — the intersections tell the full story.</p>
-    </div>
-    <div style="display: flex; gap: 12px; margin-top: 30px;">
-      <div class="srcchip" style="font-size: 15px; font-weight: 600; color: var(--ink);">AI observability</div>
-      <div class="srcchip" style="font-size: 15px; font-weight: 600; color: var(--ink);">Session replay</div>
-      <div class="srcchip" style="font-size: 15px; font-weight: 600; color: var(--ink);">Error tracking</div>
-      <div class="srcchip" style="font-size: 15px; font-weight: 600; color: var(--ink);">Surveys</div>
-    </div>
-    <div class="inters" style="margin-top: 22px;">
-      <div class="inter">
-        <div class="venn"><span></span><span></span></div>
-        <div class="combo">AI observability <span class="op">+</span> Surveys</div>
-        <div class="insight">Every trace carries the user's 👍 / 👎, so you see which answers actually landed.</div>
-      </div>
-      <div class="inter">
-        <div class="venn"><span></span><span></span></div>
-        <div class="combo">AI observability <span class="op">+</span> Session replay</div>
-        <div class="insight">The trace looks done, but the replay shows rage-clicks on a frozen response.</div>
-      </div>
-      <div class="inter">
-        <div class="venn"><span></span><span></span></div>
-        <div class="combo">AI observability <span class="op">+</span> Error tracking</div>
-        <div class="insight">The real exception from inside the agent loop, tied to the step that threw it.</div>
-      </div>
-    </div>
-    <div class="page-mark"></div>
-  </section>
-
-  <!-- APPENDIX · one example transition (backup slide) -->
-  <section data-label="One example">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Appendix · Zooming in</span></p>
-      <h2 class="slide-title" style="font-size: var(--t-display);">One example, <span class="accent">end to end</span></h2>
-      <p class="slide-subtitle" style="max-width: 42ch;">The assistant on a model-benchmarking site, captured in AI Observability — from raw messages to a shipped fix.</p>
-    </div>
-    <div class="page-mark"></div>
-  </section>
-
-  <!-- APPENDIX · signals & scouts (backup slide, after thanks) -->
-  <section data-label="Signals & scouts">
-    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
-    <div class="header-block">
-      <p class="eyebrow"><span class="em">Appendix · Discovery agents</span></p>
-      <h2 class="slide-title">Signals and scouts</h2>
-    </div>
-    <div class="duo">
-      <div class="half is-hot">
-        <div class="hk">Reactive</div>
-        <div class="ht">Signals</div>
-        <div class="hd">Something happened: a pattern in the data becomes a signal you can act on.</div>
-        <div class="hm">Online Evaluations · error spikes · survey drops</div>
-      </div>
-      <div class="half">
-        <div class="hk">Proactive</div>
-        <div class="ht">Scouts</div>
-        <div class="hd">Nothing's broken yet: scouts go looking for the users and behavior worth a closer look.</div>
-        <div class="hm">costly or unusual users</div>
-      </div>
-    </div>
-    <div class="page-mark"></div>
   </section>
 
 </deck-stage>
