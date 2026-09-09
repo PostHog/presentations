@@ -222,6 +222,12 @@ section {
 /* "you configure" chip — points at the steps the PM owns */
 .youcfg { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 7px; padding: 4px 10px; background: rgba(245,78,0,0.06); }
 
+/* ── Product chips ("What is PostHog?") ────────────────────────────────── */
+.chips { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; max-width: 1060px; }
+.chip { border: 1.5px solid var(--line-2); background: var(--surface); border-radius: 12px; padding: 12px 20px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; box-shadow: var(--shadow-hard); }
+.chip.is-hot { border-color: var(--accent); background: rgba(245,78,0,0.06); color: var(--accent); }
+.chip.more { border-style: dashed; box-shadow: none; color: var(--ink-mute); font-weight: 500; }
+
 /* ── Slide variants ──────────────────────────────────────────────────── */
 
 .title-slide { justify-content: center; gap: 0; }
@@ -283,6 +289,33 @@ deck-stage > section { counter-increment: slide; }
         <div class="role">PM, AI Observability · PostHog</div>
       </div>
     </div>
+  </section>
+
+  <!-- WHAT IS POSTHOG · every data product, one place -->
+  <section data-label="What is PostHog?">
+    <img class="brand-mark" src="../img/posthog-logomark.svg" alt="PostHog">
+    <div class="header-block">
+      <p class="eyebrow"><span class="em">What is PostHog?</span></p>
+      <h2 class="slide-title">Every product tool, in <span class="accent">one</span> place</h2>
+      <p class="slide-subtitle">Get insights across your data sources.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Product analytics</span>
+      <span class="chip">Web analytics</span>
+      <span class="chip">Session replay</span>
+      <span class="chip">Feature flags</span>
+      <span class="chip">Experiments</span>
+      <span class="chip">Surveys</span>
+      <span class="chip">Error tracking</span>
+      <span class="chip">Logs</span>
+      <span class="chip is-hot">AI observability</span>
+      <span class="chip">Data warehouse</span>
+      <span class="chip">Support</span>
+      <span class="chip">Metrics</span>
+      <span class="chip">Workflows</span>
+      <span class="chip more">+ more</span>
+    </div>
+    <div class="page-mark"></div>
   </section>
 
   <!-- THE SHIFT · self-driving = agentic discovery + delivery, on the product loop -->
