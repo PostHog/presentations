@@ -13,6 +13,7 @@ Talks and presentations from the PostHog team, hosted as static HTML decks (reve
 | Stateless ClickHouse for stream processing | Altinity OSA meetup | [`altinity-stateless-clickhouse/`](./altinity-stateless-clickhouse/) |
 | PostHog agent platform: "live" demo | Internal demo | [`agent-platform-demo/`](./agent-platform-demo/) |
 | From Snakes to Crabs — feature flags in Rust | PostHog × One Rust meetup | [`snakes-to-crabs/`](./snakes-to-crabs/) |
+| The self-driving loop beat me to my own bug | September Demo Day ft. PostHog (AI Tinkerers NYC) | [`self-driving-beat-me-to-my-bug/`](./self-driving-beat-me-to-my-bug/) |
 
 ## Viewing locally
 

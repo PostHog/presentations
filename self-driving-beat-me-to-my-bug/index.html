@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The self-driving loop beat me to my own bug</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  html,body{margin:0;height:100%;background:#F4F3EF;}
+  body{display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;
+       font-family:'Inter','Helvetica Neue',Arial,sans-serif;color:#141414;}
+  svg{width:100%;max-width:1800px;height:auto;}
+  .t{font-family:'JetBrains Mono',monospace;}
+</style></head><body>
+
+<svg viewBox="0 0 1800 860" role="img" aria-label="The self-driving pipeline in six stages, then a timeline of 21 September 2026: the loop worked the bug for 34 minutes while Jake was busy elsewhere, Jake started his own fix at 12:51:12, and the loop opened its pull request 42 seconds later.">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#A8A79F"/></marker>
+    <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#1D4AFF"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#F54E00"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#1D4AFF"/></marker>
+  </defs>
+
+  <!-- title -->
+  <text x="40" y="62" font-size="38" font-weight="800">The self-driving loop beat me to my own bug</text>
+
+  <!-- hog -->
+  <rect x="1452" y="14" width="308" height="216" rx="10" fill="#CFCBE0"/>
+  <image href="assets/self-driving-hog.png" x="1452" y="14" width="308" height="216" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- pipeline, above the rule -->
+
+  <rect x="40"   y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="133"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Ingest</text>
+  <text x="133"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">safety filter</text>
+  <line x1="232" y1="171" x2="270" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="278"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="371"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Group</text>
+  <text x="371"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">embed, cluster</text>
+  <line x1="470" y1="171" x2="508" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="516"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="609"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Research</text>
+  <text x="609"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">sandbox, real repo</text>
+  <line x1="708" y1="171" x2="746" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="754"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="847"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Assess</text>
+  <text x="847"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">worth a human?</text>
+  <line x1="946" y1="171" x2="984" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="992"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#F0A183" stroke-width="2"/>
+  <text x="1085" y="169" font-size="13.5" font-weight="700" fill="#C2470A" text-anchor="middle">Report</text>
+  <text x="1085" y="184" font-size="11" fill="#C99177" text-anchor="middle">the actual product</text>
+  <line x1="1184" y1="171" x2="1222" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="1230" y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="1323" y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Act</text>
+  <text x="1323" y="184" font-size="11" fill="#9A998F" text-anchor="middle">PR, or ask, or drop</text>
+
+  <line x1="40" y1="292" x2="1760" y2="292" stroke="#141414" stroke-width="3"/>
+
+  <!-- ===================== LOOP LANE ===================== -->
+  <text x="40" y="461" font-size="19" font-weight="800" fill="#F54E00" letter-spacing="1">LOOP</text>
+  <text x="40" y="481" font-size="13" fill="#8A8982">self-driving</text>
+  <line x1="210" y1="455" x2="1310" y2="455" stroke="#F54E00" stroke-width="3"/>
+
+  <text x="346" y="367" font-size="14" class="t" fill="#57564F">12:23:02 – 12:29:27</text>
+  <text x="346" y="391" font-size="18" font-weight="700">6m 25s cloning and reading the repo</text>
+  <text x="1310" y="367" font-size="14" class="t" fill="#57564F" text-anchor="end">12:51:54</text>
+  <text x="1310" y="391" font-size="18" font-weight="700" text-anchor="end">opens its pull request</text>
+
+  <text x="204" y="411" font-size="14" class="t" fill="#57564F">12:17:15</text>
+  <text x="204" y="433" font-size="18" font-weight="700">error hits production</text>
+  <text x="844" y="411" font-size="14" class="t" fill="#57564F">12:44:31</text>
+  <text x="844" y="433" font-size="18" font-weight="700">coding agent picks it up</text>
+
+  <line x1="285" y1="455" x2="285" y2="497" stroke="#F54E00" stroke-width="1.5"/>
+  <text x="277" y="521" font-size="18" font-weight="700">clustered into a report, safety checked</text>
+  <text x="277" y="543" font-size="14" class="t" fill="#57564F">12:20:27</text>
+
+  <circle cx="210" cy="455" r="9" fill="#F54E00"/>
+  <circle cx="285" cy="455" r="9" fill="#F54E00"/>
+  <rect x="346" y="441" width="150" height="28" rx="4" fill="#F54E00"/>
+  <circle cx="850" cy="455" r="9" fill="#F54E00"/>
+  <rect x="1012" y="443" width="24" height="24" rx="3" fill="#F54E00"/>
+
+  <!-- ===================== ME LANE ===================== -->
+  <text x="40" y="681" font-size="19" font-weight="800" fill="#1D4AFF" letter-spacing="1">ME</text>
+  <line x1="210" y1="675" x2="1007" y2="675" stroke="#A8A79F" stroke-width="3"/>
+  <line x1="1007" y1="675" x2="1310" y2="675" stroke="#1D4AFF" stroke-width="3"/>
+  <text x="228" y="655" font-size="17" font-weight="600" fill="#8A8982">monitoring a migration with my human meat eyes</text>
+
+  <circle cx="1007" cy="675" r="9" fill="#1D4AFF"/>
+  <circle cx="1186" cy="675" r="9" fill="#1D4AFF"/>
+  <rect x="1265" y="663" width="45" height="24" rx="4" fill="#1D4AFF"/>
+
+  <text x="1007" y="721" font-size="14" class="t" fill="#57564F">12:51:12</text>
+  <text x="1007" y="743" font-size="18" font-weight="700" fill="#1D4AFF">I start fixing it</text>
+
+  <text x="1310" y="777" font-size="14" class="t" fill="#57564F" text-anchor="end">13:02:42</text>
+  <text x="1310" y="799" font-size="17" font-weight="600" fill="#1D4AFF" text-anchor="end">I ditch mine, self-driving got there first</text>
+
+  <!-- 42 seconds -->
+  <line x1="1007" y1="609" x2="1024" y2="609" stroke="#141414" stroke-width="2"/>
+  <line x1="1007" y1="603" x2="1007" y2="615" stroke="#141414" stroke-width="2"/>
+  <line x1="1024" y1="603" x2="1024" y2="615" stroke="#141414" stroke-width="2"/>
+  <text x="1048" y="605" font-size="17" font-weight="800">42 seconds between me starting</text>
+  <text x="1048" y="627" font-size="17" font-weight="800">and it being finished</text>
+
+  <!-- the ping -->
+  <line x1="1033" y1="467" x2="1033" y2="651" stroke="#1D4AFF" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#p)"/>
+  <circle cx="1033" cy="455" r="6" fill="#1D4AFF"/>
+  <text x="1022" y="537" font-size="16" font-weight="700" fill="#1D4AFF" text-anchor="end">Slack tells me</text>
+  <text x="1022" y="557" font-size="13.5" class="t" fill="#57564F" text-anchor="end">12:52:18</text>
+
+  <!-- quiet note -->
+
+  <!-- merge -->
+  <path d="M1336,449 l14,20 l-14,20" fill="none" stroke="#B9B8B0" stroke-width="3"/>
+  <path d="M1336,669 l14,20 l-14,20" fill="none" stroke="#B9B8B0" stroke-width="3"/>
+  <line x1="1368" y1="455" x2="1430" y2="455" stroke="#F54E00" stroke-width="3" marker-end="url(#o)"/>
+  <line x1="1368" y1="675" x2="1430" y2="675" stroke="#1D4AFF" stroke-width="3" marker-end="url(#b)"/>
+  <line x1="1444" y1="455" x2="1444" y2="675" stroke="#141414" stroke-width="2"/>
+  <circle cx="1444" cy="565" r="12" fill="#141414"/>
+  <text x="1472" y="565" font-size="20" font-weight="800">PR merged</text>
+</svg>
+
+</body></html>
