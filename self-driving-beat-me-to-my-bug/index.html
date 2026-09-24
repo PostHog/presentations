@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The self-driving loop beat me to my own bug</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --bg:#FFF1D5; --bg2:#DAE0EB; --card:#FFFFFF; --ink:#141414; --ink2:#4F4E48; --ink3:#87867E;
+    --rule:#D9D8D0; --accent:#F54E00; --blue:#1D4AFF;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace; --body:'Inter','Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);background-attachment:fixed;
+       color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 22px 90px;}
+
+  header{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:26px}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:0 0 12px;text-wrap:balance}
+  .lede{font-size:19px;color:var(--ink2);margin:0;max-width:62ch}
+
+  .video{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:2px solid var(--accent);
+         border-radius:10px;padding:18px 20px;margin:26px 0 34px}
+  .video .play{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+  .video .play svg{width:16px;height:16px;fill:#fff;margin-left:2px}
+  .video h2{margin:0 0 4px;font-size:18px;font-weight:700}
+  .video p{margin:0;font-size:15.5px;color:var(--ink2)}
+  .video a{color:var(--accent);font-weight:600}
+
+  .intro{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;margin-bottom:40px}
+  .intro p{margin:0 0 10px;font-size:16.5px;color:var(--ink2)}
+  .intro p:last-child{margin:0}
+  .intro strong{color:var(--ink)}
+
+  .step{margin-bottom:46px}
+  .shead{display:flex;gap:14px;align-items:baseline;margin-bottom:6px}
+  .num{flex:none;font-family:var(--mono);font-size:13px;font-weight:600;color:#fff;background:var(--accent);
+       border-radius:5px;padding:3px 9px}
+  .shead h3{margin:0;font-size:23px;font-weight:700;letter-spacing:-.01em}
+  .say{margin:0 0 16px 56px;font-size:16.5px;color:var(--ink2);max-width:66ch}
+  .say a{color:var(--accent)}
+  figure{margin:0 0 0 56px;background:var(--card);border:1px solid var(--rule);border-radius:10px;
+         overflow:hidden;box-shadow:0 2px 0 var(--rule)}
+  figure img{display:block;width:100%;height:auto}
+  figure.plain{background:none;border:none;box-shadow:none;border-radius:0}
+  figure.narrow{max-width:460px}
+  figcaption{font-size:14px;color:var(--ink3);padding:11px 15px;border-top:1px solid var(--rule);background:var(--card)}
+  figcaption code{font-family:var(--mono);font-size:.88em}
+  .tl{padding:14px}
+  .tl svg{display:block;width:100%;height:auto}
+
+  .prlink{margin:0 0 14px 56px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  .prlink a{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--accent);
+            text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:1px}
+  .prlink span{font-size:15px;color:var(--ink3)}
+  .linkout{margin-left:56px;display:flex;flex-direction:column;gap:10px}
+  .linkout a{display:flex;gap:12px;align-items:baseline;background:var(--card);border:1px solid var(--rule);
+             border-radius:8px;padding:14px 16px;text-decoration:none;color:var(--ink)}
+  .linkout a:hover{border-color:var(--accent)}
+  .linkout .t{font-weight:600;font-size:16.5px}
+  .linkout .d{font-size:14.5px;color:var(--ink2)}
+  .linkout .u{font-family:var(--mono);font-size:12px;color:var(--accent);margin-left:auto;white-space:nowrap}
+
+  footer{border-top:1px solid var(--rule);padding-top:22px;margin-top:20px;font-size:15px;color:var(--ink2)}
+  footer a{color:var(--accent)}
+  @media (max-width:640px){
+    .say,figure,.linkout,.prlink{margin-left:0}
+    .linkout .u{display:none}
+  }
+</style></head><body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">AI Tinkerers NYC &middot; September Demo Day ft. PostHog &middot; 23 September 2026</p>
+  <h1>The self-driving loop beat me to my own bug</h1>
+  <p class="lede">The venue bans slides, so this was eight browser tabs and five minutes.
+  Here they are, in the order the room saw them.</p>
+</header>
+
+<div class="video">
+  <span class="play"><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg></span>
+  <div>
+    <h2><a href="https://drive.google.com/file/d/1pyvAgaV-9Y42x6ipCDnvmtg6OCGsfiKB/view?usp=sharing" target="_blank" rel="noopener">Watch the talk &rarr;</a></h2>
+    <p>6m18s. Sorry about the audio &mdash; it's a QuickTime screen recording off my laptop, so the picture is exact and the room sound is rough.</p>
+  </div>
+</div>
+
+<div class="intro">
+  <p><strong>What happened.</strong> On 21 September a funnel enum crashed the PostHog AI conversation mirror
+  in production. The self-driving loop found it, researched it in a sandbox, and opened a pull request.
+  I was 42 seconds into fixing the same bug by hand and had no idea.</p>
+  <p>My fix was the identical one-line change. I binned my branch. The loop's PR is what merged.</p>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">1</span><h3>Where I was</h3></div>
+  <p class="say">Running a migration across thousands of objects. A couple didn't convert. Background job,
+  nothing a customer could see, so no fire drill &mdash; the kind of bug you defer forever.</p>
+  <figure class="narrow"><img src="assets/balloon-meme.jpg" alt="Meme: me fixing a bug I made, reaching for a future PR, tackled by self-driving software"></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">2</span><h3>The interruption</h3></div>
+  <p class="say">Mid-debug, this landed in Slack. A bug report and a pull request, for code I wrote,
+  with me listed as the suggested reviewer. Nobody asked for it.</p>
+  <figure><img src="assets/slack-card.png" alt="Slack message from the PostHog agent: a P2 error tracking report with a linked pull request, suggesting Jake Ruth as reviewer"></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">3</span><h3>The whole arc</h3></div>
+  <p class="say">Two lanes on one clock. The loop in orange, me in grey until 12:51:12 and blue after,
+  because it had been working the problem for 34 minutes before I started. Every timestamp came from
+  the PostHog API, my local <code>git reflog</code>, or the GitHub API.</p>
+  <figure><div class="tl">
+<svg viewBox="0 0 1800 860" role="img" aria-label="The self-driving pipeline in six stages, then a timeline of 21 September 2026: the loop worked the bug for 34 minutes while Jake was busy elsewhere, Jake started his own fix at 12:51:12, and the loop opened its pull request 42 seconds later.">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#A8A79F"/></marker>
+    <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#1D4AFF"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#F54E00"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#1D4AFF"/></marker>
+  </defs>
+
+  <!-- title -->
+  <text x="40" y="62" font-size="38" font-weight="800">The self-driving loop beat me to my own bug</text>
+
+  <!-- hog -->
+  <rect x="1452" y="14" width="308" height="216" rx="10" fill="#CFCBE0"/>
+  <image href="assets/self-driving-hog.png" x="1452" y="14" width="308" height="216" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- pipeline, above the rule -->
+
+  <rect x="40"   y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="133"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Ingest</text>
+  <text x="133"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">safety filter</text>
+  <line x1="232" y1="171" x2="270" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="278"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="371"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Group</text>
+  <text x="371"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">embed, cluster</text>
+  <line x1="470" y1="171" x2="508" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="516"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="609"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Research</text>
+  <text x="609"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">sandbox, real repo</text>
+  <line x1="708" y1="171" x2="746" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="754"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="847"  y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Assess</text>
+  <text x="847"  y="184" font-size="11" fill="#9A998F" text-anchor="middle">worth a human?</text>
+  <line x1="946" y1="171" x2="984" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="992"  y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#F0A183" stroke-width="2"/>
+  <text x="1085" y="169" font-size="13.5" font-weight="700" fill="#C2470A" text-anchor="middle">Report</text>
+  <text x="1085" y="184" font-size="11" fill="#C99177" text-anchor="middle">the actual product</text>
+  <line x1="1184" y1="171" x2="1222" y2="171" stroke="#A8A79F" stroke-width="2" marker-end="url(#g)"/>
+
+  <rect x="1230" y="150" width="186" height="42" rx="6" fill="#FFF" stroke="#DEDDD5" stroke-width="1.5"/>
+  <text x="1323" y="169" font-size="13.5" font-weight="700" fill="#57564F" text-anchor="middle">Act</text>
+  <text x="1323" y="184" font-size="11" fill="#9A998F" text-anchor="middle">PR, or ask, or drop</text>
+
+  <line x1="40" y1="292" x2="1760" y2="292" stroke="#141414" stroke-width="3"/>
+
+  <!-- ===================== LOOP LANE ===================== -->
+  <text x="40" y="461" font-size="19" font-weight="800" fill="#F54E00" letter-spacing="1">LOOP</text>
+  <text x="40" y="481" font-size="13" fill="#8A8982">self-driving</text>
+  <line x1="210" y1="455" x2="1310" y2="455" stroke="#F54E00" stroke-width="3"/>
+
+  <text x="346" y="367" font-size="14" class="t" fill="#57564F">12:23:02 – 12:29:27</text>
+  <text x="346" y="391" font-size="18" font-weight="700">6m 25s cloning and reading the repo</text>
+  <text x="1310" y="367" font-size="14" class="t" fill="#57564F" text-anchor="end">12:51:54</text>
+  <text x="1310" y="391" font-size="18" font-weight="700" text-anchor="end">opens its pull request</text>
+
+  <text x="204" y="411" font-size="14" class="t" fill="#57564F">12:17:15</text>
+  <text x="204" y="433" font-size="18" font-weight="700">error hits production</text>
+  <text x="844" y="411" font-size="14" class="t" fill="#57564F">12:44:31</text>
+  <text x="844" y="433" font-size="18" font-weight="700">coding agent picks it up</text>
+
+  <line x1="285" y1="455" x2="285" y2="497" stroke="#F54E00" stroke-width="1.5"/>
+  <text x="277" y="521" font-size="18" font-weight="700">clustered into a report, safety checked</text>
+  <text x="277" y="543" font-size="14" class="t" fill="#57564F">12:20:27</text>
+
+  <circle cx="210" cy="455" r="9" fill="#F54E00"/>
+  <circle cx="285" cy="455" r="9" fill="#F54E00"/>
+  <rect x="346" y="441" width="150" height="28" rx="4" fill="#F54E00"/>
+  <circle cx="850" cy="455" r="9" fill="#F54E00"/>
+  <rect x="1012" y="443" width="24" height="24" rx="3" fill="#F54E00"/>
+
+  <!-- ===================== ME LANE ===================== -->
+  <text x="40" y="681" font-size="19" font-weight="800" fill="#1D4AFF" letter-spacing="1">ME</text>
+  <line x1="210" y1="675" x2="1007" y2="675" stroke="#A8A79F" stroke-width="3"/>
+  <line x1="1007" y1="675" x2="1310" y2="675" stroke="#1D4AFF" stroke-width="3"/>
+  <text x="228" y="655" font-size="17" font-weight="600" fill="#8A8982">monitoring a migration with my human meat eyes</text>
+
+  <circle cx="1007" cy="675" r="9" fill="#1D4AFF"/>
+  <circle cx="1186" cy="675" r="9" fill="#1D4AFF"/>
+  <rect x="1265" y="663" width="45" height="24" rx="4" fill="#1D4AFF"/>
+
+  <text x="1007" y="721" font-size="14" class="t" fill="#57564F">12:51:12</text>
+  <text x="1007" y="743" font-size="18" font-weight="700" fill="#1D4AFF">I start fixing it</text>
+
+  <text x="1310" y="777" font-size="14" class="t" fill="#57564F" text-anchor="end">13:02:42</text>
+  <text x="1310" y="799" font-size="17" font-weight="600" fill="#1D4AFF" text-anchor="end">I ditch mine, self-driving got there first</text>
+
+  <!-- 42 seconds -->
+  <line x1="1007" y1="609" x2="1024" y2="609" stroke="#141414" stroke-width="2"/>
+  <line x1="1007" y1="603" x2="1007" y2="615" stroke="#141414" stroke-width="2"/>
+  <line x1="1024" y1="603" x2="1024" y2="615" stroke="#141414" stroke-width="2"/>
+  <text x="1048" y="605" font-size="17" font-weight="800">42 seconds between me starting</text>
+  <text x="1048" y="627" font-size="17" font-weight="800">and it being finished</text>
+
+  <!-- the ping -->
+  <line x1="1033" y1="467" x2="1033" y2="651" stroke="#1D4AFF" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#p)"/>
+  <circle cx="1033" cy="455" r="6" fill="#1D4AFF"/>
+  <text x="1022" y="537" font-size="16" font-weight="700" fill="#1D4AFF" text-anchor="end">Slack tells me</text>
+  <text x="1022" y="557" font-size="13.5" class="t" fill="#57564F" text-anchor="end">12:52:18</text>
+
+  <!-- quiet note -->
+
+  <!-- merge -->
+  <path d="M1336,449 l14,20 l-14,20" fill="none" stroke="#B9B8B0" stroke-width="3"/>
+  <path d="M1336,669 l14,20 l-14,20" fill="none" stroke="#B9B8B0" stroke-width="3"/>
+  <line x1="1368" y1="455" x2="1430" y2="455" stroke="#F54E00" stroke-width="3" marker-end="url(#o)"/>
+  <line x1="1368" y1="675" x2="1430" y2="675" stroke="#1D4AFF" stroke-width="3" marker-end="url(#b)"/>
+  <line x1="1444" y1="455" x2="1444" y2="675" stroke="#141414" stroke-width="2"/>
+  <circle cx="1444" cy="565" r="12" fill="#141414"/>
+  <text x="1472" y="565" font-size="20" font-weight="800">PR merged</text>
+</svg>
+  </div><figcaption>The six pipeline stages run on every report. This one took 34 minutes end to end.</figcaption></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">4</span><h3>What it actually did</h3></div>
+  <p class="say">It cloned the monorepo into a sandbox and had 6m25s with it: read the error, checked
+  thirty days of similar issues to rule out noise, traced seven files, found the root cause, and noticed
+  seven other enums with the same problem. Then it wrote a verification plan <em>before</em> any code
+  &mdash; including the conditions under which its own evidence would be inconclusive.</p>
+  <figure><img src="assets/report.jpg" alt="The self-driving report page: evidence, CI checks, runs, follow-up checks and activity on the left, the written report on the right">
+  <figcaption>The inbox UI moves a lot &mdash; this is 24 September 2026. Most of us drive this through MCP anyway.</figcaption></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">5</span><h3>The pull request</h3></div>
+  <p class="prlink"><a href="https://github.com/PostHog/posthog/pull/103903" target="_blank" rel="noopener">PostHog/posthog#103903 &nearr;</a> <span>merged 21 September, 16:28</span></p>
+  <p class="say">Two files, +47 / &minus;9, both commits the bot's. The interesting part is what it talked
+  itself out of: it considered making the enum a <code>StrEnum</code> and rejected it, because the enum is
+  schema-generated and seven others share the path. My line was identical to its line.</p>
+  <figure><img src="assets/pr.jpg" alt="GitHub pull request 103903, files changed: the one-line change from message.model_dump() to message.model_dump(mode=json)">
+  <figcaption>The one-line change, and the comment it left to explain it.</figcaption></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">6</span><h3>It's all open source</h3></div>
+  <p class="say">This is the part that mattered to the room. Not a README &mdash; the actual pipeline,
+  and a cookbook of twenty-three things you can point a scout at. Bugs are the boring case.</p>
+  <div class="linkout">
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/ARCHITECTURE.md" target="_blank" rel="noopener">
+      <span><span class="t">The architecture</span><br><span class="d">1,700 lines. Temporal workflows, the grouping algorithm, safety, autonomy.</span></span>
+      <span class="u">signals/ARCHITECTURE.md</span></a>
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/skills/authoring-scouts/references/scout-patterns.md" target="_blank" rel="noopener">
+      <span><span class="t">The scout cookbook</span><br><span class="d">Twenty-three patterns. A scout can watch anything the project can see.</span></span>
+      <span class="u">scout-patterns.md</span></a>
+  </div>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">7</span><h3>The question I left them with</h3></div>
+  <p class="say">What would you ask a scout to investigate?</p>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">8</span><h3>Up during Q&amp;A</h3></div>
+  <p class="say">I'm still a meat-fingers engineer learning to let it drive.</p>
+  <figure class="narrow"><img src="assets/batman-meme.jpg" alt="Batman slapping Robin meme: my human meat fingers putting up a trivial PR, versus self-driving agents PR taking the wheel"></figure>
+</div>
+
+<footer>
+  <p>Jake Ruth &middot; PostHog. More talks at <a href="../">posthog.github.io/presentations</a>.
+  Notes on how this was built, and where every timestamp came from, in the
+  <a href="https://github.com/PostHog/presentations/tree/main/self-driving-beat-me-to-my-bug" target="_blank" rel="noopener">README</a>.</p>
+</footer>
+
+</div></body></html>
