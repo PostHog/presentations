@@ -23,7 +23,8 @@ pitches. NO market/business overview,"* and their guidance adds *"if a company
 name appears, it should be in a stack trace."* So this entry is not a deck,
 and it is the only entry in this repo that isn't.
 
-The talk was eight browser tabs, walked in order, in about five minutes:
+[`index.html`](./index.html) is a scrolling walkthrough of the eight browser
+tabs the room actually saw, in order, with the screenshots I showed:
 
 | # | Tab | Point |
 | - | --- | ----- |

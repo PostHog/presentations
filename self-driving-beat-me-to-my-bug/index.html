@@ -1,15 +1,115 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The self-driving loop beat me to my own bug</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-  html,body{margin:0;height:100%;background:#F4F3EF;}
-  body{display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;
-       font-family:'Inter','Helvetica Neue',Arial,sans-serif;color:#141414;}
-  svg{width:100%;max-width:1800px;height:auto;}
-  .t{font-family:'JetBrains Mono',monospace;}
-</style></head><body>
+  :root{
+    --bg:#FFF1D5; --bg2:#DAE0EB; --card:#FFFFFF; --ink:#141414; --ink2:#4F4E48; --ink3:#87867E;
+    --rule:#D9D8D0; --accent:#F54E00; --blue:#1D4AFF;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace; --body:'Inter','Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);background-attachment:fixed;
+       color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 22px 90px;}
 
+  header{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:26px}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:0 0 12px;text-wrap:balance}
+  .lede{font-size:19px;color:var(--ink2);margin:0;max-width:62ch}
+
+  .video{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:2px solid var(--accent);
+         border-radius:10px;padding:18px 20px;margin:26px 0 34px}
+  .video .play{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+  .video .play svg{width:16px;height:16px;fill:#fff;margin-left:2px}
+  .video h2{margin:0 0 4px;font-size:18px;font-weight:700}
+  .video p{margin:0;font-size:15.5px;color:var(--ink2)}
+  .video a{color:var(--accent);font-weight:600}
+
+  .intro{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;margin-bottom:40px}
+  .intro p{margin:0 0 10px;font-size:16.5px;color:var(--ink2)}
+  .intro p:last-child{margin:0}
+  .intro strong{color:var(--ink)}
+
+  .step{margin-bottom:46px}
+  .shead{display:flex;gap:14px;align-items:baseline;margin-bottom:6px}
+  .num{flex:none;font-family:var(--mono);font-size:13px;font-weight:600;color:#fff;background:var(--accent);
+       border-radius:5px;padding:3px 9px}
+  .shead h3{margin:0;font-size:23px;font-weight:700;letter-spacing:-.01em}
+  .say{margin:0 0 16px 56px;font-size:16.5px;color:var(--ink2);max-width:66ch}
+  .say a{color:var(--accent)}
+  figure{margin:0 0 0 56px;background:var(--card);border:1px solid var(--rule);border-radius:10px;
+         overflow:hidden;box-shadow:0 2px 0 var(--rule)}
+  figure img{display:block;width:100%;height:auto}
+  figure.plain{background:none;border:none;box-shadow:none;border-radius:0}
+  figure.narrow{max-width:460px}
+  figcaption{font-size:14px;color:var(--ink3);padding:11px 15px;border-top:1px solid var(--rule);background:var(--card)}
+  figcaption code{font-family:var(--mono);font-size:.88em}
+  .tl{padding:14px}
+  .tl svg{display:block;width:100%;height:auto}
+
+  .linkout{margin-left:56px;display:flex;flex-direction:column;gap:10px}
+  .linkout a{display:flex;gap:12px;align-items:baseline;background:var(--card);border:1px solid var(--rule);
+             border-radius:8px;padding:14px 16px;text-decoration:none;color:var(--ink)}
+  .linkout a:hover{border-color:var(--accent)}
+  .linkout .t{font-weight:600;font-size:16.5px}
+  .linkout .d{font-size:14.5px;color:var(--ink2)}
+  .linkout .u{font-family:var(--mono);font-size:12px;color:var(--accent);margin-left:auto;white-space:nowrap}
+
+  footer{border-top:1px solid var(--rule);padding-top:22px;margin-top:20px;font-size:15px;color:var(--ink2)}
+  footer a{color:var(--accent)}
+  @media (max-width:640px){
+    .say,figure,.linkout{margin-left:0}
+    .linkout .u{display:none}
+  }
+</style></head><body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">AI Tinkerers NYC &middot; September Demo Day ft. PostHog &middot; 23 September 2026</p>
+  <h1>The self-driving loop beat me to my own bug</h1>
+  <p class="lede">The venue bans slides, so this was eight browser tabs and five minutes.
+  Here they are, in the order the room saw them.</p>
+</header>
+
+<div class="video">
+  <span class="play"><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg></span>
+  <div>
+    <h2><a href="https://drive.google.com/file/d/1pyvAgaV-9Y42x6ipCDnvmtg6OCGsfiKB/view?usp=sharing">Watch the talk &rarr;</a></h2>
+    <p>6m18s. Sorry about the audio &mdash; it's a QuickTime screen recording off my laptop, so the picture is exact and the room sound is rough.</p>
+  </div>
+</div>
+
+<div class="intro">
+  <p><strong>What happened.</strong> On 21 September a funnel enum crashed the PostHog AI conversation mirror
+  in production. The self-driving loop found it, researched it in a sandbox, and opened a pull request.
+  I was 42 seconds into fixing the same bug by hand and had no idea.</p>
+  <p>My fix was the identical one-line change. I binned my branch. The loop's PR is what merged.</p>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">1</span><h3>Where I was</h3></div>
+  <p class="say">Running a migration across thousands of objects. A couple didn't convert. Background job,
+  nothing a customer could see, so no fire drill &mdash; the kind of bug you defer forever.</p>
+  <figure class="narrow"><img src="assets/balloon-meme.jpg" alt="Meme: me fixing a bug I made, reaching for a future PR, tackled by self-driving software"></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">2</span><h3>The interruption</h3></div>
+  <p class="say">Mid-debug, this landed in Slack. A bug report and a pull request, for code I wrote,
+  with me listed as the suggested reviewer. Nobody asked for it.</p>
+  <figure><img src="assets/slack-card.png" alt="Slack message from the PostHog agent: a P2 error tracking report with a linked pull request, suggesting Jake Ruth as reviewer"></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">3</span><h3>The whole arc</h3></div>
+  <p class="say">Two lanes on one clock. The loop in orange, me in grey until 12:51:12 and blue after,
+  because it had been working the problem for 34 minutes before I started. Every timestamp came from
+  the PostHog API, my local <code>git reflog</code>, or the GitHub API.</p>
+  <figure><div class="tl">
 <svg viewBox="0 0 1800 860" role="img" aria-label="The self-driving pipeline in six stages, then a timeline of 21 September 2026: the loop worked the bug for 34 minutes while Jake was busy elsewhere, Jake started his own fix at 12:51:12, and the loop opened its pull request 42 seconds later.">
   <defs>
     <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#A8A79F"/></marker>
@@ -123,5 +223,58 @@
   <circle cx="1444" cy="565" r="12" fill="#141414"/>
   <text x="1472" y="565" font-size="20" font-weight="800">PR merged</text>
 </svg>
+  </div><figcaption>The six pipeline stages run on every report. This one took 34 minutes end to end.</figcaption></figure>
+</div>
 
-</body></html>
+<div class="step">
+  <div class="shead"><span class="num">4</span><h3>What it actually did</h3></div>
+  <p class="say">Two sandboxes on Modal, our dev-stack image, a 162-domain allowlist. It cloned the monorepo
+  and had 6m25s with it: read the error, checked thirty days of similar issues to rule out noise, traced
+  seven files, found the root cause, and noticed seven other enums with the same problem. Then it wrote a
+  verification plan <em>before</em> any code &mdash; including the conditions under which its own evidence
+  would be inconclusive.</p>
+  <figure><img src="assets/report.jpg" alt="The self-driving report page: evidence, CI checks, runs, follow-up checks and activity on the left, the written report on the right">
+  <figcaption>The inbox UI moves a lot &mdash; this is 24 September 2026. Most of us drive this through MCP anyway.</figcaption></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">5</span><h3>The pull request</h3></div>
+  <p class="say">Two files, +47 / &minus;9, both commits the bot's. The interesting part is what it talked
+  itself out of: it considered making the enum a <code>StrEnum</code> and rejected it, because the enum is
+  schema-generated and seven others share the path. My line was identical to its line.</p>
+  <figure><img src="assets/pr.jpg" alt="GitHub pull request 103903, files changed: the one-line change from message.model_dump() to message.model_dump(mode=json)">
+  <figcaption><a href="https://github.com/PostHog/posthog/pull/103903">PostHog/posthog#103903</a> &mdash; merged 21 September, 16:28.</figcaption></figure>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">6</span><h3>It's all open source</h3></div>
+  <p class="say">This is the part that mattered to the room. Not a README &mdash; the actual pipeline,
+  and a cookbook of twenty-three things you can point a scout at. Bugs are the boring case.</p>
+  <div class="linkout">
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/ARCHITECTURE.md">
+      <span><span class="t">The architecture</span><br><span class="d">1,700 lines. Temporal workflows, the grouping algorithm, safety, autonomy.</span></span>
+      <span class="u">signals/ARCHITECTURE.md</span></a>
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/skills/authoring-scouts/references/scout-patterns.md">
+      <span><span class="t">The scout cookbook</span><br><span class="d">Twenty-three patterns. A scout can watch anything the project can see.</span></span>
+      <span class="u">scout-patterns.md</span></a>
+  </div>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">7</span><h3>The question I left them with</h3></div>
+  <p class="say">What would you ask a scout to investigate?</p>
+</div>
+
+<div class="step">
+  <div class="shead"><span class="num">8</span><h3>Up during Q&amp;A</h3></div>
+  <p class="say">I'm still a meat-fingers engineer learning to let it drive.</p>
+  <figure class="narrow"><img src="assets/batman-meme.jpg" alt="Batman slapping Robin meme: my human meat fingers putting up a trivial PR, versus self-driving agents PR taking the wheel"></figure>
+</div>
+
+<footer>
+  <p>Jake Ruth &middot; PostHog. More talks at <a href="../">posthog.github.io/presentations</a>.
+  Notes on how this was built, and where every timestamp came from, in the
+  <a href="https://github.com/PostHog/presentations/tree/main/self-driving-beat-me-to-my-bug">README</a>.</p>
+</footer>
+
+</div></body></html>
