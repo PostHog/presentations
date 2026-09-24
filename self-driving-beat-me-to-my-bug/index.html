@@ -51,6 +51,10 @@
   .tl{padding:14px}
   .tl svg{display:block;width:100%;height:auto}
 
+  .prlink{margin:0 0 14px 56px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  .prlink a{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--accent);
+            text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:1px}
+  .prlink span{font-size:15px;color:var(--ink3)}
   .linkout{margin-left:56px;display:flex;flex-direction:column;gap:10px}
   .linkout a{display:flex;gap:12px;align-items:baseline;background:var(--card);border:1px solid var(--rule);
              border-radius:8px;padding:14px 16px;text-decoration:none;color:var(--ink)}
@@ -62,7 +66,7 @@
   footer{border-top:1px solid var(--rule);padding-top:22px;margin-top:20px;font-size:15px;color:var(--ink2)}
   footer a{color:var(--accent)}
   @media (max-width:640px){
-    .say,figure,.linkout{margin-left:0}
+    .say,figure,.linkout,.prlink{margin-left:0}
     .linkout .u{display:none}
   }
 </style></head><body>
@@ -78,7 +82,7 @@
 <div class="video">
   <span class="play"><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg></span>
   <div>
-    <h2><a href="https://drive.google.com/file/d/1pyvAgaV-9Y42x6ipCDnvmtg6OCGsfiKB/view?usp=sharing">Watch the talk &rarr;</a></h2>
+    <h2><a href="https://drive.google.com/file/d/1pyvAgaV-9Y42x6ipCDnvmtg6OCGsfiKB/view?usp=sharing" target="_blank" rel="noopener">Watch the talk &rarr;</a></h2>
     <p>6m18s. Sorry about the audio &mdash; it's a QuickTime screen recording off my laptop, so the picture is exact and the room sound is rough.</p>
   </div>
 </div>
@@ -228,22 +232,22 @@
 
 <div class="step">
   <div class="shead"><span class="num">4</span><h3>What it actually did</h3></div>
-  <p class="say">Two sandboxes on Modal, our dev-stack image, a 162-domain allowlist. It cloned the monorepo
-  and had 6m25s with it: read the error, checked thirty days of similar issues to rule out noise, traced
-  seven files, found the root cause, and noticed seven other enums with the same problem. Then it wrote a
-  verification plan <em>before</em> any code &mdash; including the conditions under which its own evidence
-  would be inconclusive.</p>
+  <p class="say">It cloned the monorepo into a sandbox and had 6m25s with it: read the error, checked
+  thirty days of similar issues to rule out noise, traced seven files, found the root cause, and noticed
+  seven other enums with the same problem. Then it wrote a verification plan <em>before</em> any code
+  &mdash; including the conditions under which its own evidence would be inconclusive.</p>
   <figure><img src="assets/report.jpg" alt="The self-driving report page: evidence, CI checks, runs, follow-up checks and activity on the left, the written report on the right">
   <figcaption>The inbox UI moves a lot &mdash; this is 24 September 2026. Most of us drive this through MCP anyway.</figcaption></figure>
 </div>
 
 <div class="step">
   <div class="shead"><span class="num">5</span><h3>The pull request</h3></div>
+  <p class="prlink"><a href="https://github.com/PostHog/posthog/pull/103903" target="_blank" rel="noopener">PostHog/posthog#103903 &nearr;</a> <span>merged 21 September, 16:28</span></p>
   <p class="say">Two files, +47 / &minus;9, both commits the bot's. The interesting part is what it talked
   itself out of: it considered making the enum a <code>StrEnum</code> and rejected it, because the enum is
   schema-generated and seven others share the path. My line was identical to its line.</p>
   <figure><img src="assets/pr.jpg" alt="GitHub pull request 103903, files changed: the one-line change from message.model_dump() to message.model_dump(mode=json)">
-  <figcaption><a href="https://github.com/PostHog/posthog/pull/103903">PostHog/posthog#103903</a> &mdash; merged 21 September, 16:28.</figcaption></figure>
+  <figcaption>The one-line change, and the comment it left to explain it.</figcaption></figure>
 </div>
 
 <div class="step">
@@ -251,10 +255,10 @@
   <p class="say">This is the part that mattered to the room. Not a README &mdash; the actual pipeline,
   and a cookbook of twenty-three things you can point a scout at. Bugs are the boring case.</p>
   <div class="linkout">
-    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/ARCHITECTURE.md">
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/ARCHITECTURE.md" target="_blank" rel="noopener">
       <span><span class="t">The architecture</span><br><span class="d">1,700 lines. Temporal workflows, the grouping algorithm, safety, autonomy.</span></span>
       <span class="u">signals/ARCHITECTURE.md</span></a>
-    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/skills/authoring-scouts/references/scout-patterns.md">
+    <a href="https://github.com/PostHog/posthog/blob/master/products/signals/skills/authoring-scouts/references/scout-patterns.md" target="_blank" rel="noopener">
       <span><span class="t">The scout cookbook</span><br><span class="d">Twenty-three patterns. A scout can watch anything the project can see.</span></span>
       <span class="u">scout-patterns.md</span></a>
   </div>
@@ -274,7 +278,7 @@
 <footer>
   <p>Jake Ruth &middot; PostHog. More talks at <a href="../">posthog.github.io/presentations</a>.
   Notes on how this was built, and where every timestamp came from, in the
-  <a href="https://github.com/PostHog/presentations/tree/main/self-driving-beat-me-to-my-bug">README</a>.</p>
+  <a href="https://github.com/PostHog/presentations/tree/main/self-driving-beat-me-to-my-bug" target="_blank" rel="noopener">README</a>.</p>
 </footer>
 
 </div></body></html>
