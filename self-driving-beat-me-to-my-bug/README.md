@@ -9,6 +9,13 @@ and opened a pull request. I was 42 seconds into fixing the same bug by hand
 and didn't know the loop existed on it. My fix was the identical one-line
 change. I binned my branch and the loop's PR is what merged.
 
+## Watch it
+
+[Recording of the talk](https://drive.google.com/file/d/1pyvAgaV-9Y42x6ipCDnvmtg6OCGsfiKB/view?usp=sharing)
+(6m18s). A QuickTime screen recording from the laptop that drove the demo, so
+the picture is exact and the room audio is rough. Not committed here because
+nothing else in this repo is a video.
+
 ## There is no deck
 
 AI Tinkerers bans slides. Their submission form is explicit: *"NO slides. NO
@@ -20,14 +27,14 @@ The talk was eight browser tabs, walked in order, in about five minutes:
 
 | # | Tab | Point |
 | - | --- | ----- |
-| 1 | [`assets/balloon-meme.png`](./assets/balloon-meme.png) | What I was doing before any of this |
+| 1 | [`assets/balloon-meme.jpg`](./assets/balloon-meme.jpg) | What I was doing before any of this |
 | 2 | [`assets/slack-card.png`](./assets/slack-card.png) | The ping. A bug report and a PR for code I wrote, with me as suggested reviewer |
 | 3 | [`index.html`](./index.html) | The timeline. The only thing authored for the talk |
 | 4 | [The report](https://us.posthog.com/project/2/inbox/01a0c4c4-cd5f-7ca8-ba21-8d6a00d2c1a3) | What the research sandbox actually did |
 | 5 | [PR #103903](https://github.com/PostHog/posthog/pull/103903) | Two commits, both the bot's. The fix it shipped, and the fix it rejected |
 | 6 | [`products/signals/ARCHITECTURE.md`](https://github.com/PostHog/posthog/blob/master/products/signals/ARCHITECTURE.md) | It's open source. 1,700 lines of the real thing |
 | 7 | [`scout-patterns.md`](https://github.com/PostHog/posthog/blob/master/products/signals/skills/authoring-scouts/references/scout-patterns.md) | 23 things you can point a scout at. Bugs are the boring case |
-| 8 | [`assets/batman-meme.png`](./assets/batman-meme.png) | Left up during Q&A |
+| 8 | [`assets/batman-meme.jpg`](./assets/batman-meme.jpg) | Left up during Q&A |
 
 ## The timeline
 
