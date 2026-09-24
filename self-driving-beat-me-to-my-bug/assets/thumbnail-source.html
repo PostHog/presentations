@@ -13,7 +13,9 @@
   h1{font-size:112px;font-weight:800;line-height:1.03;letter-spacing:-.035em;margin-top:86px}
   h1 em{font-style:normal;color:#F54E00}
   .sub{font-size:36px;line-height:1.35;color:#3F3E39;margin-top:36px;max-width:24ch}
-  .who{margin-top:auto}
+  .who{margin-top:auto;display:flex;align-items:center;gap:24px}
+  .who img{width:104px;height:104px;border-radius:50%;object-fit:cover;
+           border:4px solid #fff;box-shadow:0 0 0 3px #F54E00}
   .who .n{font-size:34px;font-weight:700;line-height:1.25}
   .who .r{font-size:25px;color:#6F6E66;line-height:1.35;margin-top:2px}
   .art{position:absolute;right:60px;bottom:82px;width:600px}
@@ -25,6 +27,9 @@
   <div class="col">
     <h1>The self-driving loop <em>beat me</em> to my own bug</h1>
     <p class="sub">Five minutes, no slides. It opened the pull request 42 seconds after I started fixing the same bug by hand.</p>
-    <div class="who"><div class="n">Jake Ruth</div><div class="r">Product Engineer &middot; PostHog</div></div>
+    <div class="who">
+      <img src="jake.jpg" alt="Jake Ruth">
+      <div><div class="n">Jake Ruth</div><div class="r">Product Engineer &middot; PostHog</div></div>
+    </div>
   </div>
 </body></html>
