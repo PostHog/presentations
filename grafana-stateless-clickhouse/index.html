@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stateless ClickHouse for stream processing — PostHog @ Grafana meetup</title>
 
+    <link rel="icon" href="../img/posthog-logomark.svg" />
     <link rel="stylesheet" href="vendor/reveal/dist/reset.css" />
     <link rel="stylesheet" href="vendor/reveal/dist/reveal.css" />
     <link rel="stylesheet" href="css/posthog-theme.css" />
@@ -118,11 +119,24 @@
                 </aside>
             </section>
 
+            <!-- 5a2 · NEW: Tinybird saw the same failure -->
+            <section class="quote-slide">
+                <span class="kicker">We're not the only ones</span>
+                <blockquote class="pull-quote">“The typical situation is a query that uses all the CPU and/or IO, inserts start to pile up, memory grows, which leads to a wonderful OOM, and <em>that means data loss.</em>”</blockquote>
+                <p class="quote-source">Javi Santana, co-founder of Tinybird · <a href="https://www.tinybird.co/blog/what-i-learned-operating-clickhouse">“I've operated petabyte-scale ClickHouse® clusters for 5 years”</a></p>
+                <aside class="notes">
+                    Independent confirmation from someone who has run ClickHouse since 18.4. Tinybird's
+                    post says every company running ClickHouse struggles with ingestion, and this sentence is
+                    exactly the replay we just watched. Their first recommendation is "a replica just for
+                    writes" (compute-compute separation). Hold that thought: we take it one step further,
+                    to a write tier that holds no data at all. We'll check the design against the rest of
+                    their list near the end.
+                </aside>
+            </section>
+
             <!-- 5b · MEME: this is fine -->
             <section class="meme-slide">
-                <span class="meme-tag">meme break</span>
-                <img class="meme-img" src="img/this-is-fine.jpg" alt="This Is Fine meme: ingestion and queries on the same ClickHouse nodes" />
-                <p class="small muted meme-cap">Our data nodes, every time a dashboard fired a heavy query while the Kafka consumers were trying to keep up.</p>
+                <img class="meme-img wide" src="img/this-is-fine.jpg" alt="This Is Fine meme: ingestion and queries on the same ClickHouse nodes" />
                 <aside class="notes">Levity beat — but it's true. The shared-node failure mode in one image. Land the joke, then move to the decision.</aside>
             </section>
 
@@ -150,9 +164,7 @@ go 1.20
 
             <!-- 6b · MEME: galaxy brain evolution -->
             <section class="meme-slide">
-                <span class="meme-tag">galaxy brain</span>
                 <img class="meme-img" src="img/expanding-brain.jpg" alt="Expanding brain meme: Kafka on data nodes, to inserter service, to stateless ClickHouse nodes, to a cluster is just a remote_servers list" />
-                <p class="small muted meme-cap">The evolution of our ingestion takes — ending on the enlightenment.</p>
                 <aside class="notes">The arc of the whole talk in four panels. The last panel is the enlightenment beat — sets up the insight section.</aside>
             </section>
 
@@ -215,9 +227,7 @@ go 1.20
 
             <!-- 9b · MEME: drake -->
             <section class="meme-slide">
-                <span class="meme-tag">drake says</span>
                 <img class="meme-img" src="img/drake.jpg" alt="Drake meme: rejecting a stateful inserter service, preferring a stateless ClickHouse node with Kafka + MV + Distributed" />
-                <p class="small muted meme-cap">Build-vs-reuse, in one frame.</p>
                 <aside class="notes">Drake meme = the build-vs-reuse decision in one frame. Beat, then hit the orange takeaway slide.</aside>
             </section>
 
@@ -525,7 +535,8 @@ GROUP BY time, pod ORDER BY time</code></pre>
                     system.metric_log has one row per second with ProfileEvent_* deltas, so summing and
                     dividing by the interval is a rate. $__timeFilter, $__timeInterval and $__interval_s are
                     macros from the Grafana ClickHouse data source plugin. Verify column names against the
-                    ClickHouse version you run.
+                    ClickHouse version you run. Tinybird's advice applies here too: system.query_log is your
+                    friend, use it all the time.
                 </aside>
             </section>
 
@@ -660,6 +671,31 @@ GROUP BY time, pod ORDER BY time</code></pre>
                 </aside>
             </section>
 
+            <!-- 26b · NEW: checked against Tinybird's list -->
+            <section>
+                <span class="kicker">Checked against someone else's scars</span>
+                <h2>Tinybird's ingestion pain list, resolved</h2>
+                <table class="scar-table">
+                    <thead><tr><th>They hit (quoted)</th><th>With a stateless ingestion tier</th></tr></thead>
+                    <tbody>
+                        <tr><td>“A query that uses all the CPU… inserts start to pile up… OOM”</td><td>Queries and inserts never share a box. An ingestion OOM is a pod restart; rows are re-read from Kafka.</td></tr>
+                        <tr><td>“I always recommend having a replica just for writes”</td><td>One step further: the write tier holds <strong>no data</strong>. No replica to sync, no disk to lose.</td></tr>
+                        <tr><td>“An MV that's slightly wrong… OOMs the server”</td><td>The MV runs on a disposable pod. Blast radius is one ingestion pod, not a data node serving queries.</td></tr>
+                        <tr><td>“Backpressure… some people put Kafka before ClickHouse”</td><td>We do. The Kafka engine pulls, so peaks and slow merges show up as <strong>lag, not loss</strong>. WarpStream keeps the queue cheap.</td></tr>
+                        <tr><td>“Duplicated data: if an insert fails…”</td><td><span class="partial">Partly.</span> Delivery is at-least-once; <code>ReplacingMergeTree</code> dedupes on merge, but anything reading before the merge still sees the duplicate.</td></tr>
+                    </tbody>
+                </table>
+                <p class="xsmall muted" style="margin-top:0.5em">Source: <a href="https://www.tinybird.co/blog/what-i-learned-operating-clickhouse">Javi Santana, “I've operated petabyte-scale ClickHouse® clusters for 5 years”</a>, Tinybird blog.</p>
+                <aside class="notes">
+                    Tinybird's post is a great list of the ways ingestion hurts. Walk it row by row. Be fair
+                    about their context: they're multi-tenant and built their own backpressure system because
+                    Kafka's cost didn't work for them; for a single big tenant like us, Kafka (and WarpStream on
+                    object storage) is the queue. Last row is the honest one: at-least-once plus Replacing
+                    MergeTree is eventual dedup, not exactly-once. Their part 2 covers monitoring and suggests
+                    connecting Grafana to ClickHouse, which is where the dashboard slide came from.
+                </aside>
+            </section>
+
             <!-- 27 · Results  (TODO) -->
             <section>
                 <span class="kicker">Did it work?</span>
@@ -699,6 +735,7 @@ GROUP BY time, pod ORDER BY time</code></pre>
                         <ul class="small">
                             <li>Code: <a href="https://github.com/PostHog/posthog">github.com/PostHog/posthog</a> — <code>posthog/clickhouse/migrations/</code></li>
                             <li>ClickHouse @ PostHog: <a href="https://posthog.com/handbook/engineering/clickhouse">posthog.com/handbook/engineering/clickhouse</a></li>
+                            <li>Further reading: <a href="https://www.tinybird.co/blog/what-i-learned-operating-clickhouse">Tinybird, 5 years operating ClickHouse</a></li>
                             <li>Me: <a href="https://github.com/fuziontech">@fuziontech</a> on GitHub &amp; X · <a href="https://linkedin.com/in/fuziontech">linkedin.com/in/fuziontech</a></li>
                             <li>🙏 The whole PostHog ClickHouse team — especially <strong>Ted Kaemming</strong> &amp; <strong>Dani Escribano</strong></li>
                             <li>🦔💛 <strong>Grafana</strong> for hosting tonight, and <strong>Altinity</strong> for <a href="https://github.com/altinity/clickhouse-operator">clickhouse-operator</a></li>

@@ -25,14 +25,22 @@ python3 -m http.server 8000
 | ----- | ------------------------ | ------------- |
 | 1 · title | `firehose` | Kafka partitions → three stateless CH pods squashing rows into blocks → three MergeTree shards whose parts merge |
 | 6 · new | `contention` | The original problem, replayed: 8 cores on one data node, a dashboard query storm starves ingestion, Grafana-style lag and p95 panels, and the lag never recovers |
-| 21 · whole path | `pipeline` | A row's full trip (Kafka engine → MV block → Distributed `sipHash64` fan-out → shards), then `kubectl delete pod`: uncommitted rows go back to Kafka, a backlog builds, the rescheduled pod drains it |
-| 25 · new | `threads` | `kafka_thread_per_consumer = 0` (one thread, one squashed block) vs `= 1` (four independent flushes) |
-| 29 · new | `dashboard` | A Grafana-style dashboard for the ingestion tier: pod-recycle annotations twitch lag, `KafkaMessagesRead` and `DistributedFilesToInsert` while the data nodes' query p95 stays flat |
-| 30 · new | (static) | The SQL behind those panels: `system.kafka_consumers` and `system.metric_log` via `clusterAllReplicas`, with Grafana ClickHouse data source macros |
-| 33 · new | `shuffle` | ShuffleHog before/after: batch transactions queue on the same Postgres row locks vs one owner per key |
-| 34 · Kafka swap | `cutover` | MSK → WarpStream: create the `_ws` leg, shift producers, drain and drop the MSK leg, rows/s into `groups` stays flat |
+| 7 · new | (quote) | Tinybird's Javi Santana describing the same failure from their side: a query takes the CPU, inserts pile up, OOM, data loss |
+| 22 · whole path | `pipeline` | A row's full trip (Kafka engine → MV block → Distributed `sipHash64` fan-out → shards), then `kubectl delete pod`: uncommitted rows go back to Kafka, a backlog builds, the rescheduled pod drains it |
+| 26 · new | `threads` | `kafka_thread_per_consumer = 0` (one thread, one squashed block) vs `= 1` (four independent flushes) |
+| 30 · new | `dashboard` | A Grafana-style dashboard for the ingestion tier: pod-recycle annotations twitch lag, `KafkaMessagesRead` and `DistributedFilesToInsert` while the data nodes' query p95 stays flat |
+| 31 · new | (static) | The SQL behind those panels: `system.kafka_consumers` and `system.metric_log` via `clusterAllReplicas`, with Grafana ClickHouse data source macros |
+| 34 · new | `shuffle` | ShuffleHog before/after: batch transactions queue on the same Postgres row locks vs one owner per key |
+| 35 · Kafka swap | `cutover` | MSK → WarpStream: create the `_ws` leg, shift producers, drain and drop the MSK leg, rows/s into `groups` stays flat |
+| 38 · new | (table) | Tinybird's ingestion pain list, each item next to how the stateless tier handles it (duplicates marked as only partly solved) |
 
 Every number in the animations is simulated and labelled as such on the slide. Real metric names, illustrative values.
+
+## Prior art
+
+Slides 7 and 38 lean on Javi Santana's [“I've operated petabyte-scale ClickHouse® clusters for 5 years”](https://www.tinybird.co/blog/what-i-learned-operating-clickhouse) (Tinybird). It's an independent account of the ingestion failure this talk opens with, and a checklist the design is measured against. It's also linked from the closing slide.
+
+The meme slides have no labels or captions. The meme does the work.
 
 ## Code
 
