@@ -269,7 +269,7 @@ go 1.20
             </section>
 
             <!-- 13 · SQL ① data table -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">① Data table — on DATA nodes</span>
                 <h3>The only place that actually stores rows</h3>
                 <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS groups
@@ -290,7 +290,7 @@ ORDER BY (team_id, group_type_index, group_key)</code></pre>
             </section>
 
             <!-- 14 · SQL ② writable distributed -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">② Writable table — on INGESTION nodes</span>
                 <h3>A Distributed table is the "INSERT client"</h3>
                 <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS writable_groups
@@ -309,7 +309,7 @@ ENGINE = Distributed('posthog_single_shard', 'default', 'groups');</code></pre>
             </section>
 
             <!-- 15 · SQL ③ kafka table -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">③ Kafka table engine — on INGESTION nodes</span>
                 <h3>The consumer</h3>
                 <pre><code data-trim data-noescape class="language-sql">CREATE TABLE IF NOT EXISTS kafka_groups
@@ -362,7 +362,7 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
             </section>
 
             <!-- 18 · node_roles routing -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">How DDL knows where to land</span>
                 <h2>One migration, role-aware placement</h2>
                 <pre><code data-trim data-noescape class="language-python">operations = [
@@ -395,7 +395,7 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
             </section>
 
             <!-- 19b · Tuning the Kafka table engine -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">The catch behind the tiers</span>
                 <h2>Tuning the Kafka table engine is the fiddly part</h2>
                 <pre><code data-trim data-noescape class="language-sql">ENGINE = Kafka(warpstream_ingestion,
@@ -420,10 +420,12 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
 
             <!-- 19c · NEW: thread_per_consumer, visualized -->
             <section>
-                <span class="kicker">Same four consumers · simulated</span>
+                <span class="kicker">The Kafka engine's sneakiest default · simulated</span>
                 <h2>One flag, one thread or four</h2>
                 <canvas class="motion" data-scene="threads" data-still="8" width="1160" height="372" aria-label="Animation: with kafka_thread_per_consumer = 0, four consumers feed one thread that squashes a single block; with 1, four threads flush four blocks in parallel"></canvas>
                 <aside class="notes">
+                    (20-min cut: the tuning code slide is hidden, so say it here.) kafka_thread_per_consumer
+                    defaults to 0, it's an ENGINE setting, so fixing it means drop-and-recreate the Kafka table.
                     Left: thread_per_consumer = 0. Four consumers, but one thread pulls from each in turn and
                     squashes everything into a single block, so you get one flush at a time. Right: = 1, each
                     consumer gets its own thread and flushes independently. The rates are illustrative; the
@@ -464,7 +466,7 @@ FROM kafka_groups;            -- ← reads from the Kafka table engine</code></p
             </section>
 
             <!-- 22 · statelessness proof -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">"Stateless" — literally</span>
                 <h2>The config that proves there's nothing to lose</h2>
                 <div class="cols">
@@ -541,7 +543,7 @@ GROUP BY time, pod ORDER BY time</code></pre>
             </section>
 
             <!-- 22c · Same shape, two applications -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">One pattern, two jobs</span>
                 <h2>Same shape, different sink</h2>
                 <p class="small muted">Every stateless node is the same core — a <strong>Kafka table engine → materialized view</strong>, no MergeTree. The only thing that changes is <em>what the MV writes into</em>.</p>
@@ -580,7 +582,7 @@ GROUP BY time, pod ORDER BY time</code></pre>
             </section>
 
             <!-- 23 · ShuffleHog -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">Application B · why ShuffleHog exists</span>
                 <h2>Partition by the key your consumer aggregates on</h2>
                 <div class="pipe-row" style="font-size:0.68em; justify-content:space-between">
@@ -610,7 +612,7 @@ GROUP BY time, pod ORDER BY time</code></pre>
             </section>
 
             <!-- 23b · NEW: ShuffleHog, visualized -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">Application B · simulated</span>
                 <h2>Same rows, same consumers, no lock queue</h2>
                 <canvas class="motion" data-scene="shuffle" data-still="9" width="1160" height="372" aria-label="Animation: before, every consumer sees every key and queues on the same Postgres row locks; after re-partitioning by project and event, each consumer owns one key and never waits"></canvas>
@@ -697,7 +699,7 @@ GROUP BY time, pod ORDER BY time</code></pre>
             </section>
 
             <!-- 27 · Results  (TODO) -->
-            <section>
+            <section data-visibility="hidden">
                 <span class="kicker">Did it work?</span>
                 <h2>The payoff</h2>
                 <div class="cols">

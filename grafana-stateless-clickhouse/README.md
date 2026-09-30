@@ -19,6 +19,18 @@ python3 -m http.server 8000
 - **R**: replay the current slide's animation from the start
 - Animations only run on the current slide. In overview mode and in `?print-pdf` export, each one is drawn as a representative still frame.
 
+## 20-minute cut
+
+The deck is trimmed to 31 slides (about 14 minutes of talking, leaving room for Q&A in a 20-minute slot). Ten slides are hidden with reveal's `data-visibility="hidden"`, not deleted:
+- three of the four per-object SQL slides (the MV one stays)
+- the role-aware migration slide
+- the Kafka tuning code slide (the threads animation and its notes now carry the "defaults to 0" trap)
+- the statelessness config slide
+- "same shape, different sink", ShuffleHog and its animation
+- "the payoff" (the Tinybird table makes that argument now)
+
+Remove the attribute from a section to bring it back for a longer slot. The slide numbers below are for the full deck.
+
 ## What's new vs. the Altinity deck
 
 | Slide | Animation (`data-scene`) | What it shows |
