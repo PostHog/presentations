@@ -8,6 +8,7 @@ Talks and presentations from the PostHog team, hosted as static HTML decks (reve
 
 | Talk | Venue | Path |
 | ---- | ----- | ---- |
+| Stateless ClickHouse for stream processing (animated) | Grafana meetup | [`grafana-stateless-clickhouse/`](./grafana-stateless-clickhouse/) |
 | The self-driving loop beat me to my own bug | September Demo Day ft. PostHog (AI Tinkerers NYC) | [`self-driving-beat-me-to-my-bug/`](./self-driving-beat-me-to-my-bug/) |
 | Agentic feature discovery | Agentic PM Kickoff (PostHog × Linear × Supabase × Dreambase), SF | [`agentic-feature-discovery/`](./agentic-feature-discovery/) |
 | The road to self-driving agents | The Self-Driving Product (Merge × PostHog × Redis), NYC | [`self-driving-agents/`](./self-driving-agents/) |
