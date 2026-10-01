@@ -193,6 +193,7 @@
     margin: 0.3em 0;
 }
 .reveal pre code {
+    display: block; /* inline code only pads its first line; every later line would shift left */
     background: var(--ph-surface);
     color: var(--ph-text);
     padding: 0.9em 1.1em;
@@ -214,11 +215,35 @@
 .reveal section.title-slide { display: flex; flex-direction: column; justify-content: center; height: 100%; }
 .reveal section.title-slide h1 { font-size: 2.4em; font-weight: 700; }
 
-.reveal section.section-divider {
-    display: flex; flex-direction: column; justify-content: center; height: 100%;
-}
+/* reveal sets an inline display:block on the current slide, so the flex has to be !important to win */
+.reveal section.section-divider { flex-direction: column; justify-content: center; height: 100%; }
+.reveal .slides > section.section-divider.present,
+html.reveal-print .reveal section.section-divider { display: flex !important; }
 .reveal section.section-divider h2 { font-size: 2.2em; font-weight: 700; }
+.reveal section.section-divider .lead { max-width: 30ch; text-wrap: balance; }
 .reveal .section-num { font-family: var(--font-mono); color: var(--ph-accent); font-size: 0.9em; }
+
+/* Full-bleed takeaway slides: one big line, one supporting line, centered */
+.reveal section.takeaway { flex-direction: column; justify-content: center; height: 100%; }
+.reveal .slides > section.takeaway.present,
+html.reveal-print .reveal section.takeaway { display: flex !important; }
+.reveal section.takeaway h2 { margin-bottom: 0.45em; }
+.reveal section.takeaway .lead {
+    max-width: 30ch;
+    font-size: 1.2em;
+    line-height: 1.35;
+    text-wrap: balance;
+}
+/* The closing formula: the three parts read as one unit, the verdict on its own line */
+.reveal section.takeaway .formula { max-width: none; }
+.reveal section.takeaway .formula .parts {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35em;
+}
+.reveal section.takeaway .formula .op { opacity: 0.55; margin: 0 0.35em; }
 
 /* ---- Chrome: progress, slide number, controls -------------------------- */
 .reveal .progress { color: var(--ph-accent); height: 4px; }
@@ -257,6 +282,24 @@
 .reveal .pipe-row > .node { flex: 0 1 auto; }
 
 .reveal .stack { display: flex; flex-direction: column; gap: 0.45em; }
+
+/* Product tiles: official product icon on a tinted square, coloured per product via --pc */
+.reveal .products { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.3em 0.5em; margin: 0.3em 0 0; }
+.reveal .product { display: flex; align-items: center; gap: 0.45em; font-family: var(--font-title); font-weight: 600; font-size: 0.6em; white-space: nowrap; }
+.reveal .product .picon {
+    flex: 0 0 auto; width: 2em; height: 2em; border-radius: 0.45em; display: grid; place-items: center;
+    color: var(--pc); background: color-mix(in srgb, var(--pc) 14%, #fff);
+    border: 1px solid color-mix(in srgb, var(--pc) 35%, #fff);
+}
+.reveal .product .picon svg { width: 1.2em; height: 1.2em; fill: currentColor; }
+.reveal .crest { height: 210px; width: auto; display: block; }
+
+/* Throughput tier cards: name, a row of consumer marks, two muted lines */
+.reveal .card.tier { display: flex; flex-direction: column; gap: 0.15em; }
+.reveal .card.tier .pill { align-self: flex-start; margin: 0; }
+.reveal .card.tier .tier-name { font-family: var(--font-title); font-weight: 700; font-size: 1.5em; line-height: 1.1; margin-top: 0.15em; }
+.reveal .consumers { display: flex; gap: 3px; margin: 0.25em 0 0.35em; }
+.reveal .consumers i { display: block; width: 0.55em; height: 1em; border-radius: 2px; background: var(--ph-accent); }
 
 /* ---- Dark variant (optional; toggle with `data-theme-dark` on body) ----- */
 body.dark {
@@ -346,4 +389,24 @@ body.dark {
    apply there. Meme and quote slides are sized to sit centred instead. */
 .reveal .meme-slide .meme-img { height: 600px; width: auto; max-width: none; max-height: none; margin-top: 30px; }
 .reveal .meme-slide .meme-img.wide { width: 1160px; height: auto; margin-top: 80px; }
+
+/* Expanding-brain meme rebuilt as HTML: brain panels cropped from the template, captions as real text */
+.reveal .brain-meme {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    width: 1160px; margin: 120px auto 0;
+    background: #fff; border: 3px solid #111; border-radius: 6px; overflow: hidden;
+    box-shadow: 0 var(--ph-shadow) 0 var(--ph-border);
+}
+.reveal .brain-meme .panel { display: flex; flex-direction: column; border-right: 3px solid #111; }
+.reveal .brain-meme .panel:last-child { border-right: 0; }
+.reveal .brain-meme img { display: block; width: 100%; height: 250px; object-fit: cover; margin: 0; }
+.reveal .brain-meme .cap {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    min-height: 140px; padding: 12px 14px; text-align: center;
+    font-family: Impact, 'Arial Black', 'Helvetica Neue', sans-serif; font-size: 30px; line-height: 1.08;
+    color: #fff; letter-spacing: 0.01em;
+    -webkit-text-stroke: 1.2px #000;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 0 #000;
+}
+.reveal .brain-meme .cap em { color: #fff; font-style: normal; font-weight: normal; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
 .reveal section.quote-slide { padding-top: 120px; box-sizing: border-box; }
