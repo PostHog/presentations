@@ -130,11 +130,46 @@
   .big { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; gap: 3vh; padding: 0 4vw; }
   .big h1 { font-size: 5vw; font-weight: 800; letter-spacing: -.025em; line-height: 1.04; margin: 0; text-wrap: balance; }
   .big h1 span { color: var(--accent); }
+  .big h1 span.aside { color: var(--ink3); font-weight: 700; }
   .big h1 s { color: var(--ink3); text-decoration-color: var(--accent); text-decoration-thickness: .09em; }
-  .big p { font-size: 2vw; color: var(--ink2); margin: 0; max-width: 60vw; line-height: 1.35; }
+  .big p { font-size: 2vw; color: var(--ink2); margin: 0; max-width: 60vw; line-height: 1.35; text-wrap: balance; }
+  /* A slide's takeaway line: one line, full width, in ink. */
+  .big p.punch { max-width: none; font-size: 2.1vw; font-weight: 700; color: var(--ink); text-wrap: wrap; }
+  .big p.punch span { color: var(--accent-ink); }
   .headrow { display: flex; align-items: center; justify-content: space-between; gap: 3vw; }
   .headrow .hog { height: 22vh; }
   /* Cards are posthog.com windows: warm surface, hairline border, a title bar. */
+  /* Step 19: the points stacked on the left, a Slack thread on the right. */
+  .chill { display: grid; grid-template-columns: 1fr 1.25fr; gap: 2.4vw; align-items: center; }
+  .chill .stack { display: flex; flex-direction: column; gap: 1.8vh; }
+  .chill h1 { font-size: 3.6vw; margin-bottom: 1vh; }
+  .chill .col ul { font-size: 1.2vw; }
+  .slackwrap { position: relative; margin-top: 4vh; }
+  /* The surfer rides the thread's header bar, which is empty on the right. */
+  .slackwrap .surf { position: absolute; right: 1.2vw; bottom: 100%; margin-bottom: -6.2vh; height: 12vh; width: auto; z-index: 2; }
+  .slack { background: #fff; border: 1px solid var(--rule2); border-radius: 8px; box-shadow: var(--shadow-window); overflow: hidden;
+    font-family: Lato, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 1vw; line-height: 1.4; color: #1d1c1d; }
+  .slack-head { font-weight: 800; padding: .8vh 1.2vw; border-bottom: 1px solid #e8e8e8; }
+  .slack .msg { display: grid; grid-template-columns: 2.3vw 1fr; gap: .8vw; padding: .8vh 1.2vw; }
+  .slack .msg > div { display: flex; flex-direction: column; gap: .5vh; min-width: 0; }
+  .slack .av { width: 2.3vw; height: 2.3vw; border-radius: 6px; background: #f4f4ef; padding: .3vw; object-fit: contain; }
+  .slack .av.me { display: grid; place-items: center; padding: 0; background: var(--accent); color: #fff; font-weight: 800; font-size: .8vw; }
+  .slack .who { font-weight: 800; }
+  .slack .who i { font-style: normal; font-size: .65vw; font-weight: 700; color: #616061; background: #ebeaeb; border-radius: 3px; padding: 0 .3vw; margin-left: .2vw; vertical-align: .1em; }
+  .slack time { font-weight: 400; font-size: .8vw; color: #616061; margin-left: .3vw; }
+  .slack .card { border-left: 4px solid #ddd; padding-left: .8vw; display: flex; flex-direction: column; gap: .4vh; }
+  .slack .card .title { font-weight: 700; }
+  .slack em { font-style: italic; }
+  .slack code { font-family: var(--mono); font-size: .85em; color: #c01343; background: #f6f6f6; border: 1px solid #e8e8e8; border-radius: 3px; padding: 0 .2em; }
+  .slack mark { background: color-mix(in srgb, var(--lemon) 45%, transparent); color: inherit; border-radius: 2px; padding: 0 .1em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .slack .sbtn { align-self: flex-start; font-weight: 700; font-size: .85vw; border: 1px solid #c8c8c8; border-radius: 6px; padding: .2vh .7vw; }
+  .slack .sbtn.go { background: #007a5a; border-color: #007a5a; color: #fff; box-shadow: 0 0 0 0 rgba(0,122,90,.5); animation: ping 2s ease-out infinite; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(0,122,90,.45); } 70%, 100% { box-shadow: 0 0 0 .7vw rgba(0,122,90,0); } }
+  .slack .fixrow { display: flex; align-items: center; gap: 1vw; }
+  .slack .nudge { font-family: var(--body); font-weight: 800; font-size: 1.15vw; color: var(--accent-ink); transform: rotate(-3deg); white-space: nowrap; }
+  .slack .react { align-self: flex-start; font-size: .8vw; border: 1px solid #1d9bd1; background: #e8f5fa; border-radius: 99px; padding: 0 .5vw; color: #1264a3; }
+  .slack .meta { font-size: .8vw; color: #616061; }
+  .slack .at { color: #1264a3; background: #e8f5fa; border-radius: 3px; padding: 0 .15vw; }
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6vw; }
   .stat { background: var(--card); border: 1px solid var(--rule2); border-radius: 8px; padding: 2.4vh 1.4vw; box-shadow: var(--shadow-window); }
   .stat .n { font-size: 4.4vw; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
@@ -147,6 +182,7 @@
     margin: 0 -1.6vw 1.8vh; padding: 1vh 1.6vw; background: var(--card2); border-bottom: 1px solid var(--rule); }
   .col ul { margin: 0; padding-left: 1.2em; font-size: 1.6vw; line-height: 1.45; font-weight: 700; }
   .col li::marker { color: var(--accent); }
+  .col li em { font-style: normal; color: var(--accent-ink); }
   .col.cheap { background: transparent; border-style: dashed; color: var(--ink3); box-shadow: none; }
   .col.cheap .k { color: var(--ink3); background: transparent; border-bottom-style: dashed; }
   .col.cheap li::marker { color: var(--ink3); }
@@ -175,7 +211,7 @@
   .qr.small img { width: 12vw; }
   .qa > div { display: flex; flex-direction: column; gap: 3vh; }
   .qr figcaption { font-size: 1vw; font-weight: 700; color: var(--ink2); }
-  .footnote { font-size: 1.1vw; font-weight: 500; color: var(--ink2); }
+  .footnote, .big p.footnote { font-size: 1.05vw; font-weight: 500; color: var(--ink3); }
 
   /* Link buttons: the raised posthog.com OS button. */
   .links { display: flex; flex-wrap: wrap; gap: .8vw; margin-top: -.2vh; }
@@ -275,8 +311,18 @@
     .stat { padding: 12px; }
     .stat .n { font-size: 30px; }
     .stat .l { font-size: 13px; }
-    .footnote { font-size: 11px; }
+    .footnote, .big p.footnote { font-size: 11px; }
     .cols, .cols.two, .flow { grid-template-columns: 1fr; gap: 10px; }
+    .chill { grid-template-columns: 1fr; gap: 12px; }
+    .chill .col ul { font-size: 16px; }
+    .slack { font-size: 14px; }
+    .slack .msg { grid-template-columns: 32px 1fr; gap: 10px; padding: 8px 12px; }
+    .slack .av { width: 32px; height: 32px; padding: 4px; }
+    .slack .av.me { font-size: 12px; }
+    .slack time, .slack .sbtn, .slack .meta, .slack .react { font-size: 12px; }
+    .slack .nudge { font-size: 15px; }
+    .slack .who i { font-size: 10px; }
+    .slack-head { padding: 8px 12px; }
     .col { padding: 0 14px 12px; }
     .col .k { margin: 0 -14px 10px; padding: 8px 14px; }
     .col .k, .flow .who { font-size: 11px; }
@@ -438,39 +484,54 @@ const SCENES = [
     ][reveal],
   })),
 
-  { kind: 'big', chapter: 'numbers', node: null,
-    html: `<h1>Last 30 days, our own product</h1>
-      <div class="stats">
-        <div class="stat"><div class="n">881</div><div class="l">reports reached a merged PR. Median 35h from report to merge.</div></div>
-        <div class="stat"><div class="n">64%</div><div class="l">got checked after merge.</div></div>
-        <div class="stat hot"><div class="n">1 in 5</div><div class="l">checks with a clear verdict said the fix did not hold.</div></div>
-        <div class="stat hot"><div class="n">5 of 149</div><div class="l">failed checks got fixed again and merged.</div></div>
-      </div>
-      <p class="footnote">Merged 27 Sep to 27 Oct 2026, US project. 97 of 462 decisive verdicts failed.</p>`,
-    notes: 'Be honest here. Verification already catches a fifth of our fixes. We are much worse at fixing them again. That is the next loop to close.' },
-
   { kind: 'big', chapter: 'thoughts', node: null,
-    html: `<h1>The PR is <span>the easy part</span></h1>
+    html: `<h1>The PR is <span class="aside">(now)</span> <span>the easy part</span></h1>
       <div class="cols">
         <div class="col"><div class="k">Before</div><ul>
-          <li>What to build, and why</li><li>How you will measure it</li><li>Scaffolding the loop itself</li></ul></div>
+          <li>Plan and spec it with your agent, before any code</li><li>How you will know it worked</li><li>Scaffolding the loop itself</li></ul></div>
         <div class="col cheap"><div class="k">The PR</div><ul>
-          <li>Cheap</li><li>Fast</li><li>Mostly solved</li></ul></div>
+          <li>Cheap</li><li>Fast</li><li>Loads of bot reviews</li><li>Mostly solved</li></ul></div>
         <div class="col"><div class="k">After</div><ul>
           <li>Monitor it in production</li><li>Check it did what it said</li><li>Follow up when it did not</li></ul></div>
       </div>
-      <p>Merged is not verified. Write down what the fix should change, re-check it later, and let a failed check file the next report.</p>`,
-    notes: 'Everyone can get an agent to open a PR now. The hard bits are either side of it. Before: deciding what is worth building and how you will know it worked. After: watching it, checking it, following up. That is where the loop actually closes.' },
+      <p class="punch">Building and maintaining the system that closes the loop is <span>our job now.</span></p>`,
+    notes: 'Everyone can get an agent to open a PR now. The hard bits are either side of it. Before: spend real time with the agent planning and specing it, before any code gets written, and decide how you will know it worked. After: watching it, checking it, following up. That is where the loop actually closes.' },
 
   { kind: 'big', chapter: 'thoughts', node: null,
-    html: `<h1>Humans in the loop is fine.<br><span>Just make it chill.</span></h1>
-      <div class="cols two">
-        <div class="col"><div class="k">Agent insurance</div><ul>
-          <li>Every step leaves evidence a human can read</li><li>Re-checks and follow-ups run on their own</li><li>Failures come back as new reports, not surprises</li></ul></div>
-        <div class="col"><div class="k">So the human can</div><ul>
-          <li>QA in a minute, not an hour</li><li>Drop in at any step</li><li>Say no without losing the work</li></ul></div>
+    html: `<div class="chill">
+        <div class="stack">
+          <h1>Humans in the loop is fine.<br><span>Just make it chill.</span></h1>
+          <div class="col"><div class="k">Agent insurance</div><ul>
+            <li>Every step leaves evidence a human can read</li><li>Re-checks and follow-ups run on their own</li><li>Failures come back as new reports, not surprises</li></ul></div>
+          <div class="col"><div class="k">So the human can</div><ul>
+            <li>QA in a minute, not an hour</li><li>Drop in at any step</li><li>Say no without losing the work</li></ul></div>
+        </div>
+        <div class="slackwrap"><img class="surf" src="${A}hogs/surfer.svg" alt="">
+        <div class="slack" aria-label="A Slack thread where I ask the PostHog bot to explain a report in simple terms">
+          <div class="slack-head">Thread</div>
+          <div class="msg"><img class="av" src="${A}posthog-logomark.svg" alt=""><div>
+            <div class="who">PostHog <i>APP</i> <time>12:47</time></div>
+            <div class="card"><b>Scout · Agent feedback</b>
+              <div class="title">fix(surveys): preserve multiple-choice branching in MCP writes</div>
+              <span class="sbtn">View report in PostHog</span></div>
+          </div></div>
+          <div class="msg"><span class="av me">AM</span><div>
+            <div class="who">Andy Maguire <time>17:52</time></div>
+            <div><span class="at">@PostHog</span> explain this to me in simple terms</div>
+            <span class="react">👀 1</span>
+          </div></div>
+          <div class="msg"><img class="av" src="${A}posthog-logomark.svg" alt=""><div>
+            <div class="who">PostHog <i>APP</i> <time>17:53</time></div>
+            <div><span class="at">@Andy Maguire</span> <mark>In simple terms: an AI agent can't copy "skip logic" on multiple-choice survey questions through PostHog's MCP tools. PostHog drops the logic and still reports success.</mark></div>
+            <div><em>What the problem is</em><br>• The cause: the API schema for multiple-choice questions has no <code>branching</code> field. Its description also says "No branching logic supported", which is wrong, because the UI supports it.</div>
+            <div><em>How serious it is</em><br>It is P3 (low).</div>
+            <div>Do you want me to open a PR with this fix?</div>
+            <div class="fixrow"><span class="sbtn go">Fix it, make no mistakes</span><span class="nudge">← no really, that was the suggested prompt</span></div>
+            <div class="meta">View session · <b>Claude Opus 5.5</b></div>
+          </div></div>
+        </div></div>
       </div>`,
-    notes: 'I still review every PR in this story. That is fine. The goal is not to remove the human, it is to make their part small and easy. Think of the checks as insurance you take out in the system, so trusting the agent is a low-risk bet.' },
+    notes: 'This is how I actually read reports. A scout drops one in Slack, I ask the bot to explain it like I am five, and it ends with one button. "Fix it, make no mistakes": no really, that was the suggested prompt. Tab complete, in real life. Real thread from today, trimmed to fit. I still review every PR in this story. That is fine. The goal is not to remove the human, it is to make their part small and easy. Think of the checks as insurance you take out in the system, so trusting the agent is a low-risk bet.' },
 
   { kind: 'big', chapter: 'thoughts', node: null,
     html: `<div class="headrow"><h1>Autonomy is a dial</h1><img class="hog" src="${A}hogs/traffic-controller.svg" alt=""></div>
@@ -485,7 +546,7 @@ const SCENES = [
     notes: 'This is not all or nothing. A new feature behind a flag can run pretty loose. A query in the ingestion hot path needs tighter checks and a human closer to the wheel. Same loop, different settings.' },
 
   { kind: 'big', chapter: 'thoughts', node: null,
-    html: `<h1>How I work <span>since September</span></h1>
+    html: `<h1>I <span class="aside">(have my agent)</span> write issues, <span>not PRs</span></h1>
       <ol class="flow">
         <li><span class="who me">Me + agent</span>Spec the issue, using the repo's issue template</li>
         <li><span class="who bot">Self-driving</span>Picks it up as an inbox report. Opens a PR, or I press implement</li>
@@ -495,11 +556,12 @@ const SCENES = [
       </ol>
       <div class="cols two">
         <div class="col"><div class="k">No special framework</div><ul>
-          <li>A framework is future tech debt</li><li>Spec issues the way your repo already does. The agent gets it</li></ul></div>
-        <div class="col"><div class="k">Keep the factory flexible</div><ul>
-          <li>Use skills for everything</li><li>PostHog self-driving is one way to run it. Try it</li></ul></div>
-      </div>`,
-    notes: 'This is my actual day since early September. I spec issues with my agent, self-driving picks them up and opens PRs, agents review and babysit, and I sense check and QA at the end. Skills hold the state so I can drop in anywhere. No special framework: just write good issues the way your repo already wants them.' },
+          <li>A framework is future tech debt 🌶️</li><li>Spec issues the way your repo already does. The agent <em>gets it</em></li></ul></div>
+        <div class="col"><div class="k">Keep the factory* flexible</div><ul>
+          <li>Use skills for everything. I mean <em>eeevvverything</em></li><li>PostHog self-driving is one way to run it</li></ul></div>
+      </div>
+      <p class="footnote">* I hate the term "software factory"</p>`,
+    notes: 'Since early September I (well, my agent) write issues, not PRs. This is my actual day. I spec issues with my agent, self-driving picks them up and opens PRs, agents review and babysit, and I sense check and QA at the end. Skills hold the state so I can drop in anywhere. No special framework: just write good issues the way your repo already wants them.' },
 
   { kind: 'big', chapter: 'questions', node: null,
     html: `<div class="qa">
@@ -631,7 +693,7 @@ function updateChart(svg, reveal) {
   svg.querySelector('.summary').classList.toggle('on', reveal >= 6)
 }
 
-const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', numbers: 'The numbers', thoughts: 'Some thoughts', questions: 'Questions' }
+const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', thoughts: 'Some thoughts', questions: 'Questions' }
 
 let idx = 0
 const main = document.getElementById('main')
