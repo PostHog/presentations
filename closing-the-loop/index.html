@@ -4,44 +4,64 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Closing the loop</title>
-<link rel="icon" href="../img/posthog-logomark.svg" />
+<link rel="icon" href="assets/posthog-logomark.svg" />
+<link rel="preload" href="assets/fonts/RoundHog-Bold-latin.woff2" as="font" type="font/woff2" crossorigin />
 <style>
+  /* RoundHog and the hedgehogs come from github.com/PostHog/brand (@posthog/brand). Latin subsets only. */
+  @font-face { font-family: 'RoundHog'; font-weight: 400; font-display: swap; src: url(assets/fonts/RoundHog-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'RoundHog'; font-weight: 500; font-display: swap; src: url(assets/fonts/RoundHog-Medium-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'RoundHog'; font-weight: 700; font-display: swap; src: url(assets/fonts/RoundHog-SemiBold-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'RoundHog'; font-weight: 800; font-display: swap; src: url(assets/fonts/RoundHog-Bold-latin.woff2) format('woff2'); }
   :root {
-    --bg1: #FFF1D5; --bg2: #DAE0EB; --card: #fff; --ink: #141414; --ink2: #4F4E48; --ink3: #87867E;
-    --rule: #D9D8D0; --accent: #F54E00; --blue: #1D4AFF; --fail: #db3707; --pass: #388600; --warn: #f7a501;
-    --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-    --body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    /* posthog.com light neutrals */
+    --bg: #eeefe9; --card: #fdfdf8; --card2: #f4f4ef; --ink: #23251d; --ink2: #65675e; --ink3: #9ea096;
+    --rule: #d2d3cc; --rule2: #bfc1b7;
+    /* @posthog/brand palette */
+    --accent: #FF5C1C; --accent-ink: #e64a0a; --blue: #0457FF; --fail: #F00008; --fail-soft: #FFB8BA;
+    --pass-core: #35B14E; --pass: #2a8a3e; --pass-soft: #B8EAC2; --lemon: #FFCE1C;
+    /* the raised orange posthog.com button */
+    --btn-face: #eb9d2a; --btn-base: #cd8407; --btn-edge: #b17816;
+    --shadow-window: 0 1px 2px rgba(35,37,29,.06), 0 12px 32px -8px rgba(35,37,29,.22);
+    --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    --body: 'RoundHog', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body {
-    background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-    color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(255,206,28,.10) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 0% 100%, rgba(255,92,28,.06) 0%, transparent 70%),
+      var(--bg);
+    color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; font-variant-ligatures: none;
     overflow: hidden;
   }
   .stage { height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: 2.2vh 3vw 1.6vh; gap: 2vh; }
 
   /* Loop diagram, always visible */
   header { display: flex; align-items: center; gap: 2vw; }
-  header .brand { display: flex; flex-direction: column; gap: .3vh; min-width: 15vw; }
-  header .brand .eyebrow { font-family: var(--mono); font-size: 1.05vw; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-  header .brand .title { font-size: 2vw; font-weight: 800; letter-spacing: -.02em; }
+  header .brand { display: flex; flex-direction: column; gap: .7vh; min-width: 15vw; }
+  header .brand .logo { height: 2.6vw; width: auto; align-self: flex-start; }
+  header .brand .eyebrow { font-size: 1vw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink2); }
+  header .brand .title { font-size: 2vw; font-weight: 800; letter-spacing: -.015em; line-height: 1.1; }
   .loop { flex: 1; height: 15vh; }
   .loop svg { width: 100%; height: 100%; overflow: visible; }
-  .node rect { fill: var(--card); stroke: var(--rule); stroke-width: 2; transition: all .35s; }
-  .node text { font: 700 18px var(--body); fill: var(--ink2); transition: fill .35s; }
-  .node.done rect { stroke: var(--ink3); }
+  /* Each node is a posthog.com OS button: a face raised on a base strip. The active one is the orange button. */
+  .node .base { fill: var(--rule2); transition: all .35s; }
+  .node .face { fill: var(--card); stroke: var(--rule2); stroke-width: 1.5; transition: all .35s; }
+  .node text { font: 700 18px var(--body); fill: var(--ink3); transition: fill .35s; }
+  .node.done .face { stroke: var(--ink3); }
   .node.done text { fill: var(--ink); }
-  .node.active rect { stroke: var(--accent); stroke-width: 3.5; fill: #fff7ef; }
-  .node.active text { fill: var(--accent); }
-  .node.active.fail rect { stroke: var(--fail); fill: #fdebe5; }
-  .node.active.fail text { fill: var(--fail); }
-  .node.active.pass rect { stroke: var(--pass); fill: #ecf6e4; }
-  .node.active.pass text { fill: var(--pass); }
+  .node.active .face { fill: var(--btn-face); stroke: var(--btn-edge); stroke-width: 2; }
+  .node.active .base { fill: var(--btn-edge); }
+  .node.active text { fill: #111; font-weight: 800; }
+  .node.active.fail .face { fill: var(--fail-soft); stroke: var(--fail); }
+  .node.active.fail .base { fill: var(--fail); }
+  .node.active.pass .face { fill: var(--pass-soft); stroke: var(--pass); }
+  .node.active.pass .base { fill: var(--pass); }
   .edge { stroke: var(--ink3); stroke-width: 2; fill: none; marker-end: url(#arrow); }
-  .back { stroke: var(--rule); stroke-width: 2.5; fill: none; stroke-dasharray: 7 6; transition: stroke .35s; marker-end: url(#arrowBack); }
+  .back { stroke: var(--rule2); stroke-width: 2.5; fill: none; stroke-dasharray: 7 6; transition: stroke .35s; marker-end: url(#arrowBack); }
   .back.lit { stroke: var(--fail); stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw 1.1s ease forwards; marker-end: url(#arrowFail); }
-  .backlabel { font: 600 14px var(--body); fill: var(--ink3); transition: fill .35s; }
+  .backlabel { font: 700 14px var(--body); fill: var(--ink3); transition: fill .35s; }
   .backlabel.lit { fill: var(--fail); }
   @keyframes draw { to { stroke-dashoffset: 0; } }
 
@@ -49,98 +69,114 @@
 
   /* Timeline */
   .timeline { display: flex; flex-direction: column; min-height: 0; }
-  .chapter { font-family: var(--mono); font-size: 1vw; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); margin-bottom: .6vh; }
+  .chapter { font-size: 1vw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: .6vh; }
   .chapter-title { font-size: 1.9vw; font-weight: 800; letter-spacing: -.015em; line-height: 1.15; margin: 0 0 2vh; text-wrap: balance; }
   ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1vh; overflow: hidden; }
   ol.steps li { display: grid; grid-template-columns: 8.4vw 1fr; gap: .9vw; align-items: baseline; opacity: .45; transition: opacity .3s, transform .3s; }
   ol.steps li.current { opacity: 1; }
   ol.steps li.enter { animation: enter .35s ease; }
   @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
-  .when { font-family: var(--mono); font-size: 1.05vw; color: var(--ink3); text-align: right; white-space: nowrap; }
-  .when b { color: var(--accent); font-weight: 700; }
-  .what { font-size: 1.3vw; font-weight: 600; line-height: 1.3; }
+  .when { font-family: var(--mono); font-size: 1vw; color: var(--ink2); text-align: right; white-space: nowrap; }
+  .when b { color: var(--accent-ink); font-weight: 700; }
+  .what { font-size: 1.3vw; font-weight: 700; line-height: 1.3; }
   li.fail .what { color: var(--fail); }
   li.pass .what { color: var(--pass); }
-  li .what .tag { display: inline-block; font-size: .85vw; font-weight: 700; padding: .1vh .5vw; border-radius: 99px; margin-left: .4vw; vertical-align: middle; color: #fff; }
+  li .what .tag { display: inline-block; font-size: .85vw; font-weight: 800; padding: .1vh .55vw; border-radius: 6px; margin-left: .4vw; vertical-align: middle; color: #fff; }
   li.fail .tag { background: var(--fail); }
   li.pass .tag { background: var(--pass); }
 
   /* Evidence pane */
   .pane { position: relative; min-height: 0; display: flex; flex-direction: column; gap: 1.4vh; }
-  .say { font-size: 1.75vw; font-weight: 600; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
-  .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: rgba(255,255,255,.65); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1.1vh 1vw; max-width: 52vw; }
+  .sayrow { display: flex; align-items: center; gap: 1.6vw; }
+  .sayrow .say { flex: 1; }
+  .hog { height: 15vh; width: auto; flex: none; animation: pop .35s ease; }
+  .say { font-size: 1.75vw; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
+  .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 1.1vh 1vw; max-width: 52vw; }
   .callout b { color: var(--blue); }
-  .say em { font-style: normal; color: var(--accent); }
+  .say em { font-style: normal; color: var(--accent-ink); }
   .shot { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
-  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; background: #fff;
-    border: 1px solid var(--rule); box-shadow: 0 18px 50px rgba(20,20,20,.16); cursor: zoom-in; animation: pop .35s ease; }
+  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; background: #fff;
+    border: 1px solid var(--rule2); box-shadow: var(--shadow-window); cursor: zoom-in; animation: pop .35s ease; }
   .shot.pair { gap: 1.4vw; align-items: flex-start; }
   .shot.pair img { max-width: 49%; }
   @keyframes pop { from { opacity: 0; transform: scale(.985); } }
 
   /* Big-statement scenes */
   .big { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; gap: 3vh; padding: 0 4vw; }
-  .big h1 { font-size: 5vw; font-weight: 800; letter-spacing: -.03em; line-height: 1.02; margin: 0; text-wrap: balance; }
+  .big h1 { font-size: 5vw; font-weight: 800; letter-spacing: -.025em; line-height: 1.04; margin: 0; text-wrap: balance; }
   .big h1 span { color: var(--accent); }
   .big p { font-size: 2vw; color: var(--ink2); margin: 0; max-width: 60vw; line-height: 1.35; }
+  .headrow { display: flex; align-items: center; justify-content: space-between; gap: 3vw; }
+  .headrow .hog { height: 22vh; }
+  /* Cards are posthog.com windows: warm surface, hairline border, a title bar. */
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6vw; }
-  .stat { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 2.4vh 1.4vw; }
+  .stat { background: var(--card); border: 1px solid var(--rule2); border-radius: 8px; padding: 2.4vh 1.4vw; box-shadow: var(--shadow-window); }
   .stat .n { font-size: 4.4vw; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
   .stat .l { font-size: 1.25vw; color: var(--ink2); margin-top: 1.2vh; line-height: 1.3; }
   .stat.hot .n { color: var(--fail); }
   .cols { display: grid; grid-template-columns: 1fr .7fr 1fr; gap: 1.6vw; }
   .cols.two { grid-template-columns: 1fr 1fr; }
-  .col { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 2.2vh 1.6vw; }
-  .col .k { font-family: var(--mono); font-size: 1.05vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 1vh; }
-  .col ul { margin: 0; padding-left: 1.2em; font-size: 1.6vw; line-height: 1.45; font-weight: 600; }
-  .col.cheap { background: transparent; border-style: dashed; color: var(--ink3); }
-  .col.cheap .k { color: var(--ink3); }
-  .dial .bar { height: 2.2vh; border-radius: 99px; background: linear-gradient(90deg, var(--pass), var(--warn), var(--fail)); }
+  .col { background: var(--card); border: 1px solid var(--rule2); border-radius: 8px; padding: 0 1.6vw 2.2vh; box-shadow: var(--shadow-window); overflow: hidden; }
+  .col .k { font-size: 1vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink);
+    margin: 0 -1.6vw 1.8vh; padding: 1vh 1.6vw; background: var(--card2); border-bottom: 1px solid var(--rule); }
+  .col ul { margin: 0; padding-left: 1.2em; font-size: 1.6vw; line-height: 1.45; font-weight: 700; }
+  .col li::marker { color: var(--accent); }
+  .col.cheap { background: transparent; border-style: dashed; color: var(--ink3); box-shadow: none; }
+  .col.cheap .k { color: var(--ink3); background: transparent; border-bottom-style: dashed; }
+  .col.cheap li::marker { color: var(--ink3); }
+  .dial .bar { height: 2.2vh; border-radius: 99px; background: linear-gradient(90deg, var(--pass-core), var(--lemon), var(--fail)); border: 1.5px solid rgba(35,37,29,.25); }
   .dial .ends { display: flex; justify-content: space-between; gap: 4vw; margin-top: 1.6vh; font-size: 1.5vw; color: var(--ink2); line-height: 1.35; }
   .dial .ends > div { max-width: 32vw; }
   .dial .ends > div:last-child { text-align: right; }
   .dial .ends b { display: block; font-size: 2vw; color: var(--ink); }
   .flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2vw; counter-reset: f; }
-  .flow li { position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 1.8vh 1.1vw; font-size: 1.3vw; font-weight: 600; line-height: 1.35; }
+  .flow li { position: relative; background: var(--card); border: 1px solid var(--rule2); border-radius: 8px; padding: 1.8vh 1.1vw; font-size: 1.3vw; font-weight: 700; line-height: 1.35; box-shadow: var(--shadow-window); }
   .flow li:not(:last-child)::after { content: '→'; position: absolute; right: -1.05vw; top: 50%; transform: translateY(-50%); color: var(--ink3); font-size: 1.3vw; }
-  .flow .who { display: block; font-family: var(--mono); font-size: .9vw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8vh; }
-  .flow .who.me { color: var(--accent); }
+  .flow .who { display: block; font-size: .9vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8vh; }
+  .flow .who.me { color: var(--accent-ink); }
   .flow .who.bot { color: var(--blue); }
   .qa { display: grid; grid-template-columns: 1fr auto; gap: 4vw; align-items: center; }
   .posts { display: flex; flex-direction: column; gap: 1vh; margin-top: 2.4vh; }
-  .posts .k { font-family: var(--mono); font-size: 1vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); margin-top: 1.4vh; }
-  .posts a.feature { font-size: 2.2vw; color: var(--accent); }
+  .posts .k { font-size: 1vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink2); margin-top: 1.4vh; }
+  .posts a.feature { font-size: 2.2vw; color: var(--accent-ink); }
   .posts a.feature small { display: block; font-family: var(--mono); font-size: .95vw; font-weight: 500; color: var(--ink2); }
-  .posts a { font-size: 1.45vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
-  .posts a:hover { color: var(--accent); }
+  .posts a { font-size: 1.45vw; font-weight: 700; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
+  .posts a:hover { color: var(--accent-ink); }
+  .side { display: flex; flex-direction: column; align-items: center; gap: 2vh; }
+  .side .hog { height: 26vh; }
   .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
-  .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 12px; padding: 1vw; border: 1px solid var(--rule); }
-  .qr.small img { width: 16vw; }
+  .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 8px; padding: 1vw; border: 1px solid var(--rule2); box-shadow: var(--shadow-window); }
+  .qr.small img { width: 12vw; }
   .qa > div { display: flex; flex-direction: column; gap: 3vh; }
-  .qr figcaption { font-family: var(--mono); font-size: 1vw; color: var(--ink2); }
-  .footnote { font-size: 1vw; color: var(--ink3); font-family: var(--mono); }
+  .qr figcaption { font-size: 1vw; font-weight: 700; color: var(--ink2); }
+  .footnote { font-size: 1.1vw; font-weight: 500; color: var(--ink2); }
 
-  .links { display: flex; flex-wrap: wrap; gap: .6vw; margin-top: -.4vh; }
-  a.link { font-family: var(--mono); font-size: .95vw; font-weight: 600; color: var(--accent); text-decoration: none;
-    border: 1.5px solid var(--accent); border-radius: 99px; padding: .35vh .8vw; background: rgba(255,255,255,.6); }
-  a.link:hover { background: var(--accent); color: #fff; }
+  /* Link buttons: the raised posthog.com OS button. */
+  .links { display: flex; flex-wrap: wrap; gap: .8vw; margin-top: -.2vh; }
+  a.link, .nav button { display: inline-flex; align-items: center; font: 700 .95vw var(--body); color: var(--ink); text-decoration: none;
+    padding: .45vh .85vw; border: 1.5px solid var(--ink3); border-radius: 6px; background: var(--card);
+    box-shadow: 0 2px 0 var(--rule2), 0 3.5px 0 var(--ink3); transform: translateY(-2px); transition: transform .05s, box-shadow .05s; cursor: pointer; }
+  a.link:first-child, .nav button { background: var(--btn-face); border-color: var(--btn-edge); color: #111;
+    box-shadow: 0 2px 0 var(--btn-base), 0 3.5px 0 var(--btn-edge); }
+  a.link:hover, .nav button:hover { transform: translateY(-3px); }
+  a.link:active, .nav button:active { transform: translateY(-.5px); box-shadow: 0 .5px 0 var(--btn-base), 0 2px 0 var(--btn-edge); }
 
   .chartwrap { grid-column: 1 / -1; display: flex; flex-direction: column; min-height: 0; gap: 1vh; }
   .charthead { display: flex; align-items: baseline; justify-content: space-between; gap: 2vw; }
   .charthead .chapter-title { margin: 0; }
   svg.chart { flex: 1; min-height: 0; width: 100%; }
-  svg.chart .grid { stroke: #D9D8D0; stroke-width: 1; }
-  svg.chart .ax { font: 500 14px var(--mono); fill: #87867E; }
-  svg.chart .ax.blue, svg.chart .blue { fill: #1D4AFF; }
-  svg.chart .lg { font: 600 15px var(--body); fill: #4F4E48; }
-  svg.chart .sw.red { fill: #db3707; }
+  svg.chart .grid { stroke: var(--rule); stroke-width: 1; }
+  svg.chart .ax { font: 500 14px var(--mono); fill: var(--ink2); }
+  svg.chart .ax.blue, svg.chart .blue { fill: var(--blue); }
+  svg.chart .lg { font: 700 15px var(--body); fill: var(--ink2); }
+  svg.chart .sw.red { fill: var(--fail); }
   svg.chart .val { font: 700 15px var(--mono); paint-order: stroke; stroke: rgba(0,0,0,.18); stroke-width: 3px; opacity: 0; transition: opacity .4s .2s; }
   svg.chart .val.on { opacity: 1; }
-  svg.chart .nline { fill: none; stroke: #1D4AFF; stroke-width: 3; stroke-linejoin: round; opacity: .22; transition: opacity .6s; }
+  svg.chart .nline { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linejoin: round; opacity: .22; transition: opacity .6s; }
   svg.chart .nline.on { opacity: 1; }
   svg.chart .num { font: 800 15px var(--body); fill: #fff; }
-  svg.chart .evt { font: 700 18px var(--body); }
-  svg.chart .big1 { font: 800 24px var(--body); fill: #141414; }
+  svg.chart .evt { font: 800 18px var(--body); }
+  svg.chart .big1 { font: 800 24px var(--body); fill: var(--ink); }
   svg.chart .bar { transition: fill .5s ease, opacity .5s ease; }
   svg.chart .ev { opacity: 0; transform: translateY(-6px); transition: opacity .35s ease, transform .35s ease; }
   svg.chart .ev.on { opacity: 1; transform: none; }
@@ -150,22 +186,25 @@
   svg.chart .summary.on { opacity: 1; transform: none; }
   .steplink { min-height: 1.6em; }
 
-  footer { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: .95vw; color: var(--ink3); }
+  footer { display: flex; align-items: center; justify-content: space-between; font-size: .95vw; font-weight: 700; color: var(--ink2); }
+  footer .crumbwrap { display: flex; align-items: center; gap: .6vw; }
+  footer .crumbwrap img { height: 1.4vw; width: auto; }
+  .keys { font-weight: 500; color: var(--ink3); }
   .dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 40vw; justify-content: center; }
-  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule2); }
   .dots i.on { background: var(--accent); }
   .dots i.sep { width: 2px; background: transparent; }
 
   /* Lightbox and notes */
-  .lightbox { position: fixed; inset: 0; background: rgba(20,20,20,.82); display: none; align-items: center; justify-content: center; padding: 3vh 3vw; z-index: 10; cursor: zoom-out; }
+  .lightbox { position: fixed; inset: 0; background: rgba(35,37,29,.82); display: none; align-items: center; justify-content: center; padding: 3vh 3vw; z-index: 10; cursor: zoom-out; }
   .lightbox.open { display: flex; }
   .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; background: #fff; }
-  .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: #141414; color: #f3f3f3; border-radius: 10px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+  .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: var(--ink); color: #f3f3ee; border-radius: 8px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .notes.open { display: block; }
-  .notes b { color: #F9BD2B; font-family: var(--mono); font-size: .85vw; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
-  .nav { display: none; gap: 8px; }
-  .nav button { font: 700 18px var(--body); color: var(--accent); background: var(--card); border: 1.5px solid var(--accent); border-radius: 99px; width: 52px; height: 44px; }
-  .nav button:disabled { opacity: .3; }
+  .notes b { color: var(--lemon); font-size: .85vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
+  .nav { display: none; gap: 10px; }
+  .nav button { font-size: 18px; justify-content: center; width: 52px; height: 40px; padding: 0; }
+  .nav button:disabled { opacity: .35; }
 
   /* Phones: the projector layout is sized in vw, which shrinks to unreadable text. Stack and scroll instead. */
   @media (max-width: 800px) {
@@ -173,6 +212,7 @@
     body { overflow: auto; }
     .stage { height: auto; min-height: 100dvh; padding: 16px 16px 84px; gap: 16px; grid-template-rows: auto 1fr; }
     header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    header .brand .logo { height: 22px; }
     header .brand .eyebrow { font-size: 11px; }
     header .brand .title { font-size: 22px; }
     .loop { width: 100%; height: auto; }
@@ -184,6 +224,9 @@
     .what { font-size: 14px; }
     li .what .tag { font-size: 11px; padding: 1px 6px; }
     .say { font-size: 18px; }
+    .hog { height: 72px; }
+    .headrow .hog { height: 90px; }
+    .side .hog { display: none; }
     .callout { font-size: 15px; padding: 10px 12px; max-width: none; }
     a.link { font-size: 13px; padding: 4px 10px; }
     .shot.pair { flex-direction: column; }
@@ -197,7 +240,8 @@
     .stat .l { font-size: 13px; }
     .footnote { font-size: 11px; }
     .cols, .cols.two, .flow { grid-template-columns: 1fr; gap: 10px; }
-    .col { padding: 12px 14px; }
+    .col { padding: 0 14px 12px; }
+    .col .k { margin: 0 -14px 10px; padding: 8px 14px; }
     .col .k, .flow .who { font-size: 11px; }
     .col ul { font-size: 16px; }
     .flow li { font-size: 15px; padding: 12px 14px; }
@@ -215,8 +259,9 @@
     .chartwrap { overflow-x: auto; }
     .charthead { flex-direction: column; gap: 8px; }
     svg.chart { flex: none; min-width: 620px; }
-    .charthead::after { content: 'Scroll the chart sideways →'; font-family: var(--mono); font-size: 11px; color: var(--ink3); }
-    footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px; font-size: 12px; background: rgba(255,255,255,.92); border-top: 1px solid var(--rule); }
+    .charthead::after { content: 'Scroll the chart sideways →'; font-family: var(--mono); font-size: 11px; color: var(--ink2); }
+    footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px; font-size: 12px; background: rgba(253,253,248,.92); border-top: 1px solid var(--rule); backdrop-filter: blur(12px); }
+    footer .crumbwrap img { height: 16px; }
     .dots, .keys { display: none; }
     .nav { display: flex; }
     .notes { width: auto; left: 16px; right: 16px; bottom: 72px; font-size: 14px; }
@@ -227,15 +272,16 @@
 <div class="stage">
   <header>
     <div class="brand">
+      <img class="logo" src="assets/posthog-logo.svg" alt="PostHog" />
       <span class="eyebrow">AI Tinkerers Dublin</span>
       <span class="title">Closing the loop</span>
     </div>
     <div class="loop">
       <svg viewBox="0 0 1040 120" preserveAspectRatio="xMidYMid meet" aria-label="The self-driving loop">
         <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#87867E"/></marker>
-          <marker id="arrowBack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#D9D8D0"/></marker>
-          <marker id="arrowFail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#db3707"/></marker>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ea096"/></marker>
+          <marker id="arrowBack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bfc1b7"/></marker>
+          <marker id="arrowFail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#F00008"/></marker>
         </defs>
         <g id="nodes"></g>
         <path id="back" class="back" />
@@ -247,7 +293,7 @@
   <main id="main"></main>
 
   <footer>
-    <span id="crumb"></span>
+    <span class="crumbwrap"><img src="assets/posthog-logomark.svg" alt="" /><span id="crumb"></span></span>
     <span class="dots" id="dots"></span>
     <span class="keys">← → step · N notes · F fullscreen</span>
     <span class="nav"><button id="prev" aria-label="Previous step">←</button><button id="next" aria-label="Next step">→</button></span>
@@ -276,7 +322,10 @@ const SCENES = [
         <h1>Agents ship PRs now.<br><span>Closing the loop<br>is the hard part.</span></h1>
         <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>
       </div>
-      <figure class="qr small"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>Follow along on your phone</figcaption></figure>
+      <div class="side">
+        <img class="hog" src="${A}hogs/self-driving.svg" alt="A hedgehog in a self-driving car">
+        <figure class="qr small"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>Follow along on your phone</figcaption></figure>
+      </div>
     </div>`,
     notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one keeps going: did the fix actually work, and what happens when it did not?' },
 
@@ -310,7 +359,7 @@ const SCENES = [
     when: '16 Oct 15:43', what: 'Re-check: no longer holds',
     say: 'Two days later a scout probes production. <em>18 of the 20 slowest searches still take 1.8 to 11.7s.</em>',
     links: [{ label: 'Report with the failed check', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
-    img: 'search-check-failed.png',
+    img: 'search-check-failed.png', hog: 'stamp-denied',
     notes: 'The scout ran the same kind of query the report used as its baseline, after a 48 hour soak. The fix did not do what it claimed.' },
   { chapter: 'search', node: 'report', back: true, delta: '+0m',
     when: '15:43', what: 'Same run files a follow-up report',
@@ -333,7 +382,7 @@ const SCENES = [
     when: '19 Oct 02:40', what: 'Re-check: still holds',
     say: 'Re-checked after the soak: <em>0.69 to 0.79s</em>, one outlier. Now it is verified.',
     links: [{ label: 'Follow-up report with the passed check', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-check-passed.png',
+    img: 'search-check-passed.png', hog: 'stamp-approved',
     notes: 'Two loops, six days, one human click per PR.' },
 
   // The same story, as production saw it. Each press reveals one more annotation.
@@ -386,7 +435,7 @@ const SCENES = [
     notes: 'I still review every PR in this story. That is fine. The goal is not to remove the human, it is to make their part small and easy. Think of the checks as insurance you take out in the system, so trusting the agent is a low-risk bet.' },
 
   { kind: 'big', chapter: 'thoughts', node: null,
-    html: `<h1>Autonomy is a dial</h1>
+    html: `<div class="headrow"><h1>Autonomy is a dial</h1><img class="hog" src="${A}hogs/traffic-controller.svg" alt=""></div>
       <div class="dial">
         <div class="bar"></div>
         <div class="ends">
@@ -430,7 +479,10 @@ const SCENES = [
           <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces ↗</a>
         </div>
       </div>
-      <figure class="qr"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>posthog.github.io/presentations/closing-the-loop</figcaption></figure>
+      <div class="side">
+        <img class="hog" src="${A}hogs/speaker-1.svg" alt="">
+        <figure class="qr"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>posthog.github.io/presentations/closing-the-loop</figcaption></figure>
+      </div>
     </div>`,
     notes: 'Scan for this walkthrough. From our inbox is where I post real examples like this one every few days. The blog posts go deeper on loops, scouts and skills.' },
 ]
@@ -467,8 +519,8 @@ const CPW = CW - CL - CR, CPH = CH - CT - CB
 const cx = (t) => CL + (t / SEARCH_DAYS.length) * CPW
 const cys = (v) => CT + CPH - (v / 40) * CPH
 const cyn = (v) => CT + CPH - (v / 2000) * CPH
-const TONE = { ink: '#141414', fail: '#db3707', pass: '#388600' }
-const BAR = { before: '#87867E', fix1: '#db3707', fix2: '#388600', idle: '#C9C8C0' }
+const TONE = { ink: '#23251d', fail: '#F00008', pass: '#2a8a3e' }
+const BAR = { before: '#65675e', fix1: '#FF474D', fix2: '#35B14E', idle: '#d2d3cc' }
 const barPhase = (i) => (i === 0 ? 'before' : i <= 3 ? 'fix1' : 'fix2')
 
 // Build every element once. Each key press only toggles classes, so CSS transitions animate between steps.
@@ -501,9 +553,9 @@ function searchChart() {
       <text class="evt" data-x="${ex}" x="${ex + 20}" y="${ly + 14}" fill="${col}">${e.text}</text>
     </g>`
   })
-  svg += `<g class="summary"><rect class="sumbox" rx="12" fill="#fff" stroke="#D9D8D0"/>
-    <text class="big1" x="${cx(7.5)}" y="${CT + 58}">Slow searches: <tspan fill="#db3707">about 30 a day</tspan> → <tspan fill="#388600">about 1</tspan></text>
-    <text class="big1" x="${cx(7.5)}" y="${CT + 98}">Count queries: <tspan fill="#1D4AFF">1,700 a day</tspan> → <tspan fill="#1D4AFF">150</tspan></text></g>`
+  svg += `<g class="summary"><rect class="sumbox" rx="8" fill="#fdfdf8" stroke="#bfc1b7" style="filter: drop-shadow(0 8px 16px rgba(35,37,29,.18))"/>
+    <text class="big1" x="${cx(7.5)}" y="${CT + 58}">Slow searches: <tspan fill="${TONE.fail}">about 30 a day</tspan> → <tspan fill="${TONE.pass}">about 1</tspan></text>
+    <text class="big1" x="${cx(7.5)}" y="${CT + 98}">Count queries: <tspan fill="#0457FF">1,700 a day</tspan> → <tspan fill="#0457FF">150</tspan></text></g>`
   return svg + '</svg>'
 }
 
@@ -555,7 +607,7 @@ function buildNodes() {
     const el = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     el.setAttribute('class', 'node')
     el.id = `node-${n.id}`
-    el.innerHTML = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/><text x="${x + w / 2}" y="${y + h / 2 + 5}" text-anchor="middle">${n.label}</text>`
+    el.innerHTML = `<rect class="base" x="${x}" y="${y + 4}" width="${w}" height="${h}" rx="8"/><rect class="face" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/><text x="${x + w / 2}" y="${y + h / 2 + 5}" text-anchor="middle">${n.label}</text>`
     g.appendChild(el)
     if (i < NODES.length - 1) {
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'path')
@@ -631,7 +683,7 @@ function render() {
         <ol class="steps">${steps}</ol>
       </section>
       <section class="pane">
-        <p class="say">${scene.say}</p>
+        <div class="sayrow"><p class="say">${scene.say}</p>${scene.hog ? `<img class="hog" src="${A}hogs/${scene.hog}.svg" alt="">` : ''}</div>
         ${scene.callout ? `<p class="callout">${scene.callout}</p>` : ''}
         ${scene.links ? `<div class="links">${scene.links.map((l) => `<a class="link" href="${l.href}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('')}</div>` : ''}
         ${imgs(scene)}
