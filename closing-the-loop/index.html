@@ -74,6 +74,11 @@
   ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1vh; overflow: hidden; }
   ol.steps li { display: grid; grid-template-columns: 8.4vw 1fr; gap: .9vw; align-items: baseline; opacity: .45; transition: opacity .3s, transform .3s; }
   ol.steps li.current { opacity: 1; }
+  ol.steps li.old { opacity: .4; }
+  ol.steps li.old .when b, ol.steps li.old .when br { display: none; }
+  ol.steps li.old .when { font-size: .85vw; }
+  ol.steps li.old .what { font-size: 1.05vw; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  ol.steps li.old .tag { font-size: .7vw; }
   ol.steps li.enter { animation: enter .35s ease; }
   @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
   .when { font-family: var(--mono); font-size: 1vw; color: var(--ink2); text-align: right; white-space: nowrap; }
@@ -90,13 +95,26 @@
   .sayrow { display: flex; align-items: center; gap: 1.6vw; }
   .sayrow .say { flex: 1; }
   .hog { height: 15vh; width: auto; flex: none; animation: pop .35s ease; }
-  /* A joke hedgehog fills the empty space under a short timeline. */
-  .meme { margin: auto 0 0; align-self: center; position: relative; animation: pop .45s ease; }
-  .meme img { height: 32vh; width: auto; display: block; }
-  .meme figcaption { position: absolute; top: 1vh; left: 100%; margin-left: -2vw; font-size: 1.6vw; font-weight: 800; line-height: 1.15;
+  /* A joke hedgehog fills the space under the timeline. Older steps collapse to one line so that space survives to the end of the story. */
+  .meme { margin: auto 0 0; padding-top: 1.5vh; align-self: center; flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; animation: pop .45s ease; }
+  ol.steps { flex: none; }
+  .meme img { height: 27vh; max-height: 100%; min-height: 0; width: auto; display: block; object-fit: contain; }
+  .meme figcaption { position: relative; margin-bottom: -1.2vh; align-self: flex-end; font-size: 1.5vw; font-weight: 800; line-height: 1.15;
     color: var(--accent-ink); background: var(--card); border: 1.5px solid var(--rule2); border-radius: 8px; padding: .6vh .9vw;
-    box-shadow: var(--shadow-window); transform: rotate(-4deg); white-space: nowrap; }
-  .meme figcaption small { display: block; margin-top: .5vh; font-size: .95vw; font-weight: 700; color: var(--ink2); }
+    box-shadow: var(--shadow-window); transform: translateX(30%) rotate(-4deg); white-space: nowrap; z-index: 2; flex: none; }
+  .meme.nervous img { animation: nervous .5s ease-in-out infinite; transform-origin: 50% 90%; }
+  .meme img[src$="float.svg"] { animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
+  @keyframes nervous { 0%, 100% { transform: rotate(-1.5deg) translateX(-1px); } 50% { transform: rotate(1.5deg) translateX(1px); } }
+  /* The two-panel Drake meme: no thanks on top, yes please below. */
+  .meme.drake { align-self: stretch; margin-right: 1vw; background: var(--card); border: 1.5px solid var(--rule2); border-radius: 8px; box-shadow: var(--shadow-window); overflow: hidden; }
+  .drake > div { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1vw; padding: .4vh 1.2vw .4vh .4vw; }
+  .drake > div + div { border-top: 1.5px solid var(--rule2); }
+  .drake img { height: 12vh; width: auto; display: block; }
+  .drake span { font-size: 1.6vw; font-weight: 800; line-height: 1.15; }
+  .drake .nah span { color: var(--ink3); text-decoration: line-through; text-decoration-color: var(--fail); text-decoration-thickness: .08em; }
+  .drake .yah span { color: var(--accent-ink); }
+  .meme figcaption small { display: block; margin-top: .5vh; font-size: .9vw; font-weight: 700; color: var(--ink2); }
   .say { font-size: 1.75vw; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
   .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 1.1vh 1vw; max-width: 52vw; }
   .callout b { color: var(--blue); }
@@ -237,6 +255,13 @@
     .meme { margin: 4px 0 0; }
     .meme img { height: 130px; }
     .meme figcaption { font-size: 14px; padding: 4px 8px; }
+    .meme figcaption small { font-size: 11px; }
+    .meme.drake { margin-right: 0; }
+    .drake img { height: 64px; }
+    .drake span { font-size: 18px; }
+    ol.steps li.old .when { font-size: 10px; }
+    ol.steps li.old .what { font-size: 13px; }
+    ol.steps li.old .tag { font-size: 9px; }
     .side .hog { display: none; }
     .callout { font-size: 15px; padding: 10px 12px; max-width: none; }
     a.link { font-size: 13px; padding: 4px 10px; }
@@ -369,32 +394,33 @@ const SCENES = [
     notes: 'This is where most agent demos end: green CI, merged, done. Pause here.' },
   { chapter: 'search', node: 'check', verdict: 'fail', delta: '+2d 9h',
     when: '16 Oct 15:43', what: 'Re-check: no longer holds',
-    say: 'Two days later a scout probes production. <em>18 of the 20 slowest searches still take 1.8 to 11.7s.</em>',
+    say: 'Two days later our inbox validation scout checks production. <em>18 of the 20 slowest searches still take 1.8 to 11.7s.</em>',
     links: [{ label: 'Report with the failed check', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
-    img: 'search-check-failed.png', hog: 'stamp-denied',
+    img: 'search-check-failed.png', meme: 'shocked', memeCaption: 'Wait, what?<small>It was a simple +31/-2 PR</small>',
     notes: 'The scout ran the same kind of query the report used as its baseline, after a 48 hour soak. The fix did not do what it claimed.' },
   { chapter: 'search', node: 'report', back: true, delta: '+0m',
     when: '15:43', what: 'Same run files a follow-up report',
-    say: 'The failed check <em>files its own follow-up</em>, with the evidence attached.',
+    say: 'The scout <em>files its own follow-up report</em>, with the evidence attached.',
+    callout: '<b>We do this on every report.</b> Once a fix merges, the inbox validation scout usually re-checks it a couple of days later against what the report said it would change.',
     links: [{ label: 'Follow-up report', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: ['search-followup-report.png', 'search-followup-evidence.png'],
-    notes: 'Same minute. The loop goes round again on its own.' },
+    img: ['search-followup-report.png', 'search-followup-evidence.png'], meme: 'explorer', memeCaption: 'Scout, reporting back<small>Found something</small>',
+    notes: 'Same minute. The loop goes round again on its own. This is not special to this story: the validation scout runs on merged reports in general, it just usually says the fix held.' },
   { chapter: 'search', node: 'pr', delta: '+28m',
     when: '16:11', what: 'Agent opens PR #118678, a different fix',
     say: 'Second PR. A different idea: <em>skip the count when the page already shows every match</em>. Origin: the validation scout.',
     links: [{ label: 'PR #118678', href: 'https://github.com/PostHog/posthog/pull/118678' }, { label: 'Follow-up report', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-pr2.png',
+    img: 'search-pr2.png', drake: ['Add a GIN index', 'Just don\'t count'],
     notes: 'Note the Origin section: signals-scout-inbox-validation. The verifier is the signal source now.' },
   { chapter: 'search', node: 'merged', delta: '+1h 44m',
     when: '17:55', what: 'Reviewed and merged',
     say: 'Reviewed and merged <em>2 hours 12 minutes</em> after the failed check.',
     links: [{ label: 'PR #118678', href: 'https://github.com/PostHog/posthog/pull/118678' }],
-    img: 'search-pr2.png' },
+    img: 'search-pr2.png', meme: 'stamp-approved', nervous: true, memeCaption: 'LGTM? 😬<small>Me, approving fix number two</small>' },
   { chapter: 'search', node: 'check', verdict: 'pass', delta: '+2d 9h',
     when: '19 Oct 02:40', what: 'Re-check: still holds',
     say: 'Re-checked after the soak: <em>0.69 to 0.79s</em>, one outlier. Now it is verified.',
     links: [{ label: 'Follow-up report with the passed check', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-check-passed.png', hog: 'success',
+    img: 'search-check-passed.png', meme: 'float', memeCaption: 'Ahh, it fixed it<small>Me, two loops later</small>',
     notes: 'Two loops, six days, one human click per PR.' },
 
   // The same story, as production saw it. Each press reveals one more annotation.
@@ -684,7 +710,7 @@ function render() {
     const first = SCENES.findIndex((s) => s.chapter === scene.chapter)
     const chapterScenes = SCENES.slice(first, idx + 1)
     const steps = chapterScenes.map((s, i) => {
-      const cls = [i === chapterScenes.length - 1 ? 'current' : '', s.verdict || '', i === chapterScenes.length - 1 && moved > 0 ? 'enter' : ''].join(' ')
+      const cls = [i === chapterScenes.length - 1 ? 'current' : '', i < chapterScenes.length - 2 ? 'old' : '', s.verdict || '', i === chapterScenes.length - 1 && moved > 0 ? 'enter' : ''].join(' ')
       const tag = s.verdict === 'fail' ? '<span class="tag">✗ failed</span>' : s.verdict === 'pass' ? '<span class="tag">✓ held</span>' : ''
       return `<li class="${cls}"><span class="when">${s.delta ? `<b>${s.delta}</b><br>` : ''}${s.when}</span><span class="what">${s.what}${tag}</span></li>`
     }).join('')
@@ -693,7 +719,8 @@ function render() {
         <div class="chapter">${CHAPTERS[scene.chapter]}</div>
         <h2 class="chapter-title">${SCENES[first].title}</h2>
         <ol class="steps">${steps}</ol>
-        ${scene.meme ? `<figure class="meme"><img src="${A}hogs/${scene.meme}.svg" alt=""><figcaption>${scene.memeCaption}</figcaption></figure>` : ''}
+        ${scene.drake ? `<figure class="meme drake">${['nah', 'yah'].map((k, i) => `<div class="${k}"><img src="${A}hogs/drake-${k}.svg" alt=""><span>${scene.drake[i]}</span></div>`).join('')}</figure>` : ''}
+        ${scene.meme ? `<figure class="meme${scene.nervous ? ' nervous' : ''}"><figcaption>${scene.memeCaption}</figcaption><img src="${A}hogs/${scene.meme}.svg" alt=""></figure>` : ''}
       </section>
       <section class="pane">
         <div class="sayrow"><p class="say">${scene.say}</p>${scene.hog ? `<img class="hog" src="${A}hogs/${scene.hog}.svg" alt="">` : ''}</div>
