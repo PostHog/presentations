@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Merged is not verified</title>
+<title>Closing the loop</title>
 <link rel="icon" href="../img/posthog-logomark.svg" />
 <style>
   :root {
@@ -86,6 +86,25 @@
   .stat .n { font-size: 4.4vw; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
   .stat .l { font-size: 1.25vw; color: var(--ink2); margin-top: 1.2vh; line-height: 1.3; }
   .stat.hot .n { color: var(--fail); }
+  .cols { display: grid; grid-template-columns: 1fr .7fr 1fr; gap: 1.6vw; }
+  .cols.two { grid-template-columns: 1fr 1fr; }
+  .col { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 2.2vh 1.6vw; }
+  .col .k { font-family: var(--mono); font-size: 1.05vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 1vh; }
+  .col ul { margin: 0; padding-left: 1.2em; font-size: 1.6vw; line-height: 1.45; font-weight: 600; }
+  .col.cheap { background: transparent; border-style: dashed; color: var(--ink3); }
+  .col.cheap .k { color: var(--ink3); }
+  .dial .bar { height: 2.2vh; border-radius: 99px; background: linear-gradient(90deg, var(--pass), var(--warn), var(--fail)); }
+  .dial .ends { display: flex; justify-content: space-between; gap: 4vw; margin-top: 1.6vh; font-size: 1.5vw; color: var(--ink2); line-height: 1.35; }
+  .dial .ends > div { max-width: 32vw; }
+  .dial .ends > div:last-child { text-align: right; }
+  .dial .ends b { display: block; font-size: 2vw; color: var(--ink); }
+  .qa { display: grid; grid-template-columns: 1fr auto; gap: 4vw; align-items: center; }
+  .posts { display: flex; flex-direction: column; gap: 1.2vh; margin-top: 3vh; }
+  .posts a { font-size: 1.7vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
+  .posts a:hover { color: var(--accent); }
+  .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
+  .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 12px; padding: 1vw; border: 1px solid var(--rule); }
+  .qr figcaption { font-family: var(--mono); font-size: 1vw; color: var(--ink2); }
   .footnote { font-size: 1vw; color: var(--ink3); font-family: var(--mono); }
 
   .links { display: flex; flex-wrap: wrap; gap: .6vw; margin-top: -.4vh; }
@@ -139,7 +158,7 @@
   <header>
     <div class="brand">
       <span class="eyebrow">AI Tinkerers Dublin</span>
-      <span class="title">Merged is not verified</span>
+      <span class="title">Closing the loop</span>
     </div>
     <div class="loop">
       <svg viewBox="0 0 1040 120" preserveAspectRatio="xMidYMid meet" aria-label="The self-driving loop">
@@ -181,9 +200,9 @@ const A = 'assets/'
 // One scene per key press. `log` lines accumulate within a chapter.
 const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
-    html: `<h1>Agents ship PRs now.<br><span>Who checks they worked?</span></h1>
+    html: `<h1>Agents ship PRs now.<br><span>Closing the loop is the hard part.</span></h1>
            <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>`,
-    notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one starts there.' },
+    notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one keeps going: did the fix actually work, and what happens when it did not?' },
 
   // Inbox search: two loops
   { chapter: 'search', title: 'Inbox search: fixed, checked, fixed again', node: 'signal',
@@ -266,10 +285,56 @@ const SCENES = [
       <p class="footnote">Merged 27 Sep to 27 Oct 2026, US project. 97 of 462 decisive verdicts failed.</p>`,
     notes: 'Be honest here. Verification already catches a fifth of our fixes. We are much worse at fixing them again. That is the next loop to close.' },
 
-  { kind: 'big', chapter: 'takeaway', node: null,
-    html: `<h1>Merged is not verified.</h1>
-      <p>Make the agent write down what the fix should change. Give the loop memory and a scheduled re-check. Let a failed check file the next report.</p>`,
-    notes: 'Three things to steal. Then questions.' },
+  { kind: 'big', chapter: 'thoughts', node: null,
+    html: `<h1>The PR is <span>the easy part</span></h1>
+      <div class="cols">
+        <div class="col"><div class="k">Before</div><ul>
+          <li>What to build, and why</li><li>How you will measure it</li><li>Scaffolding the loop itself</li></ul></div>
+        <div class="col cheap"><div class="k">The PR</div><ul>
+          <li>Cheap</li><li>Fast</li><li>Mostly solved</li></ul></div>
+        <div class="col"><div class="k">After</div><ul>
+          <li>Monitor it in production</li><li>Check it did what it said</li><li>Follow up when it did not</li></ul></div>
+      </div>
+      <p>Merged is not verified. Write down what the fix should change, re-check it later, and let a failed check file the next report.</p>`,
+    notes: 'Everyone can get an agent to open a PR now. The hard bits are either side of it. Before: deciding what is worth building and how you will know it worked. After: watching it, checking it, following up. That is where the loop actually closes.' },
+
+  { kind: 'big', chapter: 'thoughts', node: null,
+    html: `<h1>Humans in the loop is fine.<br><span>Just make it chill.</span></h1>
+      <div class="cols two">
+        <div class="col"><div class="k">Agent insurance</div><ul>
+          <li>Every step leaves evidence a human can read</li><li>Re-checks and follow-ups run on their own</li><li>Failures come back as new reports, not surprises</li></ul></div>
+        <div class="col"><div class="k">So the human can</div><ul>
+          <li>QA in a minute, not an hour</li><li>Drop in at any step</li><li>Say no without losing the work</li></ul></div>
+      </div>`,
+    notes: 'I still review every PR in this story. That is fine. The goal is not to remove the human, it is to make their part small and easy. Think of the checks as insurance you take out in the system, so trusting the agent is a low-risk bet.' },
+
+  { kind: 'big', chapter: 'thoughts', node: null,
+    html: `<h1>Autonomy is a dial</h1>
+      <div class="dial">
+        <div class="bar"></div>
+        <div class="ends">
+          <div><b>More chill</b>New feature behind a flag, internal tools, copy and docs</div>
+          <div><b>Tighter</b>Prod systems in the hot path, billing, data you cannot get back</div>
+        </div>
+      </div>
+      <p>Shipping loops are real. How much you let them do on their own depends on what breaks if they are wrong.</p>`,
+    notes: 'This is not all or nothing. A new feature behind a flag can run pretty loose. A query in the ingestion hot path needs tighter checks and a human closer to the wheel. Same loop, different settings.' },
+
+  { kind: 'big', chapter: 'questions', node: null,
+    html: `<div class="qa">
+      <div>
+        <h1>Questions?</h1>
+        <div class="posts">
+          <a href="https://posthog.com/blog/how-i-use-skills-for-everything" target="_blank" rel="noopener">How I use skills for everything</a>
+          <a href="https://posthog.com/blog/self-driving-loops" target="_blank" rel="noopener">6-7 loops we use every day to make PostHog self-driving</a>
+          <a href="https://posthog.com/blog/what-is-a-scout" target="_blank" rel="noopener">What is a Scout? A technical deep dive</a>
+          <a href="https://posthog.com/blog/standup-bot-revenge" target="_blank" rel="noopener">I hate the standup bot (so I built an agent to do it for me)</a>
+          <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces</a>
+        </div>
+      </div>
+      <figure class="qr"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>posthog.github.io/presentations/closing-the-loop</figcaption></figure>
+    </div>`,
+    notes: 'Scan for this walkthrough. Blog posts on the left go deeper on loops, scouts and skills.' },
 ]
 
 // Inbox search count spans per day (posthog-web-django, SELECT COUNT(*) on signals_signalreport with the
@@ -378,7 +443,7 @@ function updateChart(svg, reveal) {
   svg.querySelector('.summary').classList.toggle('on', reveal >= 6)
 }
 
-const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', numbers: 'The numbers', takeaway: 'Takeaway' }
+const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', numbers: 'The numbers', thoughts: 'Some thoughts', questions: 'Questions' }
 
 let idx = 0
 const main = document.getElementById('main')

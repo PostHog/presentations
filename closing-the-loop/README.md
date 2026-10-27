@@ -1,4 +1,4 @@
-# Merged is not verified
+# Closing the loop
 
 Andy Maguire · **AI Tinkerers Dublin × PostHog: Technical Demo Night**, 28 October 2026.
 Talk title: *Closing the loop on self-driving products: some examples from PostHog.*
@@ -33,7 +33,9 @@ The inbox links need a PostHog login; the PRs are public.
    pganalyze alert → report with a predicted 10x gain → [PR #115874](https://github.com/PostHog/posthog/pull/115874) → merged →
    re-check "No longer holds" → follow-up report → [PR #118678](https://github.com/PostHog/posthog/pull/118678) → merged → re-check "Still holds".
 2. **The same story as production saw it**: an annotated chart, one arrow per key press.
-3. **The numbers** for the last 30 days, and the takeaway.
+3. **The numbers** for the last 30 days.
+4. **Some thoughts**: the PR is the easy part, humans in the loop is fine, autonomy is a dial.
+5. **Questions**, with links to related blog posts and a QR code for this page.
 
 ## Where the numbers come from
 
