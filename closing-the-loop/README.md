@@ -33,9 +33,7 @@ The inbox links need a PostHog login; the PRs are public.
    pganalyze alert → report with a predicted 10x gain → [PR #115874](https://github.com/PostHog/posthog/pull/115874) → merged →
    re-check "No longer holds" → follow-up report → [PR #118678](https://github.com/PostHog/posthog/pull/118678) → merged → re-check "Still holds".
 2. **The same story as production saw it**: an annotated chart, one arrow per key press.
-3. **The redirect that passed its test** ([posthog.com PR #21029](https://github.com/PostHog/posthog.com/pull/21029)): production still served 404s on an untested path.
-4. **An AI agent reported a broken MCP tool** ([PR #115678](https://github.com/PostHog/posthog/pull/115678)): fixed in 67 minutes, still fixed a week later.
-5. **The numbers** for the last 30 days, and the takeaway.
+3. **The numbers** for the last 30 days, and the takeaway.
 
 ## Where the numbers come from
 
@@ -44,7 +42,7 @@ Every timestamp comes from the reports, check verdicts and the GitHub API, not f
 - **Timeline and verdicts**: the `signals_reports_report` and `signals_report_check_verdicts` warehouse views in PostHog's own project.
 - **The chart**: daily `posthog-web-django` database spans for the inbox search count query
   (`SELECT COUNT(*)` on `signals_signalreport` with the `UPPER(title) LIKE` search predicate), from `posthog.trace_spans`.
-  Span retention starts on 12 October, so the chart starts on the 13th.
+  Database spans for this service start at 03:02 UTC on 13 October, so the chart starts that day.
 - **The 30-day numbers**: reports whose first PR merged between 27 September and 27 October 2026, joined to the latest verdict per check.
 
 ## View it

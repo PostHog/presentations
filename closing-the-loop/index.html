@@ -173,7 +173,7 @@ const A = 'assets/'
 const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
     html: `<h1>Agents ship PRs now.<br><span>Who checks they worked?</span></h1>
-           <p>Real loops from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>`,
+           <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>`,
     notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one starts there.' },
 
   // Inbox search: two loops
@@ -246,36 +246,6 @@ const SCENES = [
     ][reveal],
   })),
 
-  // 404 redirect
-  { chapter: 'notfound', title: 'The redirect passed its test. Real traffic did not', node: 'pr',
-    when: '9 Oct 20:46', what: '404 scout files a report, PR opens 2 minutes later',
-    links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a1226b-1df8-71bd-8b29-cf37ca191864' }, { label: 'posthog.com PR #21029', href: 'https://github.com/PostHog/posthog.com/pull/21029' }],
-    say: 'A scout watching website 404s finds stale links. <em>The PR opens 2 minutes later.</em>' },
-  { chapter: 'notfound', node: 'merged',
-    when: '13 Oct 12:46', what: 'Merged. Redirects return 308',
-    links: [{ label: 'posthog.com PR #21029', href: 'https://github.com/PostHog/posthog.com/pull/21029' }],
-    say: '<em>/trends</em> now redirects with a 308. Any test you write passes.' },
-  { chapter: 'notfound', node: 'check', verdict: 'fail',
-    when: '21 Oct 00:12', what: 'Re-check: still 66 404s a week',
-    links: [{ label: 'Report with the failed check', href: 'https://us.posthog.com/project/2/inbox/01a1226b-1df8-71bd-8b29-cf37ca191864' }, { label: 'Follow-up report', href: 'https://us.posthog.com/project/2/inbox/01a15bcc-dfc4-7ffd-b9fa-c76b60567438' }],
-    say: 'The check probes production traffic: <em>66 requests a week still 404</em> on a page-data path nobody tested.',
-    notes: 'Tests check what you thought of. Production checks what actually happens.' },
-
-  // MCP agent feedback
-  { chapter: 'mcp', title: 'An agent reported a broken tool. It stayed fixed', node: 'signal',
-    when: '12 Oct 17:45', what: 'An AI agent files feedback on our MCP tool',
-    links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a13138-2a84-7ad4-85ba-7f53e5335a0b' }],
-    say: 'An agent using our MCP server reports that <em>eight-digit insight IDs do not resolve</em>.' },
-  { chapter: 'mcp', node: 'merged', delta: '+1h 7m',
-    when: '18:52', what: 'PR opened at +5m, merged at +67m',
-    links: [{ label: 'PR #115678', href: 'https://github.com/PostHog/posthog/pull/115678' }, { label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a13138-2a84-7ad4-85ba-7f53e5335a0b' }],
-    say: 'Report to merged PR in <em>67 minutes</em>.' },
-  { chapter: 'mcp', node: 'check', verdict: 'pass', delta: '+7d 13h',
-    when: '20 Oct 08:11', what: 'Re-check: still holds after a 7 day soak',
-    links: [{ label: 'Report with the passed check', href: 'https://us.posthog.com/project/2/inbox/01a13138-2a84-7ad4-85ba-7f53e5335a0b' }],
-    say: 'A week later the scout calls the tool <em>three different ways</em>. All three resolve. No repeat feedback.',
-    notes: 'This is the boring, good case. Most checks look like this.' },
-
   { kind: 'big', chapter: 'numbers', node: null,
     html: `<h1>Last 30 days, our own product</h1>
       <div class="stats">
@@ -294,7 +264,7 @@ const SCENES = [
 ]
 
 // Inbox search count spans per day (posthog-web-django, SELECT COUNT(*) on signals_signalreport with the
-// UPPER(title) LIKE search predicate), from posthog.trace_spans. Span retention starts 12 Oct, so the chart starts 13 Oct.
+// UPPER(title) LIKE search predicate), from posthog.trace_spans. Database spans for this service start at 03:02 UTC on 13 Oct, so the chart starts that day.
 const SEARCH_DAYS = [
   { d: '13', n: 1725, slow: 3, p99: 865 },
   { d: '14', n: 1708, slow: 32, p99: 2011 },
@@ -373,7 +343,7 @@ function searchChart(reveal) {
   return svg + '</svg>'
 }
 
-const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', notfound: 'Website 404s', mcp: 'MCP agent feedback', numbers: 'The numbers', takeaway: 'Takeaway' }
+const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', numbers: 'The numbers', takeaway: 'Takeaway' }
 
 let idx = 0
 const main = document.getElementById('main')
