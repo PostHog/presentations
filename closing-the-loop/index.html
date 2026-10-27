@@ -40,7 +40,7 @@
   .node.active.pass text { fill: var(--pass); }
   .edge { stroke: var(--ink3); stroke-width: 2; fill: none; marker-end: url(#arrow); }
   .back { stroke: var(--rule); stroke-width: 2.5; fill: none; stroke-dasharray: 7 6; transition: stroke .35s; marker-end: url(#arrowBack); }
-  .back.lit { stroke: var(--fail); stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.1s ease forwards; marker-end: url(#arrowFail); }
+  .back.lit { stroke: var(--fail); stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw 1.1s ease forwards; marker-end: url(#arrowFail); }
   .backlabel { font: 600 14px var(--body); fill: var(--ink3); transition: fill .35s; }
   .backlabel.lit { fill: var(--fail); }
   @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -68,6 +68,8 @@
   /* Evidence pane */
   .pane { position: relative; min-height: 0; display: flex; flex-direction: column; gap: 1.4vh; }
   .say { font-size: 1.75vw; font-weight: 600; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
+  .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: rgba(255,255,255,.65); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1.1vh 1vw; max-width: 52vw; }
+  .callout b { color: var(--blue); }
   .say em { font-style: normal; color: var(--accent); }
   .shot { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
   .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; background: #fff;
@@ -182,6 +184,7 @@
     .what { font-size: 14px; }
     li .what .tag { font-size: 11px; padding: 1px 6px; }
     .say { font-size: 18px; }
+    .callout { font-size: 15px; padding: 10px 12px; max-width: none; }
     a.link { font-size: 13px; padding: 4px 10px; }
     .shot.pair { flex-direction: column; }
     .shot.pair img { max-width: 100%; }
@@ -235,8 +238,8 @@
           <marker id="arrowFail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#db3707"/></marker>
         </defs>
         <g id="nodes"></g>
-        <path id="back" class="back" d="M 950 64 C 950 112, 950 112, 900 112 L 230 112 C 190 112, 190 112, 190 66" />
-        <text id="backlabel" class="backlabel" x="570" y="106" text-anchor="middle">didn't hold → new report</text>
+        <path id="back" class="back" />
+        <text id="backlabel" class="backlabel" y="106" text-anchor="middle">didn't hold → new report</text>
       </svg>
     </div>
   </header>
@@ -281,9 +284,10 @@ const SCENES = [
   { chapter: 'search', title: 'Inbox search: fixed, checked, fixed again', node: 'signal',
     when: '13 Oct 05:19', what: 'Slow query alert from pganalyze',
     say: 'A database monitor flags a slow <em>count(*)</em>: 385ms on average, 66 calls a day.',
+    callout: '<b>Who felt it most?</b> Agents searching the inbox over MCP on behalf of their users, more than people typing in the search box. We only found that out on the second loop.',
     links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
     img: 'search-evidence.png',
-    notes: 'No human filed this. A Postgres monitor fired, and it became a signal.' },
+    notes: 'No human filed this. A Postgres monitor fired, and it became a signal. The twist: the slow searches were mostly agents using the inbox through MCP for their users, sometimes 10 seconds a search. The first report assumed people. The second loop worked out it was agents.' },
   { chapter: 'search', node: 'report',
     when: '05:19', what: 'Agent researches and writes the report',
     say: 'The agent finds the cause in the code and <em>predicts the impact</em>: "under 100ms, more than a 10x gain".',
@@ -560,6 +564,13 @@ function buildNodes() {
       g.appendChild(line)
     }
   })
+  // The return arrow runs from under Re-check back up into Report, so it follows the node layout.
+  const from = NODES.find((n) => n.id === 'check').cx, to = NODES.find((n) => n.id === 'report').cx, low = 112, r = 40
+  const back = document.getElementById('back')
+  back.setAttribute('d', `M ${from} ${y + h + 2} C ${from} ${low}, ${from} ${low}, ${from - r} ${low} L ${to + r} ${low} C ${to} ${low}, ${to} ${low}, ${to} ${y + h + 6}`)
+  // The draw animation needs the real length, or the end of the line and its arrowhead come apart.
+  back.style.setProperty('--len', Math.ceil(back.getTotalLength()))
+  document.getElementById('backlabel').setAttribute('x', (from + to) / 2)
 }
 
 function setLoop(scene) {
@@ -621,6 +632,7 @@ function render() {
       </section>
       <section class="pane">
         <p class="say">${scene.say}</p>
+        ${scene.callout ? `<p class="callout">${scene.callout}</p>` : ''}
         ${scene.links ? `<div class="links">${scene.links.map((l) => `<a class="link" href="${l.href}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('')}</div>` : ''}
         ${imgs(scene)}
       </section>`
