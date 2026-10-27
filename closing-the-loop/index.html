@@ -582,7 +582,7 @@ function setLoop(scene) {
 function imgs(scene) {
   if (!scene.img) return ''
   const list = Array.isArray(scene.img) ? scene.img : [scene.img]
-  return `<div class="shot ${list.length > 1 ? 'pair' : ''}">${list.map((s) => `<img src="${A}${s}" alt="">`).join('')}</div>`
+  return `<div class="shot ${list.length > 1 ? 'pair' : ''}">${list.map((s) => `<img src="${A}${s}" alt="" onload="this.style.maxWidth = 'min(${list.length > 1 ? 49 : 100}%, ' + this.naturalWidth / 2 + 'px)'">`).join('')}</div>`
 }
 
 function render() {
