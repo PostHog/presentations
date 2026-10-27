@@ -102,7 +102,7 @@
   .callout b { color: var(--blue); }
   .say em { font-style: normal; color: var(--accent-ink); }
   .shot { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
-  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; background: #fff;
+  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; background: #fff; padding: 1.1vw;
     border: 1px solid var(--rule2); box-shadow: var(--shadow-window); cursor: zoom-in; animation: pop .35s ease; }
   .shot.pair { gap: 1.4vw; align-items: flex-start; }
   .shot.pair img { max-width: 49%; }
@@ -206,7 +206,7 @@
   /* Lightbox and notes */
   .lightbox { position: fixed; inset: 0; background: rgba(35,37,29,.82); display: none; align-items: center; justify-content: center; padding: 3vh 3vw; z-index: 10; cursor: zoom-out; }
   .lightbox.open { display: flex; }
-  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; background: #fff; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; background: #fff; padding: 20px; }
   .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: var(--ink); color: #f3f3ee; border-radius: 8px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .notes.open { display: block; }
   .notes b { color: var(--lemon); font-size: .85vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
@@ -242,6 +242,7 @@
     a.link { font-size: 13px; padding: 4px 10px; }
     .shot.pair { flex-direction: column; }
     .shot.pair img { max-width: 100%; }
+    .shot img { padding: 8px; }
     .big { padding: 0; gap: 16px; justify-content: flex-start; }
     .big h1 { font-size: 32px; }
     .big p { font-size: 17px; max-width: none; }
