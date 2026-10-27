@@ -102,16 +102,25 @@
   svg.chart .ax.blue, svg.chart .blue { fill: #1D4AFF; }
   svg.chart .lg { font: 600 15px var(--body); fill: #4F4E48; }
   svg.chart .sw.red { fill: #db3707; }
-  svg.chart .val { font: 700 15px var(--mono); }
-  svg.chart .nline { fill: none; stroke: #1D4AFF; stroke-width: 3; stroke-linejoin: round; transition: opacity .4s; }
+  svg.chart .val { font: 700 15px var(--mono); paint-order: stroke; stroke: rgba(0,0,0,.18); stroke-width: 3px; opacity: 0; transition: opacity .4s .2s; }
+  svg.chart .val.on { opacity: 1; }
+  svg.chart .nline { fill: none; stroke: #1D4AFF; stroke-width: 3; stroke-linejoin: round; opacity: .22; transition: opacity .6s; }
+  svg.chart .nline.on { opacity: 1; }
   svg.chart .num { font: 800 15px var(--body); fill: #fff; }
   svg.chart .evt { font: 700 18px var(--body); }
   svg.chart .big1 { font: 800 24px var(--body); fill: #141414; }
-  svg.chart rect { transition: fill .4s, opacity .4s; }
-  svg.chart .ev.new { animation: enter .45s ease; }
+  svg.chart .bar { transition: fill .5s ease, opacity .5s ease; }
+  svg.chart .ev { opacity: 0; transform: translateY(-6px); transition: opacity .35s ease, transform .35s ease; }
+  svg.chart .ev.on { opacity: 1; transform: none; }
+  svg.chart .ev .drop { transform-box: fill-box; transform-origin: top; transform: scaleY(0); transition: transform .5s ease .1s; }
+  svg.chart .ev.on .drop { transform: scaleY(1); }
+  svg.chart .summary { opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease; }
+  svg.chart .summary.on { opacity: 1; transform: none; }
+  .steplink { min-height: 1.6em; }
 
   footer { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: .95vw; color: var(--ink3); }
-  .dots { display: flex; gap: 6px; }
+  .dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 40vw; justify-content: center; }
+  @media (max-width: 800px) { .dots, footer > span:last-child { display: none; } }
   .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
   .dots i.on { background: var(--accent); }
   .dots i.sep { width: 2px; background: transparent; }
@@ -290,57 +299,83 @@ const SEARCH_EVENTS = [
   { at: 6 + 2.67 / 24, n: 5, text: 'Re-check: holds', tone: 'pass', link: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' },
 ]
 
-function searchChart(reveal) {
-  const W = 1000, H = 520, L = 60, R = 70, T = 175, B = 60
-  const pw = W - L - R, ph = H - T - B
-  const days = SEARCH_DAYS.length
-  const x = (t) => L + (t / days) * pw
-  const maxSlow = 40, maxN = 2000
-  const ys = (v) => T + ph - (v / maxSlow) * ph
-  const yn = (v) => T + ph - (v / maxN) * ph
-  const bw = pw / days * 0.62
-  const phase = (i) => (i === 0 ? 'before' : i <= 3 ? 'fix1' : 'fix2')
-  const barColor = { before: '#87867E', fix1: '#db3707', fix2: '#388600' }
-  let svg = `<svg viewBox="0 0 ${W} ${H}" class="chart">`
+const CW = 1000, CH = 520, CL = 60, CR = 70, CT = 175, CB = 60
+const CPW = CW - CL - CR, CPH = CH - CT - CB
+const cx = (t) => CL + (t / SEARCH_DAYS.length) * CPW
+const cys = (v) => CT + CPH - (v / 40) * CPH
+const cyn = (v) => CT + CPH - (v / 2000) * CPH
+const TONE = { ink: '#141414', fail: '#db3707', pass: '#388600' }
+const BAR = { before: '#87867E', fix1: '#db3707', fix2: '#388600', idle: '#C9C8C0' }
+const barPhase = (i) => (i === 0 ? 'before' : i <= 3 ? 'fix1' : 'fix2')
+
+// Build every element once. Each key press only toggles classes, so CSS transitions animate between steps.
+function searchChart() {
+  const bw = (CPW / SEARCH_DAYS.length) * 0.62
+  let vals = ''
+  let svg = `<svg viewBox="0 0 ${CW} ${CH}" class="chart" preserveAspectRatio="xMidYMid meet">`
+  svg += `<defs>${Object.entries(TONE).map(([t, c]) => `<marker id="chartArrow${t}" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="8" markerHeight="8" orient="0"><path d="M0,0 L10,0 L5,10 z" fill="${c}"/></marker>`).join('')}</defs>`
   for (const v of [0, 10, 20, 30, 40]) {
-    svg += `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" class="grid"/><text x="${L - 10}" y="${ys(v) + 5}" class="ax" text-anchor="end">${v}</text>`
+    svg += `<line x1="${CL}" x2="${CW - CR}" y1="${cys(v)}" y2="${cys(v)}" class="grid"/><text x="${CL - 10}" y="${cys(v) + 5}" class="ax" text-anchor="end">${v}</text>`
   }
-  for (const v of [0, 1000, 2000]) {
-    svg += `<text x="${W - R + 10}" y="${yn(v) + 5}" class="ax blue">${v ? v / 1000 + 'k' : 0}</text>`
-  }
-  svg += `<text x="${L + 200}" y="${H - 6}" class="lg"><tspan class="sw red">■</tspan> searches over 1 second, per day</text>`
-  svg += `<text x="${W - R}" y="${H - 6}" class="lg" text-anchor="end"><tspan class="blue">━</tspan> search count queries per day</text>`
+  for (const v of [0, 1000, 2000]) svg += `<text x="${CW - CR + 10}" y="${cyn(v) + 5}" class="ax blue">${v ? v / 1000 + 'k' : 0}</text>`
   SEARCH_DAYS.forEach((r, i) => {
-    const show = reveal >= 2 || i === 0 ? 1 : 0.18
-    const lit = reveal >= 5 || (reveal >= 3 && i <= 3) || (reveal >= 1 && i === 0)
-    const c = lit ? barColor[phase(i)] : '#B9B8B0'
-    svg += `<rect x="${x(i + 0.5) - bw / 2}" y="${ys(r.slow)}" width="${bw}" height="${T + ph - ys(r.slow)}" rx="3" fill="${c}" opacity="${show}"/>`
-    if (lit && r.slow >= 8) svg += `<text x="${x(i + 0.5)}" y="${ys(r.slow) - 8}" class="val" text-anchor="middle" fill="${c}">${r.slow}</text>`
-    svg += `<text x="${x(i + 0.5)}" y="${T + ph + 24}" class="ax" text-anchor="middle">${r.d}</text>`
+    const h = CT + CPH - cys(r.slow)
+    svg += `<rect class="bar" data-i="${i}" x="${cx(i + 0.5) - bw / 2}" y="${cys(r.slow)}" width="${bw}" height="${h}" rx="3"/>`
+    // Tall bars carry their value inside, so it never collides with the line above.
+    if (r.slow >= 8) vals += `<text class="val" data-i="${i}" x="${cx(i + 0.5)}" y="${h > 40 ? cys(r.slow) + 22 : cys(r.slow) - 8}" text-anchor="middle" fill="${h > 40 ? '#fff' : BAR[barPhase(i)]}">${r.slow}</text>`
+    svg += `<text x="${cx(i + 0.5)}" y="${CT + CPH + 24}" class="ax" text-anchor="middle">${r.d}</text>`
   })
-  const pts = SEARCH_DAYS.map((r, i) => `${x(i + 0.5)},${yn(r.n)}`).join(' ')
-  svg += `<polyline points="${pts}" class="nline" opacity="${reveal >= 5 ? 1 : 0.25}"/>`
-  svg += `<text x="${L}" y="${H - 6}" class="ax">October 2026 (UTC)</text>`
+  svg += `<polyline class="nline" points="${SEARCH_DAYS.map((r, i) => `${cx(i + 0.5)},${cyn(r.n)}`).join(' ')}"/>`
+  svg += vals
+  svg += `<text x="${CL}" y="${CH - 6}" class="ax">October 2026 (UTC)</text>`
+  svg += `<text x="${CL + 200}" y="${CH - 6}" class="lg"><tspan class="sw red">■</tspan> searches over 1 second, per day</text>`
+  svg += `<text x="${CW - CR}" y="${CH - 6}" class="lg" text-anchor="end"><tspan class="blue">━</tspan> search count queries per day</text>`
   SEARCH_EVENTS.forEach((e, i) => {
-    if (reveal < e.n) return
-    const ex = x(e.at)
-    const ly = 4 + i * 32
-    const col = e.tone === 'fail' ? '#db3707' : e.tone === 'pass' ? '#388600' : '#141414'
-    const anchor = ex > W - 260 ? 'end' : 'start'
-    const tx = anchor === 'end' ? ex - 6 : ex + 6
-    svg += `<g class="ev ${reveal === e.n ? 'new' : ''}">
-      <line x1="${ex}" x2="${ex}" y1="${ly + 21}" y2="${T + ph - 2}" stroke="${col}" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#chartArrow${e.tone})"/>
+    const ex = cx(e.at), ly = 4 + i * 32, col = TONE[e.tone]
+    svg += `<g class="ev" data-n="${e.n}">
+      <line class="drop" x1="${ex}" x2="${ex}" y1="${ly + 21}" y2="${CT + CPH - 2}" stroke="${col}" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#chartArrow${e.tone})"/>
       <circle cx="${ex}" cy="${ly + 8}" r="12" fill="${col}"/><text x="${ex}" y="${ly + 13}" class="num" text-anchor="middle">${e.n}</text>
-      <text x="${anchor === 'end' ? ex - 20 : ex + 20}" y="${ly + 14}" class="evt" fill="${col}" text-anchor="${anchor}">${e.text}</text>
+      <text class="evt" data-x="${ex}" x="${ex + 20}" y="${ly + 14}" fill="${col}">${e.text}</text>
     </g>`
   })
-  if (reveal >= 6) {
-    svg += `<g class="ev new"><rect x="${x(7.2)}" y="${T + 18}" width="${x(13.8) - x(7.2)}" height="118" rx="12" fill="#fff" stroke="#D9D8D0"/>
-      <text x="${x(7.5)}" y="${T + 58}" class="big1">Slow searches: <tspan fill="#db3707">about 30 a day</tspan> → <tspan fill="#388600">about 1</tspan></text>
-      <text x="${x(7.5)}" y="${T + 98}" class="big1">Count queries: <tspan fill="#1D4AFF">1,700 a day</tspan> → <tspan fill="#1D4AFF">150</tspan></text></g>`
-  }
-  svg += `<defs>${['ink', 'fail', 'pass'].map((t) => `<marker id="chartArrow${t}" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="8" markerHeight="8" orient="0"><path d="M0,0 L10,0 L5,10 z" fill="${t === 'fail' ? '#db3707' : t === 'pass' ? '#388600' : '#141414'}"/></marker>`).join('')}</defs>`
+  svg += `<g class="summary"><rect class="sumbox" rx="12" fill="#fff" stroke="#D9D8D0"/>
+    <text class="big1" x="${cx(7.5)}" y="${CT + 58}">Slow searches: <tspan fill="#db3707">about 30 a day</tspan> → <tspan fill="#388600">about 1</tspan></text>
+    <text class="big1" x="${cx(7.5)}" y="${CT + 98}">Count queries: <tspan fill="#1D4AFF">1,700 a day</tspan> → <tspan fill="#1D4AFF">150</tspan></text></g>`
   return svg + '</svg>'
+}
+
+// Text widths depend on the font that actually loaded, so measure after insertion instead of guessing.
+function fitChart(svg) {
+  svg.querySelectorAll('.evt').forEach((t) => {
+    const ex = +t.dataset.x
+    const w = t.getBBox().width
+    if (ex + 20 + w > CW - 8) { t.setAttribute('x', ex - 20); t.setAttribute('text-anchor', 'end') }
+  })
+  const lines = [...svg.querySelectorAll('.summary .big1')]
+  const width = Math.max(...lines.map((l) => l.getBBox().width))
+  const pad = 26
+  let x0 = cx(7.5) - pad
+  if (x0 + width + pad * 2 > CW - 4) x0 = CW - 4 - width - pad * 2
+  lines.forEach((l) => l.setAttribute('x', x0 + pad))
+  const box = svg.querySelector('.sumbox')
+  box.setAttribute('x', x0); box.setAttribute('y', CT + 18)
+  box.setAttribute('width', width + pad * 2); box.setAttribute('height', 118)
+}
+
+function updateChart(svg, reveal) {
+  svg.querySelectorAll('.bar').forEach((b) => {
+    const i = +b.dataset.i
+    const lit = reveal >= 5 || (reveal >= 3 && i <= 3) || (reveal >= 1 && i === 0)
+    b.style.fill = lit ? BAR[barPhase(i)] : BAR.idle
+    b.style.opacity = reveal >= 2 || i === 0 ? 1 : 0.25
+  })
+  svg.querySelectorAll('.val').forEach((v) => {
+    const i = +v.dataset.i
+    v.classList.toggle('on', reveal >= 5 || (reveal >= 3 && i <= 3))
+  })
+  svg.querySelector('.nline').classList.toggle('on', reveal >= 5)
+  svg.querySelectorAll('.ev').forEach((g) => g.classList.toggle('on', reveal >= +g.dataset.n))
+  svg.querySelector('.summary').classList.toggle('on', reveal >= 6)
 }
 
 const CHAPTERS = { intro: 'Intro', search: 'Inbox search', searchchart: 'What production saw', numbers: 'The numbers', takeaway: 'Takeaway' }
@@ -398,10 +433,19 @@ function render() {
     main.innerHTML = `<div class="big">${scene.html}</div>`
   } else if (scene.kind === 'chart') {
     const ev = SEARCH_EVENTS[scene.reveal - 1]
-    main.innerHTML = `<div class="chartwrap">
-      <div class="charthead"><h2 class="chapter-title">Inbox search, as production saw it</h2>
-      ${ev ? `<a class="link" href="${ev.link}" target="_blank" rel="noopener">Open step ${ev.n} ↗</a>` : ''}</div>
-      ${searchChart(scene.reveal)}</div>`
+    let svg = main.querySelector('svg.chart')
+    if (!svg) {
+      main.innerHTML = `<div class="chartwrap">
+        <div class="charthead"><h2 class="chapter-title">Inbox search, as production saw it</h2><span class="steplink"></span></div>
+        ${searchChart()}</div>`
+      svg = main.querySelector('svg.chart')
+      fitChart(svg)
+      // Start from the previous step so entering the chart still animates the newest change.
+      updateChart(svg, Math.max(0, scene.reveal - 1))
+      void svg.getBoundingClientRect()
+    }
+    updateChart(svg, scene.reveal)
+    main.querySelector('.steplink').innerHTML = ev ? `<a class="link" href="${ev.link}" target="_blank" rel="noopener">Open step ${ev.n} ↗</a>` : ''
   } else {
     const first = SCENES.findIndex((s) => s.chapter === scene.chapter)
     const chapterScenes = SCENES.slice(first, idx + 1)
