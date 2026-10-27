@@ -148,7 +148,6 @@
 
   footer { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: .95vw; color: var(--ink3); }
   .dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 40vw; justify-content: center; }
-  @media (max-width: 800px) { .dots, footer > span:last-child { display: none; } }
   .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
   .dots i.on { background: var(--accent); }
   .dots i.sep { width: 2px; background: transparent; }
@@ -160,6 +159,63 @@
   .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: #141414; color: #f3f3f3; border-radius: 10px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .notes.open { display: block; }
   .notes b { color: #F9BD2B; font-family: var(--mono); font-size: .85vw; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
+  .nav { display: none; gap: 8px; }
+  .nav button { font: 700 18px var(--body); color: var(--accent); background: var(--card); border: 1.5px solid var(--accent); border-radius: 99px; width: 52px; height: 44px; }
+  .nav button:disabled { opacity: .3; }
+
+  /* Phones: the projector layout is sized in vw, which shrinks to unreadable text. Stack and scroll instead. */
+  @media (max-width: 800px) {
+    html, body { height: auto; min-height: 100%; }
+    body { overflow: auto; }
+    .stage { height: auto; min-height: 100dvh; padding: 16px 16px 84px; gap: 16px; grid-template-rows: auto 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    header .brand .eyebrow { font-size: 11px; }
+    header .brand .title { font-size: 22px; }
+    .loop { width: 100%; height: auto; }
+    main { grid-template-columns: 1fr; gap: 16px; }
+    .chapter { font-size: 11px; }
+    .chapter-title { font-size: 22px; margin-bottom: 10px; }
+    ol.steps li { grid-template-columns: 76px 1fr; gap: 10px; }
+    .when { font-size: 11px; }
+    .what { font-size: 14px; }
+    li .what .tag { font-size: 11px; padding: 1px 6px; }
+    .say { font-size: 18px; }
+    a.link { font-size: 13px; padding: 4px 10px; }
+    .shot.pair { flex-direction: column; }
+    .shot.pair img { max-width: 100%; }
+    .big { padding: 0; gap: 16px; justify-content: flex-start; }
+    .big h1 { font-size: 32px; }
+    .big p { font-size: 17px; max-width: none; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { padding: 12px; }
+    .stat .n { font-size: 30px; }
+    .stat .l { font-size: 13px; }
+    .footnote { font-size: 11px; }
+    .cols, .cols.two, .flow { grid-template-columns: 1fr; gap: 10px; }
+    .col { padding: 12px 14px; }
+    .col .k, .flow .who { font-size: 11px; }
+    .col ul { font-size: 16px; }
+    .flow li { font-size: 15px; padding: 12px 14px; }
+    .flow li:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); font-size: 14px; }
+    .dial .ends { flex-direction: column; gap: 12px; font-size: 15px; }
+    .dial .ends > div { max-width: none; }
+    .dial .ends > div:last-child { text-align: left; }
+    .dial .ends b { font-size: 20px; }
+    .qa { grid-template-columns: 1fr; gap: 20px; }
+    .posts .k { font-size: 11px; }
+    .posts a { font-size: 16px; padding-left: 10px; }
+    .posts a.feature { font-size: 24px; }
+    .posts a.feature small { font-size: 11px; }
+    .qr { display: none; }
+    .chartwrap { overflow-x: auto; }
+    .charthead { flex-direction: column; gap: 8px; }
+    svg.chart { flex: none; min-width: 620px; }
+    .charthead::after { content: 'Scroll the chart sideways →'; font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px; font-size: 12px; background: rgba(255,255,255,.92); border-top: 1px solid var(--rule); }
+    .dots, .keys { display: none; }
+    .nav { display: flex; }
+    .notes { width: auto; left: 16px; right: 16px; bottom: 72px; font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -188,7 +244,8 @@
   <footer>
     <span id="crumb"></span>
     <span class="dots" id="dots"></span>
-    <span>← → step · N notes · F fullscreen</span>
+    <span class="keys">← → step · N notes · F fullscreen</span>
+    <span class="nav"><button id="prev" aria-label="Previous step">←</button><button id="next" aria-label="Next step">→</button></span>
   </footer>
 </div>
 <div class="lightbox" id="lightbox"><img alt="" /></div>
@@ -565,6 +622,9 @@ function render() {
   document.getElementById('dots').innerHTML = SCENES.map((s, i) => (i > 0 && s.chapter !== SCENES[i - 1].chapter ? '<i class="sep"></i>' : '') + `<i class="${i <= idx ? 'on' : ''}"></i>`).join('')
   document.getElementById('notes').innerHTML = scene.notes ? `<b>Notes</b>${scene.notes}` : '<b>Notes</b>(none)'
   history.replaceState(null, '', `#${idx + 1}`)
+  document.getElementById('prev').disabled = idx === 0
+  document.getElementById('next').disabled = idx === SCENES.length - 1
+  if (moved) window.scrollTo(0, 0)
 }
 
 let moved = 0
@@ -593,6 +653,17 @@ main.addEventListener('click', (e) => {
   }
 })
 document.getElementById('lightbox').addEventListener('click', (e) => e.currentTarget.classList.remove('open'))
+document.getElementById('prev').addEventListener('click', () => go(-1))
+document.getElementById('next').addEventListener('click', () => go(1))
+// Horizontal swipes step on phones. Mostly vertical gestures still scroll, and the chart keeps its own sideways scroll.
+let touch = null
+document.addEventListener('touchstart', (e) => { touch = e.target.closest('.chartwrap') ? null : e.touches[0] }, { passive: true })
+document.addEventListener('touchend', (e) => {
+  if (!touch) return
+  const dx = e.changedTouches[0].clientX - touch.clientX, dy = e.changedTouches[0].clientY - touch.clientY
+  touch = null
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1)
+})
 
 buildNodes()
 const fromHash = parseInt(location.hash.slice(1), 10)
