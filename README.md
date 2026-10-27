@@ -8,6 +8,7 @@ Talks and presentations from the PostHog team, hosted as static HTML decks (reve
 
 | Talk | Venue | Path |
 | ---- | ----- | ---- |
+| Closing the loop on self-driving products | AI Tinkerers Dublin × PostHog Demo Night | [`closing-the-loop/`](./closing-the-loop/) |
 | Stateless ClickHouse for stream processing (animated) | Grafana meetup | [`grafana-stateless-clickhouse/`](./grafana-stateless-clickhouse/) |
 | The self-driving loop beat me to my own bug | September Demo Day ft. PostHog (AI Tinkerers NYC) | [`self-driving-beat-me-to-my-bug/`](./self-driving-beat-me-to-my-bug/) |
 | Agentic feature discovery | Agentic PM Kickoff (PostHog × Linear × Supabase × Dreambase), SF | [`agentic-feature-discovery/`](./agentic-feature-discovery/) |
