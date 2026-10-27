@@ -113,6 +113,8 @@
   .posts a:hover { color: var(--accent); }
   .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
   .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 12px; padding: 1vw; border: 1px solid var(--rule); }
+  .qr.small img { width: 16vw; }
+  .qa > div { display: flex; flex-direction: column; gap: 3vh; }
   .qr figcaption { font-family: var(--mono); font-size: 1vw; color: var(--ink2); }
   .footnote { font-size: 1vw; color: var(--ink3); font-family: var(--mono); }
 
@@ -266,8 +268,13 @@ const A = 'assets/'
 // One scene per key press. `log` lines accumulate within a chapter.
 const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
-    html: `<h1>Agents ship PRs now.<br><span>Closing the loop is the hard part.</span></h1>
-           <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>`,
+    html: `<div class="qa">
+      <div>
+        <h1>Agents ship PRs now.<br><span>Closing the loop<br>is the hard part.</span></h1>
+        <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>
+      </div>
+      <figure class="qr small"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>Follow along on your phone</figcaption></figure>
+    </div>`,
     notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one keeps going: did the fix actually work, and what happens when it did not?' },
 
   // Inbox search: two loops
