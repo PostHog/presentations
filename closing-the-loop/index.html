@@ -98,6 +98,12 @@
   .dial .ends > div { max-width: 32vw; }
   .dial .ends > div:last-child { text-align: right; }
   .dial .ends b { display: block; font-size: 2vw; color: var(--ink); }
+  .flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2vw; counter-reset: f; }
+  .flow li { position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 1.8vh 1.1vw; font-size: 1.3vw; font-weight: 600; line-height: 1.35; }
+  .flow li:not(:last-child)::after { content: '→'; position: absolute; right: -1.05vw; top: 50%; transform: translateY(-50%); color: var(--ink3); font-size: 1.3vw; }
+  .flow .who { display: block; font-family: var(--mono); font-size: .9vw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8vh; }
+  .flow .who.me { color: var(--accent); }
+  .flow .who.bot { color: var(--blue); }
   .qa { display: grid; grid-template-columns: 1fr auto; gap: 4vw; align-items: center; }
   .posts { display: flex; flex-direction: column; gap: 1.2vh; margin-top: 3vh; }
   .posts a { font-size: 1.7vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
@@ -319,6 +325,23 @@ const SCENES = [
       </div>
       <p>Shipping loops are real. How much you let them do on their own depends on what breaks if they are wrong.</p>`,
     notes: 'This is not all or nothing. A new feature behind a flag can run pretty loose. A query in the ingestion hot path needs tighter checks and a human closer to the wheel. Same loop, different settings.' },
+
+  { kind: 'big', chapter: 'thoughts', node: null,
+    html: `<h1>How I work <span>since September</span></h1>
+      <ol class="flow">
+        <li><span class="who me">Me + agent</span>Spec the issue, using the repo's issue template</li>
+        <li><span class="who bot">Self-driving</span>Picks it up as an inbox report. Opens a PR, or I press implement</li>
+        <li><span class="who bot">Agents</span>Review the PR and babysit it through CI</li>
+        <li><span class="who me">Me</span>Sense check the PR and do the final QA</li>
+        <li><span class="who me">Skills</span>Track all of it, so I can dig in anywhere</li>
+      </ol>
+      <div class="cols two">
+        <div class="col"><div class="k">No special framework</div><ul>
+          <li>A framework is future tech debt</li><li>Spec issues the way your repo already does. The agent gets it</li></ul></div>
+        <div class="col"><div class="k">Keep the factory flexible</div><ul>
+          <li>Use skills for everything</li><li>PostHog self-driving is one way to run it. Try it</li></ul></div>
+      </div>`,
+    notes: 'This is my actual day since early September. I spec issues with my agent, self-driving picks them up and opens PRs, agents review and babysit, and I sense check and QA at the end. Skills hold the state so I can drop in anywhere. No special framework: just write good issues the way your repo already wants them.' },
 
   { kind: 'big', chapter: 'questions', node: null,
     html: `<div class="qa">
