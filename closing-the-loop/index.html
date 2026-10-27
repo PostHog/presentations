@@ -98,9 +98,18 @@
   .dial .ends > div { max-width: 32vw; }
   .dial .ends > div:last-child { text-align: right; }
   .dial .ends b { display: block; font-size: 2vw; color: var(--ink); }
+  .flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2vw; counter-reset: f; }
+  .flow li { position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 1.8vh 1.1vw; font-size: 1.3vw; font-weight: 600; line-height: 1.35; }
+  .flow li:not(:last-child)::after { content: '→'; position: absolute; right: -1.05vw; top: 50%; transform: translateY(-50%); color: var(--ink3); font-size: 1.3vw; }
+  .flow .who { display: block; font-family: var(--mono); font-size: .9vw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8vh; }
+  .flow .who.me { color: var(--accent); }
+  .flow .who.bot { color: var(--blue); }
   .qa { display: grid; grid-template-columns: 1fr auto; gap: 4vw; align-items: center; }
-  .posts { display: flex; flex-direction: column; gap: 1.2vh; margin-top: 3vh; }
-  .posts a { font-size: 1.7vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
+  .posts { display: flex; flex-direction: column; gap: 1vh; margin-top: 2.4vh; }
+  .posts .k { font-family: var(--mono); font-size: 1vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); margin-top: 1.4vh; }
+  .posts a.feature { font-size: 2.2vw; color: var(--accent); }
+  .posts a.feature small { display: block; font-family: var(--mono); font-size: .95vw; font-weight: 500; color: var(--ink2); }
+  .posts a { font-size: 1.45vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
   .posts a:hover { color: var(--accent); }
   .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
   .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 12px; padding: 1vw; border: 1px solid var(--rule); }
@@ -139,7 +148,6 @@
 
   footer { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: .95vw; color: var(--ink3); }
   .dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 40vw; justify-content: center; }
-  @media (max-width: 800px) { .dots, footer > span:last-child { display: none; } }
   .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
   .dots i.on { background: var(--accent); }
   .dots i.sep { width: 2px; background: transparent; }
@@ -151,6 +159,63 @@
   .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: #141414; color: #f3f3f3; border-radius: 10px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .notes.open { display: block; }
   .notes b { color: #F9BD2B; font-family: var(--mono); font-size: .85vw; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
+  .nav { display: none; gap: 8px; }
+  .nav button { font: 700 18px var(--body); color: var(--accent); background: var(--card); border: 1.5px solid var(--accent); border-radius: 99px; width: 52px; height: 44px; }
+  .nav button:disabled { opacity: .3; }
+
+  /* Phones: the projector layout is sized in vw, which shrinks to unreadable text. Stack and scroll instead. */
+  @media (max-width: 800px) {
+    html, body { height: auto; min-height: 100%; }
+    body { overflow: auto; }
+    .stage { height: auto; min-height: 100dvh; padding: 16px 16px 84px; gap: 16px; grid-template-rows: auto 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    header .brand .eyebrow { font-size: 11px; }
+    header .brand .title { font-size: 22px; }
+    .loop { width: 100%; height: auto; }
+    main { grid-template-columns: 1fr; gap: 16px; }
+    .chapter { font-size: 11px; }
+    .chapter-title { font-size: 22px; margin-bottom: 10px; }
+    ol.steps li { grid-template-columns: 76px 1fr; gap: 10px; }
+    .when { font-size: 11px; }
+    .what { font-size: 14px; }
+    li .what .tag { font-size: 11px; padding: 1px 6px; }
+    .say { font-size: 18px; }
+    a.link { font-size: 13px; padding: 4px 10px; }
+    .shot.pair { flex-direction: column; }
+    .shot.pair img { max-width: 100%; }
+    .big { padding: 0; gap: 16px; justify-content: flex-start; }
+    .big h1 { font-size: 32px; }
+    .big p { font-size: 17px; max-width: none; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { padding: 12px; }
+    .stat .n { font-size: 30px; }
+    .stat .l { font-size: 13px; }
+    .footnote { font-size: 11px; }
+    .cols, .cols.two, .flow { grid-template-columns: 1fr; gap: 10px; }
+    .col { padding: 12px 14px; }
+    .col .k, .flow .who { font-size: 11px; }
+    .col ul { font-size: 16px; }
+    .flow li { font-size: 15px; padding: 12px 14px; }
+    .flow li:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); font-size: 14px; }
+    .dial .ends { flex-direction: column; gap: 12px; font-size: 15px; }
+    .dial .ends > div { max-width: none; }
+    .dial .ends > div:last-child { text-align: left; }
+    .dial .ends b { font-size: 20px; }
+    .qa { grid-template-columns: 1fr; gap: 20px; }
+    .posts .k { font-size: 11px; }
+    .posts a { font-size: 16px; padding-left: 10px; }
+    .posts a.feature { font-size: 24px; }
+    .posts a.feature small { font-size: 11px; }
+    .qr { display: none; }
+    .chartwrap { overflow-x: auto; }
+    .charthead { flex-direction: column; gap: 8px; }
+    svg.chart { flex: none; min-width: 620px; }
+    .charthead::after { content: 'Scroll the chart sideways →'; font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px; font-size: 12px; background: rgba(255,255,255,.92); border-top: 1px solid var(--rule); }
+    .dots, .keys { display: none; }
+    .nav { display: flex; }
+    .notes { width: auto; left: 16px; right: 16px; bottom: 72px; font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -179,7 +244,8 @@
   <footer>
     <span id="crumb"></span>
     <span class="dots" id="dots"></span>
-    <span>← → step · N notes · F fullscreen</span>
+    <span class="keys">← → step · N notes · F fullscreen</span>
+    <span class="nav"><button id="prev" aria-label="Previous step">←</button><button id="next" aria-label="Next step">→</button></span>
   </footer>
 </div>
 <div class="lightbox" id="lightbox"><img alt="" /></div>
@@ -320,21 +386,42 @@ const SCENES = [
       <p>Shipping loops are real. How much you let them do on their own depends on what breaks if they are wrong.</p>`,
     notes: 'This is not all or nothing. A new feature behind a flag can run pretty loose. A query in the ingestion hot path needs tighter checks and a human closer to the wheel. Same loop, different settings.' },
 
+  { kind: 'big', chapter: 'thoughts', node: null,
+    html: `<h1>How I work <span>since September</span></h1>
+      <ol class="flow">
+        <li><span class="who me">Me + agent</span>Spec the issue, using the repo's issue template</li>
+        <li><span class="who bot">Self-driving</span>Picks it up as an inbox report. Opens a PR, or I press implement</li>
+        <li><span class="who bot">Agents</span>Review the PR and babysit it through CI</li>
+        <li><span class="who me">Me</span>Sense check the PR and do the final QA</li>
+        <li><span class="who me">Skills</span>Track all of it, so I can dig in anywhere</li>
+      </ol>
+      <div class="cols two">
+        <div class="col"><div class="k">No special framework</div><ul>
+          <li>A framework is future tech debt</li><li>Spec issues the way your repo already does. The agent gets it</li></ul></div>
+        <div class="col"><div class="k">Keep the factory flexible</div><ul>
+          <li>Use skills for everything</li><li>PostHog self-driving is one way to run it. Try it</li></ul></div>
+      </div>`,
+    notes: 'This is my actual day since early September. I spec issues with my agent, self-driving picks them up and opens PRs, agents review and babysit, and I sense check and QA at the end. Skills hold the state so I can drop in anywhere. No special framework: just write good issues the way your repo already wants them.' },
+
   { kind: 'big', chapter: 'questions', node: null,
     html: `<div class="qa">
       <div>
         <h1>Questions?</h1>
         <div class="posts">
-          <a href="https://posthog.com/blog/how-i-use-skills-for-everything" target="_blank" rel="noopener">How I use skills for everything</a>
-          <a href="https://posthog.com/blog/self-driving-loops" target="_blank" rel="noopener">6-7 loops we use every day to make PostHog self-driving</a>
-          <a href="https://posthog.com/blog/what-is-a-scout" target="_blank" rel="noopener">What is a Scout? A technical deep dive</a>
-          <a href="https://posthog.com/blog/standup-bot-revenge" target="_blank" rel="noopener">I hate the standup bot (so I built an agent to do it for me)</a>
-          <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces</a>
+          <div class="k">Real examples, added every few days</div>
+          <a class="feature" href="https://posthog.com/docs/self-driving/from-our-inbox" target="_blank" rel="noopener">From our inbox ↗<small>posthog.com/docs/self-driving/from-our-inbox</small></a>
+          <a href="https://posthog.com/docs/self-driving" target="_blank" rel="noopener">PostHog self-driving docs ↗</a>
+          <div class="k">Recent blog posts</div>
+          <a href="https://posthog.com/blog/how-i-use-skills-for-everything" target="_blank" rel="noopener">How I use skills for everything ↗</a>
+          <a href="https://posthog.com/blog/self-driving-loops" target="_blank" rel="noopener">6-7 loops we use every day to make PostHog self-driving ↗</a>
+          <a href="https://posthog.com/blog/what-is-a-scout" target="_blank" rel="noopener">What is a Scout? A technical deep dive ↗</a>
+          <a href="https://posthog.com/blog/standup-bot-revenge" target="_blank" rel="noopener">I hate the standup bot (so I built an agent to do it for me) ↗</a>
+          <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces ↗</a>
         </div>
       </div>
       <figure class="qr"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>posthog.github.io/presentations/closing-the-loop</figcaption></figure>
     </div>`,
-    notes: 'Scan for this walkthrough. Blog posts on the left go deeper on loops, scouts and skills.' },
+    notes: 'Scan for this walkthrough. From our inbox is where I post real examples like this one every few days. The blog posts go deeper on loops, scouts and skills.' },
 ]
 
 // Inbox search count spans per day (posthog-web-django, SELECT COUNT(*) on signals_signalreport with the
@@ -535,6 +622,9 @@ function render() {
   document.getElementById('dots').innerHTML = SCENES.map((s, i) => (i > 0 && s.chapter !== SCENES[i - 1].chapter ? '<i class="sep"></i>' : '') + `<i class="${i <= idx ? 'on' : ''}"></i>`).join('')
   document.getElementById('notes').innerHTML = scene.notes ? `<b>Notes</b>${scene.notes}` : '<b>Notes</b>(none)'
   history.replaceState(null, '', `#${idx + 1}`)
+  document.getElementById('prev').disabled = idx === 0
+  document.getElementById('next').disabled = idx === SCENES.length - 1
+  if (moved) window.scrollTo(0, 0)
 }
 
 let moved = 0
@@ -563,6 +653,17 @@ main.addEventListener('click', (e) => {
   }
 })
 document.getElementById('lightbox').addEventListener('click', (e) => e.currentTarget.classList.remove('open'))
+document.getElementById('prev').addEventListener('click', () => go(-1))
+document.getElementById('next').addEventListener('click', () => go(1))
+// Horizontal swipes step on phones. Mostly vertical gestures still scroll, and the chart keeps its own sideways scroll.
+let touch = null
+document.addEventListener('touchstart', (e) => { touch = e.target.closest('.chartwrap') ? null : e.touches[0] }, { passive: true })
+document.addEventListener('touchend', (e) => {
+  if (!touch) return
+  const dx = e.changedTouches[0].clientX - touch.clientX, dy = e.changedTouches[0].clientY - touch.clientY
+  touch = null
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1)
+})
 
 buildNodes()
 const fromHash = parseInt(location.hash.slice(1), 10)

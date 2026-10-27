@@ -34,7 +34,7 @@ The inbox links need a PostHog login; the PRs are public.
    re-check "No longer holds" → follow-up report → [PR #118678](https://github.com/PostHog/posthog/pull/118678) → merged → re-check "Still holds".
 2. **The same story as production saw it**: an annotated chart, one arrow per key press.
 3. **The numbers** for the last 30 days.
-4. **Some thoughts**: the PR is the easy part, humans in the loop is fine, autonomy is a dial.
+4. **Some thoughts**: the PR is the easy part, humans in the loop is fine, autonomy is a dial, and how I work day to day.
 5. **Questions**, with links to related blog posts and a QR code for this page.
 
 ## Where the numbers come from
