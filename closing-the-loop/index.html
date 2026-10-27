@@ -74,6 +74,11 @@
   ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1vh; overflow: hidden; }
   ol.steps li { display: grid; grid-template-columns: 8.4vw 1fr; gap: .9vw; align-items: baseline; opacity: .45; transition: opacity .3s, transform .3s; }
   ol.steps li.current { opacity: 1; }
+  ol.steps li.old { opacity: .4; }
+  ol.steps li.old .when b, ol.steps li.old .when br { display: none; }
+  ol.steps li.old .when { font-size: .85vw; }
+  ol.steps li.old .what { font-size: 1.05vw; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  ol.steps li.old .tag { font-size: .7vw; }
   ol.steps li.enter { animation: enter .35s ease; }
   @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
   .when { font-family: var(--mono); font-size: 1vw; color: var(--ink2); text-align: right; white-space: nowrap; }
@@ -90,12 +95,32 @@
   .sayrow { display: flex; align-items: center; gap: 1.6vw; }
   .sayrow .say { flex: 1; }
   .hog { height: 15vh; width: auto; flex: none; animation: pop .35s ease; }
+  /* A joke hedgehog fills the space under the timeline. Older steps collapse to one line so that space survives to the end of the story. */
+  .meme { margin: auto 0 0; padding-top: 1.5vh; align-self: center; flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; animation: pop .45s ease; }
+  ol.steps { flex: none; }
+  .meme img { height: 27vh; max-height: 100%; min-height: 0; width: auto; display: block; object-fit: contain; }
+  .meme figcaption { position: relative; margin-bottom: -1.2vh; align-self: flex-end; font-size: 1.5vw; font-weight: 800; line-height: 1.15;
+    color: var(--accent-ink); background: var(--card); border: 1.5px solid var(--rule2); border-radius: 8px; padding: .6vh .9vw;
+    box-shadow: var(--shadow-window); transform: translateX(30%) rotate(-4deg); white-space: nowrap; z-index: 2; flex: none; }
+  .meme.nervous img { animation: nervous .5s ease-in-out infinite; transform-origin: 50% 90%; }
+  .meme img[src$="float.svg"] { animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
+  @keyframes nervous { 0%, 100% { transform: rotate(-1.5deg) translateX(-1px); } 50% { transform: rotate(1.5deg) translateX(1px); } }
+  /* The two-panel Drake meme: no thanks on top, yes please below. */
+  .meme.drake { align-self: stretch; margin-right: 1vw; background: var(--card); border: 1.5px solid var(--rule2); border-radius: 8px; box-shadow: var(--shadow-window); overflow: hidden; }
+  .drake > div { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1vw; padding: .4vh 1.2vw .4vh .4vw; }
+  .drake > div + div { border-top: 1.5px solid var(--rule2); }
+  .drake img { height: 12vh; width: auto; display: block; }
+  .drake span { font-size: 1.6vw; font-weight: 800; line-height: 1.15; }
+  .drake .nah span { color: var(--ink3); text-decoration: line-through; text-decoration-color: var(--fail); text-decoration-thickness: .08em; }
+  .drake .yah span { color: var(--accent-ink); }
+  .meme figcaption small { display: block; margin-top: .5vh; font-size: .9vw; font-weight: 700; color: var(--ink2); }
   .say { font-size: 1.75vw; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
   .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 1.1vh 1vw; max-width: 52vw; }
   .callout b { color: var(--blue); }
   .say em { font-style: normal; color: var(--accent-ink); }
   .shot { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
-  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; background: #fff;
+  .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; background: #fff; padding: 1.1vw;
     border: 1px solid var(--rule2); box-shadow: var(--shadow-window); cursor: zoom-in; animation: pop .35s ease; }
   .shot.pair { gap: 1.4vw; align-items: flex-start; }
   .shot.pair img { max-width: 49%; }
@@ -105,6 +130,7 @@
   .big { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; gap: 3vh; padding: 0 4vw; }
   .big h1 { font-size: 5vw; font-weight: 800; letter-spacing: -.025em; line-height: 1.04; margin: 0; text-wrap: balance; }
   .big h1 span { color: var(--accent); }
+  .big h1 s { color: var(--ink3); text-decoration-color: var(--accent); text-decoration-thickness: .09em; }
   .big p { font-size: 2vw; color: var(--ink2); margin: 0; max-width: 60vw; line-height: 1.35; }
   .headrow { display: flex; align-items: center; justify-content: space-between; gap: 3vw; }
   .headrow .hog { height: 22vh; }
@@ -198,7 +224,7 @@
   /* Lightbox and notes */
   .lightbox { position: fixed; inset: 0; background: rgba(35,37,29,.82); display: none; align-items: center; justify-content: center; padding: 3vh 3vw; z-index: 10; cursor: zoom-out; }
   .lightbox.open { display: flex; }
-  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; background: #fff; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; background: #fff; padding: 20px; }
   .notes { position: fixed; right: 1.5vw; bottom: 5vh; width: 34vw; background: var(--ink); color: #f3f3ee; border-radius: 8px; padding: 1.6vh 1.2vw; font-size: 1.05vw; line-height: 1.45; display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .notes.open { display: block; }
   .notes b { color: var(--lemon); font-size: .85vw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .6vh; }
@@ -226,11 +252,22 @@
     .say { font-size: 18px; }
     .hog { height: 72px; }
     .headrow .hog { height: 90px; }
+    .meme { margin: 4px 0 0; }
+    .meme img { height: 130px; }
+    .meme figcaption { font-size: 14px; padding: 4px 8px; }
+    .meme figcaption small { font-size: 11px; }
+    .meme.drake { margin-right: 0; }
+    .drake img { height: 64px; }
+    .drake span { font-size: 18px; }
+    ol.steps li.old .when { font-size: 10px; }
+    ol.steps li.old .what { font-size: 13px; }
+    ol.steps li.old .tag { font-size: 9px; }
     .side .hog { display: none; }
     .callout { font-size: 15px; padding: 10px 12px; max-width: none; }
     a.link { font-size: 13px; padding: 4px 10px; }
     .shot.pair { flex-direction: column; }
     .shot.pair img { max-width: 100%; }
+    .shot img { padding: 8px; }
     .big { padding: 0; gap: 16px; justify-content: flex-start; }
     .big h1 { font-size: 32px; }
     .big p { font-size: 17px; max-width: none; }
@@ -319,70 +356,71 @@ const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
     html: `<div class="qa">
       <div>
-        <h1>Agents ship PRs now.<br><span>Closing the loop<br>is the hard part.</span></h1>
-        <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>
+        <h1><s>Ideas</s> PRs are cheap.<br><span>Following through<br>is the hard part.</span></h1>
+        <p>One real loop from when we were building our own inbox at PostHog.</p>
       </div>
       <div class="side">
         <img class="hog" src="${A}hogs/self-driving.svg" alt="A hedgehog in a self-driving car">
         <figure class="qr small"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>Follow along on your phone</figcaption></figure>
       </div>
     </div>`,
-    notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one keeps going: did the fix actually work, and what happens when it did not?' },
+    notes: 'I build the loops that build PostHog. Getting an agent to open a PR is easy now. Following through is the hard bit: did the fix actually work, and what happens when it didn\'t?' },
 
   // Inbox search: two loops
   { chapter: 'search', title: 'Inbox search: fixed, checked, fixed again', node: 'signal',
     when: '13 Oct 05:19', what: 'Slow query alert from pganalyze',
     say: 'A database monitor flags a slow <em>count(*)</em>: 385ms on average, 66 calls a day.',
-    callout: '<b>Who felt it most?</b> Agents searching the inbox over MCP on behalf of their users, more than people typing in the search box. We only found that out on the second loop.',
+    callout: '<b>Who felt it most?</b> Agents searching the inbox over MCP on behalf of their users, more than people typing in the search box.',
     links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
     img: 'search-evidence.png',
-    notes: 'No human filed this. A Postgres monitor fired, and it became a signal. The twist: the slow searches were mostly agents using the inbox through MCP for their users, sometimes 10 seconds a search. The first report assumed people. The second loop worked out it was agents.' },
+    notes: 'No human filed this. A Postgres monitor fired, and it became a signal. The twist: the slow searches were mostly agents using the inbox through MCP for their users, sometimes 10 seconds a search.' },
   { chapter: 'search', node: 'report',
     when: '05:19', what: 'Agent researches and writes the report',
-    say: 'The agent finds the cause in the code and <em>predicts the impact</em>: "under 100ms, more than a 10x gain".',
+    say: 'The agent <i>thinks</i> it finds the cause in the code and <em>predicts the impact</em>: "under 100ms, more than a 10x gain".',
     links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
     img: 'search-report.png',
     notes: 'Point at "Expected impact" at the bottom. That prediction is what gets checked later. Write it down or you can never close the loop.' },
   { chapter: 'search', node: 'pr', delta: '+26m',
     when: '05:45', what: 'Agent opens PR #115874',
-    say: 'A coding agent opens the PR: two trigram indexes. <em>All tests pass.</em>',
+    say: 'A coding agent wants to add a GIN index. Two, actually. <em>All tests pass.</em>',
     links: [{ label: 'PR #115874', href: 'https://github.com/PostHog/posthog/pull/115874' }],
-    img: 'search-pr1.png',
-    notes: 'Nobody started this task by hand. It auto-started once the report was rated ready to fix.' },
+    img: 'search-pr1.png', meme: 'gatsby', memeCaption: 'Cheers to<br>GIN indexes 🍸<small>TIL what a GIN index is</small>',
+    notes: 'Nobody started this task by hand. It auto-started once the report was rated ready to fix. GIN is a Generalized Inverted Index: with pg_trgm it indexes 3-letter chunks of the text, so a LIKE search with a wildcard on both ends can use an index instead of reading every row.' },
   { chapter: 'search', node: 'merged', delta: '+1d',
     when: '14 Oct 06:27', what: 'I review it. Merged',
     say: 'I approve it, it merges, it deploys. <em>Most loops stop here.</em>',
     links: [{ label: 'PR #115874', href: 'https://github.com/PostHog/posthog/pull/115874' }],
-    img: 'search-pr1.png',
+    img: 'search-pr1.png', meme: 'stamp-approved', memeCaption: 'LGTM 👍<small>Me, approving a GIN index<br>I did not understand</small>',
     notes: 'This is where most agent demos end: green CI, merged, done. Pause here.' },
   { chapter: 'search', node: 'check', verdict: 'fail', delta: '+2d 9h',
     when: '16 Oct 15:43', what: 'Re-check: no longer holds',
-    say: 'Two days later a scout probes production. <em>18 of the 20 slowest searches still take 1.8 to 11.7s.</em>',
+    say: 'Two days later our inbox validation scout checks production. <em>18 of the 20 slowest searches still take 1.8 to 11.7s.</em>',
     links: [{ label: 'Report with the failed check', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
-    img: 'search-check-failed.png', hog: 'stamp-denied',
+    img: 'search-check-failed.png', meme: 'shocked', memeCaption: 'Wait, what?<small>It was a simple +31/-2 PR</small>',
     notes: 'The scout ran the same kind of query the report used as its baseline, after a 48 hour soak. The fix did not do what it claimed.' },
   { chapter: 'search', node: 'report', back: true, delta: '+0m',
     when: '15:43', what: 'Same run files a follow-up report',
-    say: 'The failed check <em>files its own follow-up</em>, with the evidence attached.',
+    say: 'The scout <em>files its own follow-up report</em>, with the evidence attached.',
+    callout: '<b>We do this on every report.</b> Once a fix merges, the inbox validation scout usually re-checks it a couple of days later against what the report said it would change.',
     links: [{ label: 'Follow-up report', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: ['search-followup-report.png', 'search-followup-evidence.png'],
-    notes: 'Same minute. The loop goes round again on its own.' },
+    img: ['search-followup-report.png', 'search-followup-evidence.png'], meme: 'explorer', memeCaption: 'Scout, reporting back<small>Found something</small>',
+    notes: 'Same minute. The loop goes round again on its own. This is not special to this story: the validation scout runs on merged reports in general, it just usually says the fix held.' },
   { chapter: 'search', node: 'pr', delta: '+28m',
     when: '16:11', what: 'Agent opens PR #118678, a different fix',
     say: 'Second PR. A different idea: <em>skip the count when the page already shows every match</em>. Origin: the validation scout.',
     links: [{ label: 'PR #118678', href: 'https://github.com/PostHog/posthog/pull/118678' }, { label: 'Follow-up report', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-pr2.png',
+    img: 'search-pr2.png', drake: ['Add a GIN index', 'Just don\'t count'],
     notes: 'Note the Origin section: signals-scout-inbox-validation. The verifier is the signal source now.' },
   { chapter: 'search', node: 'merged', delta: '+1h 44m',
     when: '17:55', what: 'Reviewed and merged',
     say: 'Reviewed and merged <em>2 hours 12 minutes</em> after the failed check.',
     links: [{ label: 'PR #118678', href: 'https://github.com/PostHog/posthog/pull/118678' }],
-    img: 'search-pr2.png' },
+    img: 'search-pr2.png', meme: 'stamp-approved', nervous: true, memeCaption: 'LGTM? 😬<small>Me, approving fix number two</small>' },
   { chapter: 'search', node: 'check', verdict: 'pass', delta: '+2d 9h',
     when: '19 Oct 02:40', what: 'Re-check: still holds',
     say: 'Re-checked after the soak: <em>0.69 to 0.79s</em>, one outlier. Now it is verified.',
     links: [{ label: 'Follow-up report with the passed check', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-check-passed.png', hog: 'stamp-approved',
+    img: 'search-check-passed.png', meme: 'float', memeCaption: 'Ahh, it fixed it<small>Me, two loops later</small>',
     notes: 'Two loops, six days, one human click per PR.' },
 
   // The same story, as production saw it. Each press reveals one more annotation.
@@ -672,7 +710,7 @@ function render() {
     const first = SCENES.findIndex((s) => s.chapter === scene.chapter)
     const chapterScenes = SCENES.slice(first, idx + 1)
     const steps = chapterScenes.map((s, i) => {
-      const cls = [i === chapterScenes.length - 1 ? 'current' : '', s.verdict || '', i === chapterScenes.length - 1 && moved > 0 ? 'enter' : ''].join(' ')
+      const cls = [i === chapterScenes.length - 1 ? 'current' : '', i < chapterScenes.length - 2 ? 'old' : '', s.verdict || '', i === chapterScenes.length - 1 && moved > 0 ? 'enter' : ''].join(' ')
       const tag = s.verdict === 'fail' ? '<span class="tag">✗ failed</span>' : s.verdict === 'pass' ? '<span class="tag">✓ held</span>' : ''
       return `<li class="${cls}"><span class="when">${s.delta ? `<b>${s.delta}</b><br>` : ''}${s.when}</span><span class="what">${s.what}${tag}</span></li>`
     }).join('')
@@ -681,6 +719,8 @@ function render() {
         <div class="chapter">${CHAPTERS[scene.chapter]}</div>
         <h2 class="chapter-title">${SCENES[first].title}</h2>
         <ol class="steps">${steps}</ol>
+        ${scene.drake ? `<figure class="meme drake">${['nah', 'yah'].map((k, i) => `<div class="${k}"><img src="${A}hogs/drake-${k}.svg" alt=""><span>${scene.drake[i]}</span></div>`).join('')}</figure>` : ''}
+        ${scene.meme ? `<figure class="meme${scene.nervous ? ' nervous' : ''}"><figcaption>${scene.memeCaption}</figcaption><img src="${A}hogs/${scene.meme}.svg" alt=""></figure>` : ''}
       </section>
       <section class="pane">
         <div class="sayrow"><p class="say">${scene.say}</p>${scene.hog ? `<img class="hog" src="${A}hogs/${scene.hog}.svg" alt="">` : ''}</div>
