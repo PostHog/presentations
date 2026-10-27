@@ -105,8 +105,11 @@
   .flow .who.me { color: var(--accent); }
   .flow .who.bot { color: var(--blue); }
   .qa { display: grid; grid-template-columns: 1fr auto; gap: 4vw; align-items: center; }
-  .posts { display: flex; flex-direction: column; gap: 1.2vh; margin-top: 3vh; }
-  .posts a { font-size: 1.7vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
+  .posts { display: flex; flex-direction: column; gap: 1vh; margin-top: 2.4vh; }
+  .posts .k { font-family: var(--mono); font-size: 1vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); margin-top: 1.4vh; }
+  .posts a.feature { font-size: 2.2vw; color: var(--accent); }
+  .posts a.feature small { display: block; font-family: var(--mono); font-size: .95vw; font-weight: 500; color: var(--ink2); }
+  .posts a { font-size: 1.45vw; font-weight: 600; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
   .posts a:hover { color: var(--accent); }
   .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
   .qr img { width: 24vw; max-width: 50vh; background: #fff; border-radius: 12px; padding: 1vw; border: 1px solid var(--rule); }
@@ -348,16 +351,20 @@ const SCENES = [
       <div>
         <h1>Questions?</h1>
         <div class="posts">
-          <a href="https://posthog.com/blog/how-i-use-skills-for-everything" target="_blank" rel="noopener">How I use skills for everything</a>
-          <a href="https://posthog.com/blog/self-driving-loops" target="_blank" rel="noopener">6-7 loops we use every day to make PostHog self-driving</a>
-          <a href="https://posthog.com/blog/what-is-a-scout" target="_blank" rel="noopener">What is a Scout? A technical deep dive</a>
-          <a href="https://posthog.com/blog/standup-bot-revenge" target="_blank" rel="noopener">I hate the standup bot (so I built an agent to do it for me)</a>
-          <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces</a>
+          <div class="k">Real examples, added every few days</div>
+          <a class="feature" href="https://posthog.com/docs/self-driving/from-our-inbox" target="_blank" rel="noopener">From our inbox ↗<small>posthog.com/docs/self-driving/from-our-inbox</small></a>
+          <a href="https://posthog.com/docs/self-driving" target="_blank" rel="noopener">PostHog self-driving docs ↗</a>
+          <div class="k">Recent blog posts</div>
+          <a href="https://posthog.com/blog/how-i-use-skills-for-everything" target="_blank" rel="noopener">How I use skills for everything ↗</a>
+          <a href="https://posthog.com/blog/self-driving-loops" target="_blank" rel="noopener">6-7 loops we use every day to make PostHog self-driving ↗</a>
+          <a href="https://posthog.com/blog/what-is-a-scout" target="_blank" rel="noopener">What is a Scout? A technical deep dive ↗</a>
+          <a href="https://posthog.com/blog/standup-bot-revenge" target="_blank" rel="noopener">I hate the standup bot (so I built an agent to do it for me) ↗</a>
+          <a href="https://posthog.com/blog/llm-analytics-clustering-how-it-works" target="_blank" rel="noopener">How we built automatic clustering for LLM traces ↗</a>
         </div>
       </div>
       <figure class="qr"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>posthog.github.io/presentations/closing-the-loop</figcaption></figure>
     </div>`,
-    notes: 'Scan for this walkthrough. Blog posts on the left go deeper on loops, scouts and skills.' },
+    notes: 'Scan for this walkthrough. From our inbox is where I post real examples like this one every few days. The blog posts go deeper on loops, scouts and skills.' },
 ]
 
 // Inbox search count spans per day (posthog-web-django, SELECT COUNT(*) on signals_signalreport with the
