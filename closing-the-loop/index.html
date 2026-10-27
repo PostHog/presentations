@@ -90,6 +90,13 @@
   .sayrow { display: flex; align-items: center; gap: 1.6vw; }
   .sayrow .say { flex: 1; }
   .hog { height: 15vh; width: auto; flex: none; animation: pop .35s ease; }
+  /* A joke hedgehog fills the empty space under a short timeline. */
+  .meme { margin: auto 0 0; align-self: center; position: relative; animation: pop .45s ease; }
+  .meme img { height: 32vh; width: auto; display: block; }
+  .meme figcaption { position: absolute; top: 1vh; left: 100%; margin-left: -2vw; font-size: 1.6vw; font-weight: 800; line-height: 1.15;
+    color: var(--accent-ink); background: var(--card); border: 1.5px solid var(--rule2); border-radius: 8px; padding: .6vh .9vw;
+    box-shadow: var(--shadow-window); transform: rotate(-4deg); white-space: nowrap; }
+  .meme figcaption small { display: block; margin-top: .5vh; font-size: .95vw; font-weight: 700; color: var(--ink2); }
   .say { font-size: 1.75vw; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 0; text-wrap: balance; }
   .callout { margin: 0; font-size: 1.25vw; line-height: 1.4; color: var(--ink2); background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 1.1vh 1vw; max-width: 52vw; }
   .callout b { color: var(--blue); }
@@ -105,6 +112,7 @@
   .big { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: center; gap: 3vh; padding: 0 4vw; }
   .big h1 { font-size: 5vw; font-weight: 800; letter-spacing: -.025em; line-height: 1.04; margin: 0; text-wrap: balance; }
   .big h1 span { color: var(--accent); }
+  .big h1 s { color: var(--ink3); text-decoration-color: var(--accent); text-decoration-thickness: .09em; }
   .big p { font-size: 2vw; color: var(--ink2); margin: 0; max-width: 60vw; line-height: 1.35; }
   .headrow { display: flex; align-items: center; justify-content: space-between; gap: 3vw; }
   .headrow .hog { height: 22vh; }
@@ -226,6 +234,9 @@
     .say { font-size: 18px; }
     .hog { height: 72px; }
     .headrow .hog { height: 90px; }
+    .meme { margin: 4px 0 0; }
+    .meme img { height: 130px; }
+    .meme figcaption { font-size: 14px; padding: 4px 8px; }
     .side .hog { display: none; }
     .callout { font-size: 15px; padding: 10px 12px; max-width: none; }
     a.link { font-size: 13px; padding: 4px 10px; }
@@ -319,41 +330,41 @@ const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
     html: `<div class="qa">
       <div>
-        <h1>Agents ship PRs now.<br><span>Closing the loop<br>is the hard part.</span></h1>
-        <p>One real loop from PostHog's own product, October 2026. Every timestamp is from the API, every screenshot is the real thing.</p>
+        <h1><s>Ideas</s> PRs are cheap.<br><span>Following through<br>is the hard part.</span></h1>
+        <p>One real loop from when we were building our own inbox at PostHog.</p>
       </div>
       <div class="side">
         <img class="hog" src="${A}hogs/self-driving.svg" alt="A hedgehog in a self-driving car">
         <figure class="qr small"><img src="${A}qr.svg" alt="QR code for this walkthrough"><figcaption>Follow along on your phone</figcaption></figure>
       </div>
     </div>`,
-    notes: 'I build the loops that build PostHog. Most demos stop at the merged PR. This one keeps going: did the fix actually work, and what happens when it did not?' },
+    notes: 'I build the loops that build PostHog. Getting an agent to open a PR is easy now. Following through is the hard bit: did the fix actually work, and what happens when it didn\'t?' },
 
   // Inbox search: two loops
   { chapter: 'search', title: 'Inbox search: fixed, checked, fixed again', node: 'signal',
     when: '13 Oct 05:19', what: 'Slow query alert from pganalyze',
     say: 'A database monitor flags a slow <em>count(*)</em>: 385ms on average, 66 calls a day.',
-    callout: '<b>Who felt it most?</b> Agents searching the inbox over MCP on behalf of their users, more than people typing in the search box. We only found that out on the second loop.',
+    callout: '<b>Who felt it most?</b> Agents searching the inbox over MCP on behalf of their users, more than people typing in the search box.',
     links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
     img: 'search-evidence.png',
-    notes: 'No human filed this. A Postgres monitor fired, and it became a signal. The twist: the slow searches were mostly agents using the inbox through MCP for their users, sometimes 10 seconds a search. The first report assumed people. The second loop worked out it was agents.' },
+    notes: 'No human filed this. A Postgres monitor fired, and it became a signal. The twist: the slow searches were mostly agents using the inbox through MCP for their users, sometimes 10 seconds a search.' },
   { chapter: 'search', node: 'report',
     when: '05:19', what: 'Agent researches and writes the report',
-    say: 'The agent finds the cause in the code and <em>predicts the impact</em>: "under 100ms, more than a 10x gain".',
+    say: 'The agent <i>thinks</i> it finds the cause in the code and <em>predicts the impact</em>: "under 100ms, more than a 10x gain".',
     links: [{ label: 'Report', href: 'https://us.posthog.com/project/2/inbox/01a133b3-b87d-7d72-a0d9-502221f9906d' }],
     img: 'search-report.png',
     notes: 'Point at "Expected impact" at the bottom. That prediction is what gets checked later. Write it down or you can never close the loop.' },
   { chapter: 'search', node: 'pr', delta: '+26m',
     when: '05:45', what: 'Agent opens PR #115874',
-    say: 'A coding agent opens the PR: two trigram indexes. <em>All tests pass.</em>',
+    say: 'A coding agent wants to add a GIN index. Two, actually. <em>All tests pass.</em>',
     links: [{ label: 'PR #115874', href: 'https://github.com/PostHog/posthog/pull/115874' }],
-    img: 'search-pr1.png',
-    notes: 'Nobody started this task by hand. It auto-started once the report was rated ready to fix.' },
+    img: 'search-pr1.png', meme: 'gatsby', memeCaption: 'Cheers to<br>GIN indexes 🍸<small>TIL what a GIN index is</small>',
+    notes: 'Nobody started this task by hand. It auto-started once the report was rated ready to fix. GIN is a Generalized Inverted Index: with pg_trgm it indexes 3-letter chunks of the text, so a LIKE search with a wildcard on both ends can use an index instead of reading every row.' },
   { chapter: 'search', node: 'merged', delta: '+1d',
     when: '14 Oct 06:27', what: 'I review it. Merged',
     say: 'I approve it, it merges, it deploys. <em>Most loops stop here.</em>',
     links: [{ label: 'PR #115874', href: 'https://github.com/PostHog/posthog/pull/115874' }],
-    img: 'search-pr1.png',
+    img: 'search-pr1.png', meme: 'stamp-approved', memeCaption: 'LGTM 👍<small>Me, approving a GIN index<br>I did not understand</small>',
     notes: 'This is where most agent demos end: green CI, merged, done. Pause here.' },
   { chapter: 'search', node: 'check', verdict: 'fail', delta: '+2d 9h',
     when: '16 Oct 15:43', what: 'Re-check: no longer holds',
@@ -382,7 +393,7 @@ const SCENES = [
     when: '19 Oct 02:40', what: 'Re-check: still holds',
     say: 'Re-checked after the soak: <em>0.69 to 0.79s</em>, one outlier. Now it is verified.',
     links: [{ label: 'Follow-up report with the passed check', href: 'https://us.posthog.com/project/2/inbox/01a14561-c1a5-7523-acdf-489788bffb08' }],
-    img: 'search-check-passed.png', hog: 'stamp-approved',
+    img: 'search-check-passed.png', hog: 'success',
     notes: 'Two loops, six days, one human click per PR.' },
 
   // The same story, as production saw it. Each press reveals one more annotation.
@@ -681,6 +692,7 @@ function render() {
         <div class="chapter">${CHAPTERS[scene.chapter]}</div>
         <h2 class="chapter-title">${SCENES[first].title}</h2>
         <ol class="steps">${steps}</ol>
+        ${scene.meme ? `<figure class="meme"><img src="${A}hogs/${scene.meme}.svg" alt=""><figcaption>${scene.memeCaption}</figcaption></figure>` : ''}
       </section>
       <section class="pane">
         <div class="sayrow"><p class="say">${scene.say}</p>${scene.hog ? `<img class="hog" src="${A}hogs/${scene.hog}.svg" alt="">` : ''}</div>
