@@ -162,6 +162,7 @@
   .slack em { font-style: italic; }
   .slack code { font-family: var(--mono); font-size: .85em; color: #c01343; background: #f6f6f6; border: 1px solid #e8e8e8; border-radius: 3px; padding: 0 .2em; }
   .slack mark { background: color-mix(in srgb, var(--lemon) 45%, transparent); color: inherit; border-radius: 2px; padding: 0 .1em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .qa h1 mark { background: color-mix(in srgb, var(--lemon) 55%, transparent); color: inherit; border-radius: 4px; padding: 0 .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
   .slack .sbtn { align-self: flex-start; font-weight: 700; font-size: .85vw; border: 1px solid #c8c8c8; border-radius: 6px; padding: .2vh .7vw; }
   .slack .sbtn.go { background: #007a5a; border-color: #007a5a; color: #fff; box-shadow: 0 0 0 0 rgba(0,122,90,.5); animation: ping 2s ease-out infinite; }
   @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(0,122,90,.45); } 70%, 100% { box-shadow: 0 0 0 .7vw rgba(0,122,90,0); } }
@@ -412,7 +413,7 @@ const SCENES = [
   { kind: 'big', chapter: 'intro', node: null,
     html: `<div class="qa">
       <div>
-        <h1><s>Ideas</s> PRs are cheap.<br><span>Following through<br>is the hard part (maybe?)</span></h1>
+        <h1><s>Ideas</s> PRs are cheap.<br><span>Getting the loop flowing<br>is super <mark>load bearing</mark>.</span></h1>
         <p>One real loop from when we were building our own inbox at PostHog.</p>
         <div class="presenter">
           <div class="avatar"><img src="${A}andy.jpg" alt="Andy Maguire"></div>
