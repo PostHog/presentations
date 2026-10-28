@@ -204,6 +204,11 @@
   .posts a.feature small { display: block; font-family: var(--mono); font-size: .95vw; font-weight: 500; color: var(--ink2); }
   .posts a { font-size: 1.45vw; font-weight: 700; color: var(--ink); text-decoration: none; border-left: 4px solid var(--accent); padding-left: 1vw; }
   .posts a:hover { color: var(--accent-ink); }
+  .presenter { display: flex; align-items: center; gap: 1.4vw; margin-top: 2vh; }
+  .presenter .avatar { width: 7.2vw; height: 7.2vw; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+  .presenter .avatar img { width: 6.7vw; height: 6.7vw; border-radius: 50%; object-fit: cover; background: #fff; }
+  .presenter .name { font-size: 1.9vw; font-weight: 700; line-height: 1.12; }
+  .presenter .role { font-size: 1.4vw; color: var(--ink3); }
   .side { display: flex; flex-direction: column; align-items: center; gap: 2vh; }
   .side .hog { height: 26vh; }
   .qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
@@ -270,6 +275,11 @@
 
   /* Phones: the projector layout is sized in vw, which shrinks to unreadable text. Stack and scroll instead. */
   @media (max-width: 800px) {
+    .presenter { gap: 12px; margin-top: 8px; }
+    .presenter .avatar { width: 56px; height: 56px; }
+    .presenter .avatar img { width: 52px; height: 52px; }
+    .presenter .name { font-size: 18px; }
+    .presenter .role { font-size: 14px; }
     html, body { height: auto; min-height: 100%; }
     body { overflow: auto; }
     .stage { height: auto; min-height: 100dvh; padding: 16px 16px 84px; gap: 16px; grid-template-rows: auto 1fr; }
@@ -404,6 +414,10 @@ const SCENES = [
       <div>
         <h1><s>Ideas</s> PRs are cheap.<br><span>Following through<br>is the hard part.</span></h1>
         <p>One real loop from when we were building our own inbox at PostHog.</p>
+        <div class="presenter">
+          <div class="avatar"><img src="${A}andy.jpg" alt="Andy Maguire"></div>
+          <div class="who"><div class="name">Andy Maguire</div><div class="role">AI Product Engineer · PostHog</div></div>
+        </div>
       </div>
       <div class="side">
         <img class="hog" src="${A}hogs/self-driving.svg" alt="A hedgehog in a self-driving car">
